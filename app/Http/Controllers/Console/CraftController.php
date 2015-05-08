@@ -14,7 +14,9 @@ class CraftController extends ConsoleController {
 	 */
 	public function index()
 	{
-		//
+        $rows = \App\Craft::paginate(10);
+
+        return view('console.craft.list', ['rows'=>$rows]);
 	}
 
 	/**

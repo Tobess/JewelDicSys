@@ -5,7 +5,7 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 
-class UsersController extends ConsoleController {
+class UserController extends ConsoleController {
 
 	/**
 	 * Display a listing of the resource.
@@ -14,7 +14,7 @@ class UsersController extends ConsoleController {
 	 */
 	public function index()
 	{
-		$users = \App\User::orderBy('updated_at', 'desc')->paginate(10);
+        $users = \App\User::orderBy('updated_at', 'desc')->paginate(10);
 
         return view('console.user.list', ['admins'=>$users]);
 	}

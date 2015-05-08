@@ -2,7 +2,7 @@
 
 @section('breadcrumb')
     <li><a class="text-muted">行业标准</a></li>
-    <li class="active"><a class="text-muted">材质分类</a></li>
+    <li class="active"><a class="text-muted">样式分类</a></li>
 @stop
 
 @section('toolLeft')
@@ -48,9 +48,9 @@
 @stop
 
 @section('footerLeft')
-    @include('layouts.blocks.jumper', ['paginator' => $rows, 'queries'=>'&query='.$query.'&parent='.$parent])
+    @include('layouts.blocks.jumper', ['paginator' => $rows, 'queries'=>'&query='.$query])
 @stop
 
 @section('footerRight')
-    @include('layouts.blocks.pager', ['paginator' =>$rows->appends(['query' => $query, 'parent' => $parent])])
+    @include('layouts.blocks.pager', ['paginator' =>$rows->appends(['query' => $query])])
 @stop

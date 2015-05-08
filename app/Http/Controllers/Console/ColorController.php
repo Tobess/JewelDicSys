@@ -14,7 +14,9 @@ class ColorController extends ConsoleController {
 	 */
 	public function index()
 	{
-		//
+        $rows = \App\Color::paginate(10);
+
+        return view('console.color.list', ['rows'=>$rows]);
 	}
 
 	/**

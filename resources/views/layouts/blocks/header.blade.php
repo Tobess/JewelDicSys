@@ -9,8 +9,7 @@
         </button>
         <!-- brand -->
         <a href="#/" class="navbar-brand text-lt">
-            <i class="fa fa-btc"></i>
-            <img src="/build/img/logo.png" alt="." class="hide">
+            <img src="/build/img/logo.png" alt=".">
             <span class="hidden-folded m-l-xs">珠宝词库</span>
         </a>
         <!-- / brand -->

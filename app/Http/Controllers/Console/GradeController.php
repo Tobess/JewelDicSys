@@ -14,7 +14,9 @@ class GradeController extends ConsoleController {
 	 */
 	public function index()
 	{
-		//
+        $rows = \App\Grade::paginate(10);
+
+        return view('console.grade.list', ['rows'=>$rows]);
 	}
 
 	/**

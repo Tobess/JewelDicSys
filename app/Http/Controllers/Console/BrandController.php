@@ -14,7 +14,9 @@ class BrandController extends ConsoleController {
 	 */
 	public function index()
 	{
-		//
+        $rows = \App\Brand::paginate(10);
+
+        return view('console.brand.list', ['rows'=>$rows]);
 	}
 
 	/**

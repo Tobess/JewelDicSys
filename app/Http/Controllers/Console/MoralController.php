@@ -14,7 +14,9 @@ class MoralController extends ConsoleController {
 	 */
 	public function index()
 	{
-		//
+        $rows = \App\Moral::paginate(10);
+
+        return view('console.moral.list', ['rows'=>$rows]);
 	}
 
 	/**

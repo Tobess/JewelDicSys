@@ -14,49 +14,49 @@
         </li>
         <li>
             <a href="/console/materials">
-                <i class="fa fa-users text-info-lter"></i>
+                <i class="fa fa-bars text-info-lter"></i>
                 <span class="font-bold">材质分类</span>
             </a>
         </li>
         <li>
             <a href="/console/varieties">
-                <i class="fa fa-warning text-info-lter"></i>
+                <i class="fa fa-sitemap text-info-lter"></i>
                 <span class="font-bold">样式分类</span>
             </a>
         </li>
         <li>
             <a href="/console/brands">
-                <i class="fa icon-feed text-info-lter"></i>
-                <span class="font-bold">行业品牌</span>
+                <i class="fa fa-btc text-info-lter"></i>
+                <span class="font-bold">珠宝品牌</span>
             </a>
         </li>
         <li>
             <a href="/console/crafts">
-                <i class="fa icon-question text-info-lter"></i>
+                <i class="icon icon-calculator text-info-lter"></i>
                 <span class="font-bold">加工工艺</span>
             </a>
         </li>
         <li>
             <a href="/console/colors">
-                <i class="fa icon-question text-info-lter"></i>
-                <span class="font-bold">珠宝颜色</span>
+                <i class="glyphicon glyphicon-adjust text-info-lter"></i>
+                <span class="font-bold">宝石颜色</span>
             </a>
         </li>
         <li>
             <a href="/console/grades">
-                <i class="fa icon-question text-info-lter"></i>
+                <i class="glyphicon glyphicon-signal text-info-lter"></i>
                 <span class="font-bold">宝石等级</span>
             </a>
         </li>
         <li>
             <a href="/console/styles">
-                <i class="fa icon-question text-info-lter"></i>
+                <i class="icon icon-fire text-info-lter"></i>
                 <span class="font-bold">珠宝款式</span>
             </a>
         </li>
         <li>
             <a href="/console/morals">
-                <i class="fa icon-question text-info-lter"></i>
+                <i class="glyphicon glyphicon-bookmark text-info-lter"></i>
                 <span class="font-bold">珠宝寓意</span>
             </a>
         </li>
@@ -66,8 +66,12 @@
         </li>
         <li>
             <a href="/console/users">
-                <i class="glyphicon glyphicon-heart text-info-lter"></i>
+                <i class="icon icon-users text-info-lter"></i>
                 <span>账号管理</span>
+            </a>
+            <a href="/console/rules">
+                <i class="icon icon-link text-info-lter"></i>
+                <span>名称规则</span>
             </a>
         </li>
     </ul>

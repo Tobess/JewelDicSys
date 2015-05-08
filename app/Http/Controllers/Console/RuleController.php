@@ -14,7 +14,9 @@ class RuleController extends Controller {
 	 */
 	public function index()
 	{
-		//
+        $rows = \App\Rule::paginate(10);
+
+        return view('console.rule.list', ['rows'=>$rows]);
 	}
 
 	/**

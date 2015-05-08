@@ -14,7 +14,18 @@ class MaterialController extends ConsoleController {
 	 */
 	public function index()
 	{
-		//
+        $que = \App\Material::select('code', 'name', 'description', 'pinyin');
+        $query = \Input::get('query', '');
+        if ($query) {
+            $que->where('code', '=', $query)->orWhere('name', '=', $query);
+        }
+        $parent = \Input::get('parent', 0);
+        if ($parent > 0) {
+            $que->where('parent', $parent);
+        }
+        $rows = $que->orderBy('code')->paginate(10);
+
+        return view('console.material.list', ['rows'=>$rows, 'query'=>$query, 'parent'=>$parent]);
 	}
 
 	/**

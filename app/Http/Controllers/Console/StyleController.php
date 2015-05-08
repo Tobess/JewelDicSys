@@ -14,7 +14,9 @@ class StyleController extends ConsoleController {
 	 */
 	public function index()
 	{
-		//
+        $rows = \App\Style::paginate(10);
+
+        return view('console.style.list', ['rows'=>$rows]);
 	}
 
 	/**
