@@ -2,7 +2,7 @@
 <!-- nav -->
 <nav ui-nav class="navi clearfix">
     <ul class="nav">
-        <li>
+        <li class="active">
             <a href="#">
                 <i class="fa fa-dashboard text-info-lter"></i>
                 <span>综合概况</span>
@@ -69,6 +69,8 @@
                 <i class="icon icon-users text-info-lter"></i>
                 <span>账号管理</span>
             </a>
+        </li>
+        <li>
             <a href="/console/rules">
                 <i class="icon icon-link text-info-lter"></i>
                 <span>名称规则</span>

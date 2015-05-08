@@ -24,9 +24,15 @@
 @stop
 
 @section('tableTitle')
+    <th style="width:20px;">
+        <label class="i-checks m-b-none">
+            <input type="checkbox"><i></i>
+        </label>
+    </th>
     <th>编号</th>
     <th>名称</th>
     <th>拼音</th>
+    <th>简拼</th>
     <th>描述</th>
     <th style="width:30px;"></th>
 @stop
@@ -38,6 +44,7 @@
         <td>{{ $row->code }}</td>
         <td>{{ $row->name }}</td>
         <td>{{ $row->pinyin }}</td>
+        <td>{{ $row->letter }}</td>
         <td>{{ $row->description }}</td>
         <td>
             <button class="btn btn-xs btn-info m-b-none" type="button">编辑</button>

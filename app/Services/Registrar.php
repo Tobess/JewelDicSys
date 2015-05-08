@@ -15,7 +15,9 @@ class Registrar implements RegistrarContract {
 	public function validator(array $data)
 	{
         // TODO CLOSE REGISTER SERVER
-        $data = [];
+        if (env('APP_ENV') != 'local') {
+            $data = [];
+        }
 
 		return Validator::make($data, [
 			'name' => 'required|max:255',

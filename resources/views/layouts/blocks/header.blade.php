@@ -10,7 +10,7 @@
         <!-- brand -->
         <a href="#/" class="navbar-brand text-lt">
             <img src="/build/img/logo.png" alt=".">
-            <span class="hidden-folded m-l-xs">珠宝词库</span>
+            <span class="hidden-folded m-l-xs">珠宝词库系统</span>
         </a>
         <!-- / brand -->
     </div>
