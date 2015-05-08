@@ -10,7 +10,7 @@
 				<div class="panel-heading">Home</div>
 
 				<div class="panel-body">
-					词库首页
+					<a href="/auth/login">登陆</a>
 				</div>
 			</div>
 		</div>

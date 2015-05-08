@@ -44,17 +44,10 @@
                 <footer class="panel-footer">
                     <div class="row">
                         <div class="col-sm-4 hidden-xs">
-                            @if ($admins->total() > 0)
-                            <select id="pageChooserBox" class="input-sm form-control w-sm inline v-middle">
-                                @for ($i = 1; $i <= $admins->lastPage(); $i++)
-                                <option value="{{ $i }}" {{ $admins->currentPage() == $i ? 'selected="selected"' : '' }}>第{{ $i }}页</option>
-                                @endfor
-                            </select>
-                            <button class="btn btn-sm btn-default" onclick="window.location.href='?page='+$('#pageChooserBox').val();">跳转</button>
-                            @endif
+                            @include('layouts.blocks.jumper', ['paginator' => $admins])
                         </div>
                         <div class="col-sm-4 text-center">
-                            <small class="text-muted inline m-t-sm m-b-sm">当前正显示第{{$admins->perPage()}}-{{$admins->perPage()}}条数据，本页{{$admins->count()}}条，共{{$admins->total()}}条</small>
+                            @include('layouts.blocks.counter', ['paginator' => $admins])
                         </div>
                         <div class="col-sm-4 text-right text-center-xs">
                             @include('layouts.blocks.pager', ['paginator' => $admins])
