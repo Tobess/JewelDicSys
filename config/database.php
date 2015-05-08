@@ -84,6 +84,18 @@ return [
 			'prefix'   => '',
 		],
 
+        'mongodb' => array(
+            'driver'   => 'mongodb',
+            'host'     => 'localhost',
+            'port'     => 27017,
+            'username' => null,
+            'password' => null,
+            'database' => 'dictionary',
+            'options' => array(
+                'db' => 'admin' // sets the authenication database required by mongo 3
+            )
+        ),
+
 	],
 
 	/*

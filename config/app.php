@@ -39,7 +39,7 @@ return [
 	|
 	*/
 
-	'timezone' => 'UTC',
+	'timezone' => 'PRC',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -145,6 +145,12 @@ return [
 		'App\Providers\EventServiceProvider',
 		'App\Providers\RouteServiceProvider',
 
+        /*
+         * The Third Party Service Providers...
+         */
+        'Overtrue\LaravelPinyin\ServiceProvider',
+        'Jenssegers\Mongodb\MongodbServiceProvider',
+
 	],
 
 	/*
@@ -192,6 +198,12 @@ return [
 		'URL'       => 'Illuminate\Support\Facades\URL',
 		'Validator' => 'Illuminate\Support\Facades\Validator',
 		'View'      => 'Illuminate\Support\Facades\View',
+
+        /*
+         * The Third Party Lib Aliases...
+         */
+        'Pinyin'    => 'Overtrue\Pinyin\Pinyin',
+        'Moloquent'       => 'Jenssegers\Mongodb\Model',
 
 	],
 

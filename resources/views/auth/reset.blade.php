@@ -1,6 +1,8 @@
-@extends('app')
+@extends('layouts.master')
 
-@section('content')
+@section('title', '密码重设')
+
+@section('container')
 <div class="container-fluid">
 	<div class="row">
 		<div class="col-md-8 col-md-offset-2">

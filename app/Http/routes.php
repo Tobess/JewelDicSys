@@ -11,11 +11,20 @@
 |
 */
 
-Route::get('/', 'WelcomeController@index');
-
-Route::get('home', 'HomeController@index');
+Route::get('/', 'HomeController@index');
+Route::get('/p', function(){
+    $words = [];
+    App\Word::split('an,qianzujinjiezhi', $words);
+    return Response::json($words);
+});
 
 Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',
 ]);
+
+Route::group(['namespace' => 'Console', 'prefix' => 'console'], function()
+{
+    Route::resource('/', 'ConsoleController');
+    Route::resource('users', 'UsersController');
+});

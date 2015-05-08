@@ -1,61 +1,49 @@
-@extends('app')
+@extends('layouts.master')
 
-@section('content')
-<div class="container-fluid">
-	<div class="row">
-		<div class="col-md-8 col-md-offset-2">
-			<div class="panel panel-default">
-				<div class="panel-heading">Login</div>
-				<div class="panel-body">
-					@if (count($errors) > 0)
-						<div class="alert alert-danger">
-							<strong>Whoops!</strong> There were some problems with your input.<br><br>
-							<ul>
-								@foreach ($errors->all() as $error)
-									<li>{{ $error }}</li>
-								@endforeach
-							</ul>
-						</div>
-					@endif
+@section('title', '登陆')
 
-					<form class="form-horizontal" role="form" method="POST" action="{{ url('/auth/login') }}">
-						<input type="hidden" name="_token" value="{{ csrf_token() }}">
+@section('container')
+<div class="app app-header-fixed  ">
 
-						<div class="form-group">
-							<label class="col-md-4 control-label">E-Mail Address</label>
-							<div class="col-md-6">
-								<input type="email" class="form-control" name="email" value="{{ old('email') }}">
-							</div>
-						</div>
 
-						<div class="form-group">
-							<label class="col-md-4 control-label">Password</label>
-							<div class="col-md-6">
-								<input type="password" class="form-control" name="password">
-							</div>
-						</div>
+    <div class="container w-xxl w-auto-xs" ng-controller="SigninFormController" ng-init="app.settings.container = false;">
+        <a href class="navbar-brand block m-t">黄金珠宝行业词库系统</a>
+        <div class="m-b-lg">
+            <form name="form" class="form-validation" role="form" method="POST" action="{{ url('/auth/login') }}">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-						<div class="form-group">
-							<div class="col-md-6 col-md-offset-4">
-								<div class="checkbox">
-									<label>
-										<input type="checkbox" name="remember"> Remember Me
-									</label>
-								</div>
-							</div>
-						</div>
+                <div class="text-danger wrapper text-center" ng-show="authError">
+                    @if (count($errors) > 0)
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+                <div class="list-group list-group-sm">
+                    <div class="list-group-item">
+                        <input name="email" type="email" placeholder="Email" class="form-control no-border" required value="{{ old('email') }}">
+                    </div>
+                    <div class="list-group-item">
+                        <input name="password" type="password" placeholder="Password" class="form-control no-border" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-lg btn-primary btn-block">登陆</button>
+                <div class="text-center m-t m-b"><a href="{{ url('/password/email') }}">忘记密码?</a></div>
+                <div class="line line-dashed"></div>
+                <p class="text-center"><small>没有账号?</small></p>
+                <a href="{{ url('/auth/register') }}" class="btn btn-lg btn-default btn-block">注册账号</a>
+            </form>
+        </div>
+        <div class="text-center">
+            <p>
+                <small class="text-muted">金企联盟 <br>&copy; 2015</small>
+            </p>
+        </div>
+    </div>
 
-						<div class="form-group">
-							<div class="col-md-6 col-md-offset-4">
-								<button type="submit" class="btn btn-primary">Login</button>
 
-								<a class="btn btn-link" href="{{ url('/password/email') }}">Forgot Your Password?</a>
-							</div>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
 </div>
 @endsection
+
