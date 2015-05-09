@@ -1,81 +1,44 @@
+<?php
+    $navTree = [
+        '行业标准',
+        ['path'=>'/console/materials', 'title'=>'材质分类', 'icon'=>'fa fa-bars'],
+        ['path'=>'/console/varieties', 'title'=>'样式分类', 'icon'=>'fa fa-sitemap'],
+        ['path'=>'/console/brands', 'title'=>'珠宝品牌', 'icon'=>'fa fa-btc'],
+        ['path'=>'/console/crafts', 'title'=>'加工工艺', 'icon'=>'icon icon-calculator'],
+        ['path'=>'/console/colors', 'title'=>'宝石颜色', 'icon'=>'glyphicon glyphicon-adjust'],
+        ['path'=>'/console/grades', 'title'=>'宝石等级', 'icon'=>'glyphicon glyphicon-signal'],
+        ['path'=>'/console/styles', 'title'=>'珠宝款式', 'icon'=>'icon icon-fire'],
+        ['path'=>'/console/morals', 'title'=>'珠宝寓意', 'icon'=>'glyphicon glyphicon-bookmark'],
+        '系统管理',
+        ['path'=>'/console/users', 'title'=>'账户管理', 'icon'=>'icon icon-users'],
+        ['path'=>'/console/rules', 'title'=>'名称规则', 'icon'=>'icon icon-link'],
+    ];
+    $selectedNav = '/'.Route::getCurrentRoute()->getPath();
+?>
 <!-- list -->
 <!-- nav -->
 <nav ui-nav class="navi clearfix">
     <ul class="nav">
-        <li class="active">
-            <a href="#">
+        <li {{ $selectedNav == '/console' ? 'class=active' : '' }}>
+            <a href="/console">
                 <i class="fa fa-dashboard text-info-lter"></i>
                 <span>综合概况</span>
             </a>
         </li>
-        <!-- clients center -->
-        <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
-            <span>行业标准</span>
-        </li>
-        <li>
-            <a href="/console/materials">
-                <i class="fa fa-bars text-info-lter"></i>
-                <span class="font-bold">材质分类</span>
-            </a>
-        </li>
-        <li>
-            <a href="/console/varieties">
-                <i class="fa fa-sitemap text-info-lter"></i>
-                <span class="font-bold">样式分类</span>
-            </a>
-        </li>
-        <li>
-            <a href="/console/brands">
-                <i class="fa fa-btc text-info-lter"></i>
-                <span class="font-bold">珠宝品牌</span>
-            </a>
-        </li>
-        <li>
-            <a href="/console/crafts">
-                <i class="icon icon-calculator text-info-lter"></i>
-                <span class="font-bold">加工工艺</span>
-            </a>
-        </li>
-        <li>
-            <a href="/console/colors">
-                <i class="glyphicon glyphicon-adjust text-info-lter"></i>
-                <span class="font-bold">宝石颜色</span>
-            </a>
-        </li>
-        <li>
-            <a href="/console/grades">
-                <i class="glyphicon glyphicon-signal text-info-lter"></i>
-                <span class="font-bold">宝石等级</span>
-            </a>
-        </li>
-        <li>
-            <a href="/console/styles">
-                <i class="icon icon-fire text-info-lter"></i>
-                <span class="font-bold">珠宝款式</span>
-            </a>
-        </li>
-        <li>
-            <a href="/console/morals">
-                <i class="glyphicon glyphicon-bookmark text-info-lter"></i>
-                <span class="font-bold">珠宝寓意</span>
-            </a>
-        </li>
-
-        <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
-            <span>系统管理</span>
-        </li>
-        <li>
-            <a href="/console/users">
-                <i class="icon icon-users text-info-lter"></i>
-                <span>账号管理</span>
-            </a>
-        </li>
-        <li>
-            <a href="/console/rules">
-                <i class="icon icon-link text-info-lter"></i>
-                <span>名称规则</span>
-            </a>
-        </li>
+        @foreach ($navTree as $nav)
+            @if (is_string($nav))
+                <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+                    <span>{{ $nav }}</span>
+                </li>
+            @else
+                <li {{ $selectedNav == $nav['path'] ? 'class=active' : '' }}>
+                    <a href="{{ $nav['path'] }}">
+                        <i class="{{ $nav['icon'] }} text-info-lter"></i>
+                        <span class="font-bold">{{ $nav['title'] }}</span>
+                    </a>
+                </li>
+            @endif
+        @endforeach
     </ul>
 </nav>
 <!-- nav -->

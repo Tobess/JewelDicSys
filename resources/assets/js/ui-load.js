@@ -26,13 +26,13 @@ var uiLoad = uiLoad || {};
 				promise = deferred.promise();
 			}
 
-      $.each(srcs, function(index, src) {
-      	promise = promise.then( function(){
-      		return src.indexOf('.css') >=0 ? loadCSS(src) : loadScript(src);
-      	} );
-      });
-      deferred.resolve();
-      return promise;
+            $.each(srcs, function(index, src) {
+            promise = promise.then( function(){
+                return src.indexOf('.css') >=0 ? loadCSS(src) : loadScript(src);
+            } );
+            });
+            deferred.resolve();
+            return promise;
 		};
 
 		/**
