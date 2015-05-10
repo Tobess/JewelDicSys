@@ -12,75 +12,77 @@ class MoralController extends ConsoleController {
 	 *
 	 * @return Response
 	 */
-	public function index()
+	public function getIndex()
 	{
         $rows = \App\Moral::paginate(10);
 
         return view('console.moral.list', ['rows'=>$rows]);
 	}
 
-	/**
-	 * Show the form for creating a new resource.
-	 *
-	 * @return Response
-	 */
-	public function create()
-	{
-		//
-	}
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function postStore()
+    {
+        $name = \Input::get('name');
+        if ($name) {
+            $moral = new \App\Moral;
+            $moral->name = $name;
+            $moral->pinyin = pinyin($name);
+            $moral->letter = letter($name);
+            $moral->save();
+        }
 
-	/**
-	 * Store a newly created resource in storage.
-	 *
-	 * @return Response
-	 */
-	public function store()
-	{
-		//
-	}
+        return redirect('console/morals');
+    }
 
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function show($id)
-	{
-		//
-	}
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function getProfile($id)
+    {
+        //
+    }
 
-	/**
-	 * Show the form for editing the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function edit($id)
-	{
-		//
-	}
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function postUpdate($id)
+    {
+        $name = \Input::get('name');
+        $moral = \App\Moral::find($id);
+        if ($name && $moral) {
+            $moral->name = $name;
+            $moral->pinyin = pinyin($name);
+            $moral->letter = letter($name);
+            $moral->save();
+        }
 
-	/**
-	 * Update the specified resource in storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function update($id)
-	{
-		//
-	}
+        return redirect('console/morals');
+    }
 
-	/**
-	 * Remove the specified resource from storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function destroy($id)
-	{
-		//
-	}
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function getDestroy($id)
+    {
+        $moral = \App\Moral::find($id);
+        if ($moral) {
+            $moral->delete();
+        }
+
+        return redirect('console/morals');
+    }
 
 }

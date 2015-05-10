@@ -12,21 +12,11 @@ class BrandController extends ConsoleController {
 	 *
 	 * @return Response
 	 */
-	public function index()
+	public function getIndex()
 	{
-        $rows = \App\Brand::paginate(10);
+        $rows = \App\Brand::paginate(20);
 
         return view('console.brand.list', ['rows'=>$rows]);
-	}
-
-	/**
-	 * Show the form for creating a new resource.
-	 *
-	 * @return Response
-	 */
-	public function create()
-	{
-		//
 	}
 
 	/**
@@ -34,9 +24,18 @@ class BrandController extends ConsoleController {
 	 *
 	 * @return Response
 	 */
-	public function store()
+	public function postStore()
 	{
-		//
+        $name = \Input::get('name');
+        if ($name) {
+            $brand = new \App\Brand;
+            $brand->name = $name;
+            $brand->pinyin = pinyin($name);
+            $brand->letter = letter($name);
+            $brand->save();
+        }
+
+        return redirect('console/brands');
 	}
 
 	/**
@@ -45,18 +44,7 @@ class BrandController extends ConsoleController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function show($id)
-	{
-		//
-	}
-
-	/**
-	 * Show the form for editing the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function edit($id)
+	public function getProfile($id)
 	{
 		//
 	}
@@ -67,9 +55,18 @@ class BrandController extends ConsoleController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update($id)
+	public function postUpdate($id)
 	{
-		//
+        $name = \Input::get('name');
+        $brand = \App\Brand::find($id);
+        if ($name && $brand) {
+            $brand->name = $name;
+            $brand->pinyin = pinyin($name);
+            $brand->letter = letter($name);
+            $brand->save();
+        }
+
+        return redirect('console/brands');
 	}
 
 	/**
@@ -78,9 +75,14 @@ class BrandController extends ConsoleController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($id)
+	public function getDestroy($id)
 	{
-		//
+        $brand = \App\Brand::find($id);
+        if ($brand) {
+            $brand->delete();
+        }
+
+        return redirect('console/brands');
 	}
 
 }

@@ -7,7 +7,7 @@
 
 @section('toolLeft')
     <span class="input-group-btn">
-      <button class="btn btn-sm btn-success" type="button">
+      <button class="btn btn-sm btn-success" type="button" onClick="save(0)">
           <i class="fa fa-plus"></i>
           新增
       </button>
@@ -31,13 +31,13 @@
     @foreach ($rows as $row)
     <tr>
         <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
-        <td>{{ $row->code }}</td>
-        <td>{{ $row->name }}</td>
+        <td id="styleCode{{ $row->id }}">{{ $row->code }}</td>
+        <td id="styleName{{ $row->id }}">{{ $row->name }}</td>
         <td>{{ $row->pinyin }}</td>
         <td>{{ $row->letter }}</td>
         <td>
-            <button class="btn btn-xs btn-info m-b-none" type="button">编辑</button>
-            <button class="btn btn-xs btn-danger m-b-none" type="button">删除</button>
+            <button class="btn btn-xs btn-info m-b-none" type="button" onClick="save({{ $row->id }})">编辑</button>
+            <a class="btn btn-xs btn-danger m-b-none" type="button" href="/console/styles/destroy/{{ $row->id }}">删除</a>
         </td>
     </tr>
     @endforeach
@@ -49,4 +49,26 @@
 
 @section('footerRight')
     @include('layouts.blocks.pager', ['paginator' =>$rows])
+@stop
+
+<!--编辑页面-->
+@section('extend')
+@include('console.style.form')
+@stop
+
+@section('scripts')
+<script>
+    function save(id) {
+        var mWin = $("#modalWin");
+        mWin.find('form').get(0).reset();
+        mWin.find('form').attr('action', "/console/styles/" + (id > 0 ? ('update/' + id) : 'store'));
+        if (id > 0) {
+            mWin.find('[name="name"]').val($("#styleName"+id).text());
+            mWin.find('[name="code"]').val($("#styleCode"+id).text());
+        }
+        mWin.find('[name="code"]').focus();
+
+        mWin.modal();
+    }
+</script>
 @stop

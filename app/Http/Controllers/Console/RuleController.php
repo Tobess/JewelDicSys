@@ -12,75 +12,81 @@ class RuleController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function index()
+	public function getIndex()
 	{
-        $rows = \App\Rule::paginate(10);
+        $rows = \App\Rule::paginate(20);
 
         return view('console.rule.list', ['rows'=>$rows]);
 	}
 
-	/**
-	 * Show the form for creating a new resource.
-	 *
-	 * @return Response
-	 */
-	public function create()
-	{
-		//
-	}
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function postStore()
+    {
+        $name = \Input::get('name');
+        $code = \Input::get('code');
+        if ($name || $code) {
+            $rule = new \App\Rule;
+            $rule->name = $name;
+            $rule->code = $code;
+            $rule->pinyin = pinyin($name);
+            $rule->letter = letter($name);
+            $rule->save();
+        }
 
-	/**
-	 * Store a newly created resource in storage.
-	 *
-	 * @return Response
-	 */
-	public function store()
-	{
-		//
-	}
+        return redirect('console/rules');
+    }
 
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function show($id)
-	{
-		//
-	}
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function getProfile($id)
+    {
+        //
+    }
 
-	/**
-	 * Show the form for editing the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function edit($id)
-	{
-		//
-	}
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function postUpdate($id)
+    {
+        $name = \Input::get('name');
+        $code = \Input::get('code');
+        $rule = \App\Rule::find($id);
+        if (($name || $code) && $rule) {
+            $rule->name = $name;
+            $rule->code = $code;
+            $rule->pinyin = pinyin($name);
+            $rule->letter = letter($name);
+            $rule->save();
+        }
 
-	/**
-	 * Update the specified resource in storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function update($id)
-	{
-		//
-	}
+        return redirect('console/rules');
+    }
 
-	/**
-	 * Remove the specified resource from storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function destroy($id)
-	{
-		//
-	}
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function getDestroy($id)
+    {
+        $rule = \App\Rule::find($id);
+        if ($rule) {
+            $rule->delete();
+        }
+
+        return redirect('console/rules');
+    }
 
 }

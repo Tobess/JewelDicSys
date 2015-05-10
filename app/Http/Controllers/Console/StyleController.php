@@ -12,75 +12,81 @@ class StyleController extends ConsoleController {
 	 *
 	 * @return Response
 	 */
-	public function index()
+	public function getIndex()
 	{
         $rows = \App\Style::paginate(10);
 
         return view('console.style.list', ['rows'=>$rows]);
 	}
 
-	/**
-	 * Show the form for creating a new resource.
-	 *
-	 * @return Response
-	 */
-	public function create()
-	{
-		//
-	}
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function postStore()
+    {
+        $name = \Input::get('name');
+        $code = \Input::get('code');
+        if ($name || $code) {
+            $style = new \App\Style;
+            $style->name = $name;
+            $style->code = $code;
+            $style->pinyin = pinyin($name);
+            $style->letter = letter($name);
+            $style->save();
+        }
 
-	/**
-	 * Store a newly created resource in storage.
-	 *
-	 * @return Response
-	 */
-	public function store()
-	{
-		//
-	}
+        return redirect('console/styles');
+    }
 
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function show($id)
-	{
-		//
-	}
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function getProfile($id)
+    {
+        //
+    }
 
-	/**
-	 * Show the form for editing the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function edit($id)
-	{
-		//
-	}
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function postUpdate($id)
+    {
+        $name = \Input::get('name');
+        $code = \Input::get('code');
+        $style = \App\Style::find($id);
+        if (($name || $code) && $style) {
+            $style->name = $name;
+            $style->code = $code;
+            $style->pinyin = pinyin($name);
+            $style->letter = letter($name);
+            $style->save();
+        }
 
-	/**
-	 * Update the specified resource in storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function update($id)
-	{
-		//
-	}
+        return redirect('console/styles');
+    }
 
-	/**
-	 * Remove the specified resource from storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function destroy($id)
-	{
-		//
-	}
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function getDestroy($id)
+    {
+        $style = \App\Style::find($id);
+        if ($style) {
+            $style->delete();
+        }
+
+        return redirect('console/styles');
+    }
 
 }

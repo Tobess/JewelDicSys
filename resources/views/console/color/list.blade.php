@@ -7,7 +7,7 @@
 
 @section('toolLeft')
     <span class="input-group-btn">
-      <button class="btn btn-sm btn-success" type="button">
+      <button class="btn btn-sm btn-success" type="button" onClick="save(0)">
           <i class="fa fa-plus"></i>
           新增
       </button>
@@ -23,19 +23,19 @@
     <th>名称</th>
     <th>拼音</th>
     <th>简拼</th>
-    <th style="width:30px;"></th>
+    <th style="width:106px;"></th>
 @stop
 
 @section('tableRows')
     @foreach ($rows as $row)
     <tr>
         <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
-        <td>{{ $row->name }}</td>
+        <td id="colorName{{ $row->id }}">{{ $row->name }}</td>
         <td>{{ $row->pinyin }}</td>
         <td>{{ $row->letter }}</td>
         <td>
-            <button class="btn btn-xs btn-info m-b-none" type="button">编辑</button>
-            <button class="btn btn-xs btn-danger m-b-none" type="button">删除</button>
+            <button class="btn btn-xs btn-info m-b-none" type="button" onClick="save({{ $row->id }})">编辑</button>
+            <a class="btn btn-xs btn-danger m-b-none" type="button" href="/console/colors/destroy/{{ $row->id }}">删除</a>
         </td>
     </tr>
     @endforeach
@@ -47,4 +47,25 @@
 
 @section('footerRight')
     @include('layouts.blocks.pager', ['paginator' =>$rows])
+@stop
+
+<!--编辑页面-->
+@section('extend')
+    @include('console.color.form')
+@stop
+
+@section('scripts')
+<script>
+    function save(id) {
+        var mWin = $("#modalWin");
+        mWin.find('form').get(0).reset();
+        mWin.find('form').attr('action', "/console/colors/" + (id > 0 ? ('update/' + id) : 'store'));
+        if (id > 0) {
+            mWin.find('[name="name"]').val($("#colorName"+id).text());
+        }
+        mWin.find('[name="name"]').focus();
+
+        mWin.modal();
+    }
+</script>
 @stop

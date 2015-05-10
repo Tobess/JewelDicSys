@@ -12,75 +12,77 @@ class CraftController extends ConsoleController {
 	 *
 	 * @return Response
 	 */
-	public function index()
+	public function getIndex()
 	{
         $rows = \App\Craft::paginate(10);
 
         return view('console.craft.list', ['rows'=>$rows]);
 	}
 
-	/**
-	 * Show the form for creating a new resource.
-	 *
-	 * @return Response
-	 */
-	public function create()
-	{
-		//
-	}
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function postStore()
+    {
+        $name = \Input::get('name');
+        if ($name) {
+            $craft = new \App\Craft;
+            $craft->name = $name;
+            $craft->pinyin = pinyin($name);
+            $craft->letter = letter($name);
+            $craft->save();
+        }
 
-	/**
-	 * Store a newly created resource in storage.
-	 *
-	 * @return Response
-	 */
-	public function store()
-	{
-		//
-	}
+        return redirect('console/crafts');
+    }
 
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function show($id)
-	{
-		//
-	}
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function getProfile($id)
+    {
+        //
+    }
 
-	/**
-	 * Show the form for editing the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function edit($id)
-	{
-		//
-	}
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function postUpdate($id)
+    {
+        $name = \Input::get('name');
+        $craft = \App\Craft::find($id);
+        if ($name && $craft) {
+            $craft->name = $name;
+            $craft->pinyin = pinyin($name);
+            $craft->letter = letter($name);
+            $craft->save();
+        }
 
-	/**
-	 * Update the specified resource in storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function update($id)
-	{
-		//
-	}
+        return redirect('console/crafts');
+    }
 
-	/**
-	 * Remove the specified resource from storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function destroy($id)
-	{
-		//
-	}
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function getDestroy($id)
+    {
+        $craft = \App\Craft::find($id);
+        if ($craft) {
+            $craft->delete();
+        }
+
+        return redirect('console/crafts');
+    }
 
 }

@@ -27,13 +27,13 @@ Route::group(['namespace' => 'Console', 'prefix' => 'console'], function()
 {
     Route::resource('/', 'ConsoleController');
     Route::resource('users', 'UserController');
-    Route::resource('brands', 'BrandController');
-    Route::resource('colors', 'ColorController');
-    Route::resource('crafts', 'CraftController');
-    Route::resource('grades', 'GradeController');
+    Route::controller('brands', 'BrandController');
+    Route::controller('colors', 'ColorController');
+    Route::controller('crafts', 'CraftController');
+    Route::controller('grades', 'GradeController');
     Route::resource('materials', 'MaterialController');
-    Route::resource('morals', 'MoralController');
-    Route::resource('rules', 'RuleController');
-    Route::resource('styles', 'StyleController');
+    Route::controller('morals', 'MoralController');
+    Route::controller('rules', 'RuleController');
+    Route::controller('styles', 'StyleController');
     Route::resource('varieties', 'VarietyController');
 });
