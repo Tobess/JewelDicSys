@@ -8,11 +8,14 @@ use Illuminate\Database\Eloquent\Model;
  */
 class WRef {
 
-    const CACHE_KEY_WORD_DIC = 'words:dic:';
     const CACHE_KEY_WORD_SEARCH = 'words:search:';
+    const CACHE_KEY_WORD_DIC = 'words:dic:';
+    const CACHE_KEY_WORD_MATCH = 'words:match:';
     const CACHE_KEY_WORD_SPLIT = 'words:split:';
 
     const CACHE_KEY_PINYIN_IDX = 'pinyin:index';
+
+    const CACHE_KEY_WORD_SEARCH_EXPIRE = 15*24*60;
 
     /**
      * 名称生成规则元素类型

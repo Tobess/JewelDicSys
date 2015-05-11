@@ -18,9 +18,20 @@ class HomeController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function index()
+	public function getIndex()
 	{
 		return view('home');
 	}
 
+    /**
+     * Search jewel property & product name by chinese pinyin.
+     *
+     * @param string $query
+     * @return Response
+     */
+    public function getSearch()
+    {
+        $query = \Input::get('query');
+        return \Response::json(\App\Word::search($query));
+    }
 }

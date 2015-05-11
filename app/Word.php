@@ -43,8 +43,8 @@ class Word extends Model {
         } else {
             $cPinyin = $pinyin =trim($pinyin);
         }
-        if (\Cache::has(\App\WRef::CACHE_KEY_WORD_SEARCH.$cPinyin)) {
-            $words = unserialize(\Cache::get(\App\WRef::CACHE_KEY_WORD_SEARCH.$cPinyin));
+        if (\Cache::has(\App\WRef::CACHE_KEY_WORD_MATCH.$cPinyin)) {
+            $words = unserialize(\Cache::get(\App\WRef::CACHE_KEY_WORD_MATCH.$cPinyin));
             return;
         }
 
@@ -88,7 +88,7 @@ class Word extends Model {
         if (count($strings)) {
             self::match($strings, $words);
             if (count($words) > $lenMatched) {
-                \Cache::forever(\App\WRef::CACHE_KEY_WORD_SEARCH.implode('', $strings), serialize(array_slice($words, $lenMatched)));
+                \Cache::forever(\App\WRef::CACHE_KEY_WORD_MATCH.implode('', $strings), serialize(array_slice($words, $lenMatched)));
             }
         }
     }
@@ -185,5 +185,33 @@ class Word extends Model {
         }
 
         \App\WRelation::link($py->id, $relType, $relId);
+    }
+
+    public static function search($query)
+    {
+        // 从缓存中确定匹配结果
+        if (\Cache::has(\App\WRef::CACHE_KEY_WORD_SEARCH.$query)) {
+            $results = unserialize(\Cache::get(\App\WRef::CACHE_KEY_WORD_SEARCH.$query));
+            return $results;
+        }
+
+        // 匹配出相关元素
+        $words = [];
+        if (\Cache::has(\App\WRef::CACHE_KEY_WORD_MATCH.$query)) {
+            $words = unserialize(\Cache::get(\App\WRef::CACHE_KEY_WORD_MATCH.$query));
+        } else {
+            self::match($query, $words);
+            if (count($words)) {
+                \Cache::forever(\App\WRef::CACHE_KEY_WORD_MATCH.$query, serialize($words));
+            }
+        }
+
+        // 结合名称生成规则分析元素合成名称待选项目
+        $results = [];
+
+        // 缓存数据
+        \Cache::put(\App\WRef::CACHE_KEY_WORD_SEARCH.$query, serialize($results), \App\WRef::CACHE_KEY_WORD_SEARCH_EXPIRE);
+
+        return $results;
     }
 }

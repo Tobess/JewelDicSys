@@ -11,12 +11,8 @@
 |
 */
 
-Route::get('/', 'HomeController@index');
-Route::get('/p', function(){
-    $words = [];
-    App\Word::match('an,qianzujinjiezhi', $words);
-    return Response::json($words);
-});
+Route::get('/', 'HomeController@getIndex');
+Route::get('search', 'HomeController@getSearch');
 
 Route::controllers([
 	'auth' => 'Auth\AuthController',
