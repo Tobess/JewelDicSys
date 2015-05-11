@@ -14,7 +14,7 @@
 Route::get('/', 'HomeController@index');
 Route::get('/p', function(){
     $words = [];
-    App\Word::split('an,qianzujinjiezhi', $words);
+    App\Word::match('an,qianzujinjiezhi', $words);
     return Response::json($words);
 });
 
@@ -25,7 +25,8 @@ Route::controllers([
 
 Route::group(['namespace' => 'Console', 'prefix' => 'console'], function()
 {
-    Route::resource('/', 'ConsoleController');
+    Route::get('/', 'DashboardController@getIndex');
+    Route::controller('dashboard', 'DashboardController');
     Route::resource('users', 'UserController');
     Route::controller('brands', 'BrandController');
     Route::controller('colors', 'ColorController');

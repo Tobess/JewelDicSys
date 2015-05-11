@@ -24,32 +24,44 @@
 						<input type="hidden" name="_token" value="{{ csrf_token() }}">
 
 						<div class="form-group">
-							<label class="col-md-4 control-label">Name</label>
+							<label class="col-md-4 control-label">姓名</label>
 							<div class="col-md-6">
-								<input type="text" class="form-control" name="name" value="{{ old('name') }}">
+								<input id="name" type="text" class="form-control" name="name" value="{{ old('name') }}">
 							</div>
 						</div>
 
 						<div class="form-group">
-							<label class="col-md-4 control-label">E-Mail Address</label>
+							<label class="col-md-4 control-label">电子邮箱</label>
 							<div class="col-md-6">
-								<input type="email" class="form-control" name="email" value="{{ old('email') }}">
+								<input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}">
 							</div>
 						</div>
 
 						<div class="form-group">
-							<label class="col-md-4 control-label">Password</label>
+							<label class="col-md-4 control-label">密码</label>
 							<div class="col-md-6">
 								<input type="password" class="form-control" name="password">
 							</div>
 						</div>
 
 						<div class="form-group">
-							<label class="col-md-4 control-label">Confirm Password</label>
+							<label class="col-md-4 control-label">密码确认</label>
 							<div class="col-md-6">
 								<input type="password" class="form-control" name="password_confirmation">
 							</div>
 						</div>
+
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">验证码</label>
+                            <div class="col-md-6">
+                                <input type="text" class="form-control" name="token">
+                            </div>
+                            <div class="col-md">
+                                <a id="tokenBtn" type="button" class="btn" onClick="send_verify_code()">
+                                    获取
+                                </a>
+                            </div>
+                        </div>
 
 						<div class="form-group">
 							<div class="col-md-6 col-md-offset-4">
@@ -65,3 +77,52 @@
 	</div>
 </div>
 @endsection
+
+@section('scripts')
+    <script>
+        function send_verify_code() {
+            var name = $("#name").val(),
+                email = $("#email").val();
+            if (name && email) {
+                var stopLoading = false;
+                loading();
+                $.ajax({
+                    url: "/auth/verify-code",
+                    data:{'email':email, 'name': name},
+                    type: "GET",
+                    dataType:'json',
+                    success:function(data){
+                        if (data) {
+                            data.message ? alert(data.message) : alert('验证码发送成功，请联系系统管理，所要验证码。');
+                        } else {
+                            stopLoading = true;
+                            alert('未知错误。');
+                        }
+                    },
+                    error:function(error) {
+                        stopLoading = true;
+                        alert('验证码发送失败。');
+                    }
+                });
+            } else {
+                alert('请输入姓名和电子邮箱地址。');
+                return;
+            }
+
+            var time = 60,
+                $btn = $("#tokenBtn");
+            function loading() {
+                var timer = setInterval(function(){
+                    $btn.text(time + '秒后重新获取');
+                    $btn[0].disabled = true;
+                    time--;
+                    if (time == 0 || stopLoading) {
+                        $btn[0].disabled = false;
+                        $btn.text('获取');
+                        clearInterval(timer);
+                    }
+                }, 1000);
+            }
+        }
+    </script>
+@stop

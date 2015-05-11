@@ -13,15 +13,15 @@ class WPinyin extends Model {
      */
     public static function getAllAndCache()
     {
-        if (\Cache::has('pinyin')) {
-            $pinyins = explode('|', \Cache::get('pinyin'));
+        if (\Cache::has(\App\WRef::CACHE_KEY_PINYIN_IDX)) {
+            $pinyins = explode('|', \Cache::get(\App\WRef::CACHE_KEY_PINYIN_IDX));
         } else {
             $pinyins = [];
             foreach (self::all() as $pinyin) {
                 $pinyins[] = $pinyin->key;
             }
 
-            \Cache::forever('pinyin', implode('|', $pinyins));
+            \Cache::forever(\App\WRef::CACHE_KEY_PINYIN_IDX, implode('|', $pinyins));
         }
 
         return $pinyins;

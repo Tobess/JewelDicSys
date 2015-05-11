@@ -17,15 +17,15 @@ class Word extends Model {
     /*
      * 获得拼音词条(缓存)
      */
-    public function getOrCacheByKey($key)
+    public static function getOrCacheByKey($key)
     {
-        if (\Cache::has('words:dic:'.$key)) {
-            $id = explode('|', \Cache::get('words:dic:'.$key));
+        if (\Cache::has(\App\WRef::CACHE_KEY_WORD_DIC.$key)) {
+            $id = explode('|', \Cache::get(\App\WRef::CACHE_KEY_WORD_DIC.$key));
         } else {
             $word = self::where('key', $key)->first();
             if ($word && $word->id > 0) {
                 $id = $word->id;
-                \Cache::forever('words:dic:'.$key, $id);
+                \Cache::forever(\App\WRef::CACHE_KEY_WORD_DIC.$key, $id);
             }
         }
 
@@ -43,8 +43,8 @@ class Word extends Model {
         } else {
             $cPinyin = $pinyin =trim($pinyin);
         }
-        if (\Cache::has('words:search:'.$pinyin)) {
-            $words = unserialize(\Cache::get('words:search:'.$pinyin));
+        if (\Cache::has(\App\WRef::CACHE_KEY_WORD_SEARCH.$cPinyin)) {
+            $words = unserialize(\Cache::get(\App\WRef::CACHE_KEY_WORD_SEARCH.$cPinyin));
             return;
         }
 
@@ -59,6 +59,8 @@ class Word extends Model {
                 for ($i = 0; $i < $strlen; $i++) {
                     $strings[] = substr($pinyin, $i, 1);
                 }
+            } else {
+                \Cache::forever(\App\WRef::CACHE_KEY_WORD_DIC.$pinyin, implode('|', $strings));
             }
         }
 
@@ -86,7 +88,7 @@ class Word extends Model {
         if (count($strings)) {
             self::match($strings, $words);
             if (count($words) > $lenMatched) {
-                \Cache::forever('words:search:'.implode('', $strings), serialize(array_slice($words, $lenMatched)));
+                \Cache::forever(\App\WRef::CACHE_KEY_WORD_SEARCH.implode('', $strings), serialize(array_slice($words, $lenMatched)));
             }
         }
     }
@@ -97,8 +99,8 @@ class Word extends Model {
     public static function split($pinyin, &$words)
     {
         $pinyin = trim($pinyin);
-        if (\Cache::has('words:split:'.$pinyin)) {
-            $words = explode('|', \Cache::get('words:split:'.$pinyin));
+        if (\Cache::has(\App\WRef::CACHE_KEY_WORD_DIC.$pinyin)) {
+            $words = explode('|', \Cache::get(\App\WRef::CACHE_KEY_WORD_DIC.$pinyin));
             return true;
         }
 
@@ -128,7 +130,7 @@ class Word extends Model {
             if ($pinyin) {
                 $state = self::split($pinyin, $words);
                 if ($state) {
-                    \Cache::forever('words:split:'.$pinyin, implode('|', array_slice($words, $lenMatched)));
+                    \Cache::forever(\App\WRef::CACHE_KEY_WORD_DIC.$pinyin, implode('|', array_slice($words, $lenMatched)));
                 }
 
                 return $state;
@@ -162,5 +164,26 @@ class Word extends Model {
         }
 
         return $poses;
+    }
+
+    /**
+     * 生成拼音与名称元素的关联
+     *
+     * @param int $relType 名称元素类型
+     * @param int $relId   名称元素类型ID
+     * @param string 名称拼音或简拼
+     *
+     * @return void
+     */
+    public static function wordRefToLink($relType, $relId, $pinyin)
+    {
+        $py = self::where('key', $pinyin)->first();
+        if (!$py || !$py->id) {
+            $py = new self;
+            $py->key = $pinyin;
+            $py->save();
+        }
+
+        \App\WRelation::link($py->id, $relType, $relId);
     }
 }

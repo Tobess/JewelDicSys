@@ -1,11 +1,11 @@
 <?php namespace App\Http\Controllers\Console;
 
 use App\Http\Requests;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\ConsoleController;
 
 use Illuminate\Http\Request;
 
-class RuleController extends Controller {
+class RuleController extends ConsoleController {
 
 	/**
 	 * Display a listing of the resource.

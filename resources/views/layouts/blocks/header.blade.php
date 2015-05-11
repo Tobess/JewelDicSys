@@ -29,11 +29,65 @@
         <!-- nabar right -->
         <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
+                <a id="generateBtn" href="#" data-toggle="dropdown" class="dropdown-toggle clear" data-toggle="dropdown">
+                    <span class="hidden-sm hidden-md">词库生成</span>
+                    <b class="caret"></b>
+                </a>
+                <!-- dropdown -->
+                <ul class="dropdown-menu animated fadeInTop">
+                    <li>
+                        <a>
+                            <span class="hidden-sm hidden-md" onclick="generateDic(1);">宝石分类</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a>
+                            <span class="hidden-sm hidden-md" onclick="generateDic(2);">金属分类</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a>
+                            <span class="hidden-sm hidden-md" onclick="generateDic(3);">样式分类</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a>
+                            <span class="hidden-sm hidden-md" onclick="generateDic(4);">珠宝品牌</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a>
+                            <span class="hidden-sm hidden-md" onclick="generateDic(5);">加工工艺</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a>
+                            <span class="hidden-sm hidden-md" onclick="generateDic(6);">宝石颜色</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a>
+                            <span class="hidden-sm hidden-md" onclick="generateDic(7);">宝石等级</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a>
+                            <span class="hidden-sm hidden-md" onclick="generateDic(8);">珠宝款式</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a>
+                            <span class="hidden-sm hidden-md" onclick="generateDic(9);">珠宝寓意</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="dropdown">
                 <a href="#" data-toggle="dropdown" class="dropdown-toggle clear" data-toggle="dropdown">
-              <span class="thumb-sm avatar pull-right m-t-n-sm m-b-n-sm m-l-sm">
-                <img src="/build/img/a0.jpg" alt="...">
-                <i class="on md b-white bottom"></i>
-              </span>
+                  <span class="thumb-sm avatar pull-right m-t-n-sm m-b-n-sm m-l-sm">
+                    <img src="/build/img/a0.jpg" alt="...">
+                    <i class="on md b-white bottom"></i>
+                  </span>
                     <span class="hidden-sm hidden-md">13666120159</span> <b class="caret"></b>
                 </a>
                 <!-- dropdown -->

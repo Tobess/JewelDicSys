@@ -39,4 +39,31 @@ class AuthController extends Controller {
 		$this->middleware('guest', ['except' => 'getLogout']);
 	}
 
+    /**
+     * Send register token to administrator.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getVerifyCode()
+    {
+        $name = \Input::get('name');
+        $email = \Input::get('email');
+        if ($name && $email) {
+            if (\App\User::where('email', $email)->count()) {
+                return \Response::json(['message'=>'该电子邮箱已经注册.']);
+            }
+
+            $token = mt_rand(10000000, 99999999);
+            \Session::put('verify_code', $token);
+            \Mail::raw($name.'正在注册珠宝名称系统，验证码为：'.$token, function($message)
+            {
+                $message->to('product@fromai.com', '智爱科技－产品部');
+            });
+            return \Response::json([]);
+        } else {
+            return \Response::json(['message'=>'姓名或电子邮箱地址不能为空.']);
+        }
+    }
+
 }

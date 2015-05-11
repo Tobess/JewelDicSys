@@ -1,4 +1,4 @@
-<?php namespace App\Http\Controllers\Console;
+<?php namespace App\Http\Controllers;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -17,13 +17,4 @@ class ConsoleController extends Controller {
         $this->middleware('auth');
     }
 
-    /**
-     * Show the application dashboard to the user.
-     *
-     * @return Response
-     */
-    public function index()
-    {
-        return view('console.main');
-    }
 }

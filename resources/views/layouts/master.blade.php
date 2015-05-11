@@ -27,6 +27,35 @@
 <script src="{{ asset('build/js/jquery.min.js') }}"></script>
 <script src="{{ asset('build/js/bootstrap.js') }}"></script>
 <script src="{{ elixir("js/all.js") }}"></script>
+<script>
+    // 词库生成
+    function generateDic(type) {
+        if (type <= 0) {
+            alert('无效的名称元素类型。');
+            return;
+        }
+
+        var $btn = $("#generateBtn");
+        $btn[0].disabled = true;
+        $.ajax({
+            url: "/console/dashboard/generate-cache/" + type,
+            type: "GET",
+            dataType:'json',
+            success:function(data){
+                if (data) {
+                    data.message ? alert(data.message) : alert('词库生成成功。');
+                } else {
+                    alert('未知错误。');
+                }
+                $btn[0].disabled = false;
+            },
+            error:function(error) {
+                alert('词库生成失败。');
+                $btn[0].disabled = false;
+            }
+        });
+    }
+</script>
 
 @yield('scripts')
 
