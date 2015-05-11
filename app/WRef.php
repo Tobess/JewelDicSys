@@ -15,7 +15,7 @@ class WRef {
 
     const CACHE_KEY_PINYIN_IDX = 'pinyin:index';
 
-    const CACHE_KEY_WORD_SEARCH_EXPIRE = 15*24*60;
+    const CACHE_KEY_WORD_SEARCH_EXPIRE = 21600;
 
     /**
      * 名称生成规则元素类型
