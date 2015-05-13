@@ -22,6 +22,7 @@ class CreateWordTable extends Migration {
         // 词关系
         Schema::create('words_relations', function(Blueprint $table)
         {
+            $table->primary(array('word_id', 'rel_type', 'rel_id'));
             $table->integer('word_id')->unsigned();
             $table->foreign('word_id')->references('id')->on('words');
             $table->tinyInteger('rel_type');

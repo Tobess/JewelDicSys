@@ -34,6 +34,7 @@ class DashboardController extends ConsoleController {
             $data = $dQue->get();
             foreach ($data as $row) {
                 \App\Word::wordRefToLink($type, $row->id, $row->pinyin);
+                \App\Word::wordRefToLink($type, $row->id, $row->letter, false);
             }
 
             return \Response::json([]);

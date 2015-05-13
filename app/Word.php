@@ -181,11 +181,41 @@ class Word extends Model {
      * @param int $relType 名称元素类型
      * @param int $relId   名称元素类型ID
      * @param string 名称拼音或简拼
+     * @param bool $isFullPy 是否是全拼
      *
      * @return void
      */
-    public static function wordRefToLink($relType, $relId, $pinyin)
+    public static function wordRefToLink($relType, $relId, $pinyin, $isFullPy = true)
     {
+        if ($isFullPy) {
+            $pySplits = [];
+            self::split($pinyin, $pySplits);
+            if (count($pySplits)) {
+                $posPySplits = $oppPySplits = $pySplits;
+                // 正向拆分
+                $pinyin = '';
+                while ($word = array_shift($posPySplits)) {
+                    $pinyin .= $word;
+                    self::wordLinkSave($relType, $relId, $pinyin);
+                }
+                // 反向拆分
+                array_shift($oppPySplits);
+                $pinyin = '';
+                while ($word = array_pop($posPySplits)) {
+                    $pinyin = $word.$pinyin;
+                    self::wordLinkSave($relType, $relId, $pinyin);
+                }
+                return;
+            }
+        }
+
+        self::wordLinkSave($relType, $relId, $pinyin);
+    }
+
+    /**
+     * 添加词根并保存拼音链接关系
+     */
+    private static function wordLinkSave($relType, $relId, $pinyin) {
         $py = self::where('key', $pinyin)->first();
         if (!$py || !$py->id) {
             $py = new self;
@@ -223,7 +253,13 @@ class Word extends Model {
             self::getWordsLinkRelation($words, $typeLinks, $types);
 
             // 用词条的匹配的类型集合与系统名称规则定义的配置对比分析找出与之匹配的规则
-            //
+            if (count($types)) {
+                \Log::debug('types->'.print_r($types, true));
+                $matchRules = self::matchRules($types);
+                \Log::debug('match->rules:'.print_r($matchRules, true));
+
+                // 用规则生成结果列表
+            }
         }
 
         // 结合名称生成规则分析元素合成名称待选项目
@@ -259,7 +295,36 @@ class Word extends Model {
 
     private static function matchRules($types)
     {
+        if (!count($types)) return false;
+
         // TODO 暂时支持单一规则当时。复杂规则下一步处理
-        $rules
+        // 将已经匹配的名称组合元素生成正则匹配表达式
+        $regex = '';
+        $linkExt = '';
+        foreach ($types as $type) {
+            $regex .= $linkExt.'(\+['.implode(',', $type).']\+)';
+            $linkExt = '+.+';
+        }
+        \Log::debug('regex->:'.$regex);
+        if (!empty($regex)) {
+            if (\Cache::has(\App\WRef::CACHE_KEY_RULE_MATCH.$regex)) {
+                $matches = unserialize(\Cache::get(\App\WRef::CACHE_KEY_RULE_MATCH.$regex));
+                return $matches;
+            }
+
+            $rules = \App\Rule::getRulesAndCache();
+            $matches = [];
+            foreach ($rules as $rule) {
+                if (preg_match('/'.$regex.'/', $rule)) {
+                    $matches[] = $rule;
+                }
+            }
+            if (count($matches)) {
+                \Cache::put(\App\WRef::CACHE_KEY_RULE_MATCH.$regex, serialize($matches), \App\WRef::CACHE_KEY_WORD_SEARCH_EXPIRE);
+                return $matches;
+            }
+        }
+
+        return false;
     }
 }
