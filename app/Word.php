@@ -20,11 +20,12 @@ class Word extends Model {
     public static function getOrCacheByKey($key)
     {
         if (\Cache::has(\App\WRef::CACHE_KEY_WORD_DIC.$key)) {
-            $id = explode('|', \Cache::get(\App\WRef::CACHE_KEY_WORD_DIC.$key));
+            $id = \Cache::get(\App\WRef::CACHE_KEY_WORD_DIC.$key);
         } else {
             $word = self::where('key', $key)->first();
             if ($word && $word->id > 0) {
                 $id = $word->id;
+                \Log::debug('mathch:'.$key.'->'.print_r($word->count(), true));
                 \Cache::forever(\App\WRef::CACHE_KEY_WORD_DIC.$key, $id);
             }
         }
@@ -35,7 +36,7 @@ class Word extends Model {
     /*
      * 通过拼音匹配出与拼音相关联的词汇元素
      */
-    public static function match($pinyin, $words)
+    private static function match($pinyin, &$words)
     {
         // 首先从缓存中查询相应词条是否存在
         if (is_array($pinyin)) {
@@ -44,7 +45,10 @@ class Word extends Model {
             $cPinyin = $pinyin =trim($pinyin);
         }
         if (\Cache::has(\App\WRef::CACHE_KEY_WORD_MATCH.$cPinyin)) {
-            $words = unserialize(\Cache::get(\App\WRef::CACHE_KEY_WORD_MATCH.$cPinyin));
+            $cWords = unserialize(\Cache::get(\App\WRef::CACHE_KEY_WORD_MATCH.$cPinyin));
+            foreach ($cWords as $word) {
+                $words[] = $word;
+            }
             return;
         }
 
@@ -60,7 +64,8 @@ class Word extends Model {
                     $strings[] = substr($pinyin, $i, 1);
                 }
             } else {
-                \Cache::forever(\App\WRef::CACHE_KEY_WORD_DIC.$pinyin, implode('|', $strings));
+                \Log::debug('split:'.print_r($strings, true));
+                \Cache::forever(\App\WRef::CACHE_KEY_WORD_SPLIT.$pinyin, implode('|', $strings));
             }
         }
 
@@ -70,18 +75,19 @@ class Word extends Model {
         while ($string = array_shift($strings)) {
             $word .= $string;
             $wordId = self::getOrCacheByKey($word);
-            if ($wordId === false) {
-                break;
-            }
+            //if ($wordId === false) {
+            //    break;
+            //}
 
             array_push($matches, $word);
         }
 
         // 匹配结果处理
         $words[] = $word = array_pop($matches);
-        foreach ($matches as $word) {
-            $words[] = $word;
-        }
+        //foreach ($matches as $word) {
+        //    $words[] = $word;
+        //}
+        \Log::debug('word:'.$cPinyin.':'.print_r($words, true));
 
         // 继续匹配剩下的词条
         $lenMatched = count($words);
@@ -99,8 +105,11 @@ class Word extends Model {
     public static function split($pinyin, &$words)
     {
         $pinyin = trim($pinyin);
-        if (\Cache::has(\App\WRef::CACHE_KEY_WORD_DIC.$pinyin)) {
-            $words = explode('|', \Cache::get(\App\WRef::CACHE_KEY_WORD_DIC.$pinyin));
+        if (\Cache::has(\App\WRef::CACHE_KEY_WORD_SPLIT.$pinyin)) {
+            $cWords = explode('|', \Cache::get(\App\WRef::CACHE_KEY_WORD_SPLIT.$pinyin));
+            foreach ($cWords as $word) {
+                $words[] = $word;
+            }
             return true;
         }
 
@@ -130,7 +139,7 @@ class Word extends Model {
             if ($pinyin) {
                 $state = self::split($pinyin, $words);
                 if ($state) {
-                    \Cache::forever(\App\WRef::CACHE_KEY_WORD_DIC.$pinyin, implode('|', array_slice($words, $lenMatched)));
+                    \Cache::forever(\App\WRef::CACHE_KEY_WORD_SPLIT.$pinyin, implode('|', array_slice($words, $lenMatched)));
                 }
 
                 return $state;
@@ -201,17 +210,56 @@ class Word extends Model {
             $words = unserialize(\Cache::get(\App\WRef::CACHE_KEY_WORD_MATCH.$query));
         } else {
             self::match($query, $words);
+            \Log::debug('words->'.$query.':'.print_r($words, true));
             if (count($words)) {
                 \Cache::forever(\App\WRef::CACHE_KEY_WORD_MATCH.$query, serialize($words));
             }
         }
+        // 如果存在匹配元素则进行规则匹配流程
+        if (count($words)) {
+            $types = [];
+            $typeLinks = [];
+            // 取出词根包含的名称组成元素类型集合
+            self::getWordsLinkRelation($words, $typeLinks, $types);
+
+            // 用词条的匹配的类型集合与系统名称规则定义的配置对比分析找出与之匹配的规则
+            //
+        }
 
         // 结合名称生成规则分析元素合成名称待选项目
         $results = [];
+        $rules = \App\Rule::getRulesAndCache();
+
 
         // 缓存数据
         \Cache::put(\App\WRef::CACHE_KEY_WORD_SEARCH.$query, serialize($results), \App\WRef::CACHE_KEY_WORD_SEARCH_EXPIRE);
 
         return $results;
+    }
+
+    /**
+     * 获取已匹配的词根的词汇组成关系
+     */
+    private static function getWordsLinkRelation($words, &$relTypeQue, &$relTypes)
+    {
+        foreach ($words as $index => $pinyin) {
+            if (($wId = self::getOrCacheByKey($pinyin)) !== false) {
+                $links = \App\WRelation::getLinksAndCacheByWordID($wId);
+                foreach ($links as $link) {
+                    if (!isset($relTypeQue[$link->rel_type]) || !in_array($link->rel_id, $relTypeQue[$link->rel_type])) {
+                        $relTypeQue[$link->rel_type][] = $link->rel_id;
+                    }
+                    if (!isset($relTypes[$index]) || !in_array($link->rel_type, $relTypes[$index])) {
+                        $relTypes[$index][] = $link->rel_type;
+                    }
+                }
+            }
+        }
+    }
+
+    private static function matchRules($types)
+    {
+        // TODO 暂时支持单一规则当时。复杂规则下一步处理
+        $rules
     }
 }

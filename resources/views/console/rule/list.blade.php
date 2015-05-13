@@ -20,8 +20,8 @@
             <input type="checkbox"><i></i>
         </label>
     </th>
-    <th>编号</th>
     <th>名称</th>
+    <th>配置</th>
     <th>拼音</th>
     <th style="width:106px;"></th>
 @stop
@@ -30,8 +30,8 @@
     @foreach ($rows as $row)
     <tr>
         <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
-        <td id="ruleCode{{ $row->id }}">{{ $row->code }}</td>
         <td id="ruleName{{ $row->id }}">{{ $row->name }}</td>
+        <td id="ruleCfg{{ $row->id }}">{{ $row->configure }}</td>
         <td>{{ $row->pinyin }}</td>
         <td>
             <button class="btn btn-xs btn-info m-b-none" type="button" onClick="save({{ $row->id }})">编辑</button>
@@ -62,7 +62,7 @@
         mWin.find('form').attr('action', "/console/rules/" + (id > 0 ? ('update/' + id) : 'store'));
         if (id > 0) {
             mWin.find('[name="name"]').val($("#ruleName"+id).text());
-            mWin.find('[name="code"]').val($("#ruleCode"+id).text());
+            mWin.find('[name="configure"]').val($("#ruleCfg"+id).text());
         }
         mWin.find('[name="name"]').focus();
 

@@ -8,12 +8,16 @@ use Illuminate\Database\Eloquent\Model;
  */
 class WRef {
 
-    const CACHE_KEY_WORD_SEARCH = 'words:search:';
-    const CACHE_KEY_WORD_DIC = 'words:dic:';
-    const CACHE_KEY_WORD_MATCH = 'words:match:';
-    const CACHE_KEY_WORD_SPLIT = 'words:split:';
+    const CACHE_KEY_WORD_SEARCH = 'words:search:';// 拼音搜索缓存
+    const CACHE_KEY_WORD_DIC = 'words:dic:';// 词根缓存
+    const CACHE_KEY_WORD_MATCH = 'words:match:';// 拼音匹配缓存
+    const CACHE_KEY_WORD_SPLIT = 'words:split:';// 拼音拆分缓存
+    const CACHE_KEY_WORD_LINK = 'words:links:';// 拼音关系链缓存
 
-    const CACHE_KEY_PINYIN_IDX = 'pinyin:index';
+    const CACHE_KEY_PINYIN_IDX = 'pinyin:index';// 拼音音节索引表
+
+    const CACHE_KEY_RULE_IDX = 'rules:index:';// 名称规则索引缓存
+    const CACHE_KEY_RULE_MATCH = 'rules:match:';// 名称规则索引缓存
 
     const CACHE_KEY_WORD_SEARCH_EXPIRE = 21600;
 

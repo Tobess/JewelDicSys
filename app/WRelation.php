@@ -49,4 +49,21 @@ class WRelation extends Model {
         return self::where('word_id', $wId)->where('rel_type', $rType)->where('rel_id', $rId)->delete();
     }
 
+    /**
+     * 获得词根的关联关系并缓存
+     */
+    public static function getLinksAndCacheByWordID($wId)
+    {
+        if (\Cache::has(\App\WRef::CACHE_KEY_WORD_LINK)) {
+            $links = unserialize(\Cache::get(\App\WRef::CACHE_KEY_WORD_LINK));
+        } else {
+            $links = self::where('word_id', $wId)->get();
+            if (count($links)) {
+                \Cache::put(\App\WRef::CACHE_KEY_WORD_LINK, serialize($links), \App\WRef::CACHE_KEY_WORD_SEARCH_EXPIRE);
+            }
+        }
+
+        return $links;
+    }
+
 }

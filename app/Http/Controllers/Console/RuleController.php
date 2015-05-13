@@ -27,14 +27,13 @@ class RuleController extends ConsoleController {
     public function postStore()
     {
         $name = \Input::get('name');
-        $code = \Input::get('code');
-        if ($name || $code) {
+        $configure = \Input::get('configure');
+        if ($name && $configure) {
             $rule = new \App\Rule;
             $rule->name = $name;
-            $rule->code = $code;
-            $rule->pinyin = pinyin($name);
-            $rule->letter = letter($name);
+            $rule->configure = $configure;
             $rule->save();
+            \Cache::forget('rules');
         }
 
         return redirect('console/rules');
@@ -60,14 +59,13 @@ class RuleController extends ConsoleController {
     public function postUpdate($id)
     {
         $name = \Input::get('name');
-        $code = \Input::get('code');
+        $configure = \Input::get('configure');
         $rule = \App\Rule::find($id);
-        if (($name || $code) && $rule) {
+        if ($name && $configure && $rule) {
             $rule->name = $name;
-            $rule->code = $code;
-            $rule->pinyin = pinyin($name);
-            $rule->letter = letter($name);
+            $rule->configure = $configure;
             $rule->save();
+            \Cache::forget('rules');
         }
 
         return redirect('console/rules');
@@ -84,6 +82,7 @@ class RuleController extends ConsoleController {
         $rule = \App\Rule::find($id);
         if ($rule) {
             $rule->delete();
+            \Cache::forget('rules');
         }
 
         return redirect('console/rules');

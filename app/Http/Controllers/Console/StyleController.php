@@ -27,11 +27,9 @@ class StyleController extends ConsoleController {
     public function postStore()
     {
         $name = \Input::get('name');
-        $code = \Input::get('code');
         if ($name || $code) {
             $style = new \App\Style;
             $style->name = $name;
-            $style->code = $code;
             $style->pinyin = pinyin($name);
             $style->letter = letter($name);
             $style->save();
@@ -60,11 +58,9 @@ class StyleController extends ConsoleController {
     public function postUpdate($id)
     {
         $name = \Input::get('name');
-        $code = \Input::get('code');
         $style = \App\Style::find($id);
         if (($name || $code) && $style) {
             $style->name = $name;
-            $style->code = $code;
             $style->pinyin = pinyin($name);
             $style->letter = letter($name);
             $style->save();

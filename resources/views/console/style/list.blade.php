@@ -20,7 +20,6 @@
             <input type="checkbox"><i></i>
         </label>
     </th>
-    <th>款号</th>
     <th>名称</th>
     <th>拼音</th>
     <th>简拼</th>
@@ -31,7 +30,6 @@
     @foreach ($rows as $row)
     <tr>
         <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
-        <td id="styleCode{{ $row->id }}">{{ $row->code }}</td>
         <td id="styleName{{ $row->id }}">{{ $row->name }}</td>
         <td>{{ $row->pinyin }}</td>
         <td>{{ $row->letter }}</td>
@@ -64,9 +62,8 @@
         mWin.find('form').attr('action', "/console/styles/" + (id > 0 ? ('update/' + id) : 'store'));
         if (id > 0) {
             mWin.find('[name="name"]').val($("#styleName"+id).text());
-            mWin.find('[name="code"]').val($("#styleCode"+id).text());
         }
-        mWin.find('[name="code"]').focus();
+        mWin.find('[name="name"]').focus();
 
         mWin.modal();
     }
