@@ -39,7 +39,7 @@
                         success:function(data){
                             var len;
                             if (data && (len = data.length) > 0) {
-                                $("#countBox").text('系统已经为您找到<strong>' + len + '</strong>条记录');
+                                $("#countBox").html('系统已经为您找到<strong>' + len + '</strong>条记录');
                                 var $results = [];
                                 for (var i = 0; i < len; i++) {
                                     if (data.hasOwnProperty(i)) {

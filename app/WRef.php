@@ -19,7 +19,7 @@ class WRef {
     const CACHE_KEY_RULE_IDX = 'rules:index:';// 名称规则索引缓存
     const CACHE_KEY_RULE_MATCH = 'rules:match:';// 名称规则索引缓存
 
-    const CACHE_KEY_WORD_SEARCH_EXPIRE = 3;//21600;
+    const CACHE_KEY_WORD_SEARCH_EXPIRE = 30;//21600;
 
     /**
      * 名称生成规则元素类型
