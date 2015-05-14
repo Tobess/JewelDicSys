@@ -17,6 +17,7 @@ class CreateWordTable extends Migration {
 		{
 			$table->increments('id')->unsigned();
 			$table->string('key', 150)->unique();
+            $table->tinyInteger('type')->default(0);// 0-完整拼音 1-拼音正向拆分项 2-拼音反向拆分项
 		});
 
         // 词关系

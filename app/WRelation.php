@@ -54,12 +54,12 @@ class WRelation extends Model {
      */
     public static function getLinksAndCacheByWordID($wId)
     {
-        if (\Cache::has(\App\WRef::CACHE_KEY_WORD_LINK)) {
-            $links = unserialize(\Cache::get(\App\WRef::CACHE_KEY_WORD_LINK));
+        if (\Cache::has(\App\WRef::CACHE_KEY_WORD_LINK.$wId)) {
+            $links = unserialize(\Cache::get(\App\WRef::CACHE_KEY_WORD_LINK.$wId));
         } else {
             $links = self::where('word_id', $wId)->get();
             if (count($links)) {
-                \Cache::put(\App\WRef::CACHE_KEY_WORD_LINK, serialize($links), \App\WRef::CACHE_KEY_WORD_SEARCH_EXPIRE);
+                //\Cache::put(\App\WRef::CACHE_KEY_WORD_LINK.$wId, serialize($links), \App\WRef::CACHE_KEY_WORD_SEARCH_EXPIRE);
             }
         }
 

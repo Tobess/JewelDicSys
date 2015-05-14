@@ -19,7 +19,7 @@ class WRef {
     const CACHE_KEY_RULE_IDX = 'rules:index:';// 名称规则索引缓存
     const CACHE_KEY_RULE_MATCH = 'rules:match:';// 名称规则索引缓存
 
-    const CACHE_KEY_WORD_SEARCH_EXPIRE = 21600;
+    const CACHE_KEY_WORD_SEARCH_EXPIRE = 3;//21600;
 
     /**
      * 名称生成规则元素类型
@@ -27,7 +27,7 @@ class WRef {
      */
     protected static $wTypes = [
         ['id'=>1, 'name'=>'宝石分类', 'table'=>'materials', 'where'=>'type<>1'],
-        ['id'=>2, 'name'=>'金属分类', 'table'=>'materials', 'where'=>'type==1'],
+        ['id'=>2, 'name'=>'金属分类', 'table'=>'materials', 'where'=>'type=1'],
         ['id'=>3, 'name'=>'样式分类', 'table'=>'varieties'],
         ['id'=>4, 'name'=>'珠宝品牌', 'table'=>'brands'],
         ['id'=>5, 'name'=>'加工工艺', 'table'=>'crafts'],
@@ -45,7 +45,27 @@ class WRef {
      */
     public static function getRefById($id)
     {
-        return self::$wTypes[$id - 1]?:false;
+        return $id > 0 ? self::$wTypes[$id - 1] : false;
+    }
+
+    public static function getRelationNameByType($type, $where = '', $key = 'name')
+    {
+        $wRef = self::getRefById($type);
+        if (is_array($wRef)) {
+            $dQue = \DB::table($wRef['table']);
+            if (isset($wRef['where'])) {
+                $dQue->whereRaw($wRef['where']);
+            }
+            if ($where) {
+                $dQue->whereRaw($where);
+            }
+
+            $data = $dQue->get();
+
+            return $data;
+        }
+
+        return false;
     }
 
 }
