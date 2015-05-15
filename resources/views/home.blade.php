@@ -9,7 +9,7 @@
             <div class="input-group">
                 <input type="text" class="form-control input-lg" placeholder="请输入拼音搜索" id="queryBox">
                 <span class="input-group-btn">
-                    <button class="btn btn-lg btn-default" type="button">搜索</button>
+                    <a href="/auth/login" class="btn btn-lg btn-primary" type="button">登录</a>
                 </span>
             </div>
         </form>
