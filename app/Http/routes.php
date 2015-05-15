@@ -28,9 +28,10 @@ Route::group(['namespace' => 'Console', 'prefix' => 'console'], function()
     Route::controller('colors', 'ColorController');
     Route::controller('crafts', 'CraftController');
     Route::controller('grades', 'GradeController');
-    Route::resource('materials', 'MaterialController');
+    Route::controller('materials', 'MaterialController');
     Route::controller('morals', 'MoralController');
     Route::controller('rules', 'RuleController');
     Route::controller('styles', 'StyleController');
-    Route::resource('varieties', 'VarietyController');
+    Route::controller('varieties', 'VarietyController');
+    Route::controller('aliases', 'AliasController');
 });

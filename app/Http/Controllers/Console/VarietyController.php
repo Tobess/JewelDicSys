@@ -12,9 +12,9 @@ class VarietyController extends ConsoleController {
 	 *
 	 * @return Response
 	 */
-	public function index()
+	public function getIndex()
 	{
-        $que = \App\Variety::select('code', 'name', 'description', 'pinyin');
+        $que = \App\Variety::select('code', 'name', 'description', 'pinyin', 'id');
         $query = \Input::get('query', '');
         if ($query) {
             $que->where('code', '=', $query)->orWhere('name', '=', $query);
@@ -29,23 +29,21 @@ class VarietyController extends ConsoleController {
 	}
 
 	/**
-	 * Show the form for creating a new resource.
-	 *
-	 * @return Response
-	 */
-	public function create()
-	{
-		//
-	}
-
-	/**
 	 * Store a newly created resource in storage.
 	 *
 	 * @return Response
 	 */
-	public function store()
+	public function postStore()
 	{
-		//
+        $variety = new \App\Variety();
+        $variety->name = \Input::get('name');
+        $variety->parent = \Input::get('parent');
+        $variety->code = \Input::get('code');
+        $variety->type = \Input::get('type');
+        $variety->description = \Input::get('description');
+        $variety->save();
+
+        return redirect()->back();
 	}
 
 	/**
@@ -54,21 +52,67 @@ class VarietyController extends ConsoleController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function show($id)
+	public function getProfile($id)
 	{
-		//
+        $variety = \App\Variety::find($id);
+        $item = $variety->toArray();
+
+        return \Response::json($item);
 	}
 
-	/**
-	 * Show the form for editing the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function edit($id)
-	{
-		//
-	}
+    /**
+     * Get the parent's nodes of variety
+     *
+     * @param  int  $type
+     * @return Response
+     */
+    public function getParentList($type)
+    {
+        if ($type == 0) {
+            $id = \Input::get('variety');
+            if ($id > 0) {
+                $variety = \App\Variety::find($id);
+                if ($variety->parent == 0) {
+                    $type = 1;
+                } else {
+                    $sVariety = \App\Variety::find($variety->parent);
+                    if ($sVariety->parent == 0) {
+                        $type = 2;
+                    } else {
+                        $type = 3;
+                    }
+                }
+            } else {
+                return \Response::json([]);
+            }
+        }
+        if ($type == 1) {
+            return \Response::json([['id'=>0, 'name'=>'顶级']]);
+        } else {
+            if ($type == 2 || $type == 3) {
+                $pList = \App\Variety::where('parent', 0)->get();
+                $sParentNodes = [];
+                $pTree = [];
+                foreach ($pList as $pItem) {
+                    $sParentNodes[] = $pItem->id;
+                    $pTree[$pItem->id]['name'] = $pItem->name;
+                    $pTree[$pItem->id]['id'] = $pItem->id;
+                }
+                if ($type == 2) {
+                    return \Response::json(array_values($pTree));
+                } else {
+                    $sList = \App\Variety::whereRaw('parent in ('.implode(',', $sParentNodes).')')->get();
+                    foreach ($sList as $sItem) {
+                        $pTree[$sItem->parent]['children'][] = ['id'=>$sItem->id, 'name'=>$sItem->name];
+                    }
+
+                    return \Response::json(array_values($pTree));
+                }
+            }
+
+            return \Response::json([]);
+        }
+    }
 
 	/**
 	 * Update the specified resource in storage.
@@ -76,9 +120,15 @@ class VarietyController extends ConsoleController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update($id)
+	public function postUpdate($id)
 	{
-		//
+        $variety = \App\Variety::find($id);
+        $variety->name = \Input::get('name');
+        $variety->code = \Input::get('code');
+        $variety->description = \Input::get('description');
+        $variety->save();
+
+        return redirect()->back();
 	}
 
 	/**
@@ -87,9 +137,15 @@ class VarietyController extends ConsoleController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($id)
+	public function getDestroy($id)
 	{
-		//
+        if (\App\Variety::where('parent', $id)->count()) {
+            return redirect()->back();
+        }
+        $variety = \App\Variety::find($id);
+        $variety->delete();
+
+        return redirect()->back();
 	}
 
 }

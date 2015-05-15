@@ -6,12 +6,18 @@
 @stop
 
 @section('toolLeft')
-    <span class="input-group-btn">
-      <button class="btn btn-sm btn-success" type="button" onClick="save(0)">
-          <i class="fa fa-plus"></i>
-          新增
-      </button>
-    </span>
+    <button class="btn btn-sm btn-success" type="button" onClick="save(0, 1)">
+        <i class="fa fa-plus"></i>
+        新增大类
+    </button>
+    <button class="btn btn-sm btn-success" type="button" onClick="save(0, 2)">
+        <i class="fa fa-plus"></i>
+        新增中类
+    </button>
+    <button class="btn btn-sm btn-success" type="button" onClick="save(0, 3)">
+        <i class="fa fa-plus"></i>
+        新增小类
+    </button>
 @stop
 
 @section('toolRight')
@@ -34,7 +40,7 @@
     <th>拼音</th>
     <th>简拼</th>
     <th>描述</th>
-    <th style="width:106px;"></th>
+    <th style="width:159px;"></th>
 @stop
 
 @section('tableRows')
@@ -47,7 +53,8 @@
         <td>{{ $row->letter }}</td>
         <td id="materialDesc{{ $row->id }}">{{ $row->description }}</td>
         <td>
-            <button class="btn btn-xs btn-info m-b-none" type="button" onClick="save({{ $row->id }})">编辑</button>
+            <a href="/console/aliases?type={{ $row->type == 1 ? 2 : 1}}&parent={{ $row->id }}" class="btn btn-xs btn-info m-b-none" type="button">别名</a>
+            <button class="btn btn-xs btn-info m-b-none" type="button" onClick="save({{ $row->id }}, 0)">编辑</button>
             <a class="btn btn-xs btn-danger m-b-none" type="button" href="/console/materials/destroy/{{ $row->id }}">删除</a>
         </td>
     </tr>
@@ -69,7 +76,7 @@
 
 @section('scripts')
 <script>
-    function save(id) {
+    function save(id, type) {
         var mWin = $("#modalWin");
         mWin.find('form').get(0).reset();
         mWin.find('form').attr('action', "/console/materials/" + (id > 0 ? ('update/' + id) : 'store'));
@@ -78,7 +85,72 @@
         }
         mWin.find('[name="name"]').focus();
 
-        mWin.modal();
+        var pChooser = mWin.find('select[name="parent"]');
+        pChooser.children().remove();
+        $.ajax({
+            url: "/console/materials/parent-list/" + type,
+            data:{'material':id},
+            type: "GET",
+            dataType:'json',
+            success:function(data){
+                for (var i = 0; i < data.length; i++) {
+                    if (data.hasOwnProperty(i)) {
+                        var pItem = data[i];
+                        if (pItem.children && pItem.children.length > 0) {
+                            pChooser.append('<optgroup label="'+pItem.name+'">');
+                            for (var s = 0; s < pItem.children.length; s++) {
+                                if (pItem.children.hasOwnProperty(i)) {
+                                    var sItem = pItem.children[s];
+                                    sItem && pChooser.append('<option value='+sItem.id+'>&nbsp;&nbsp;&nbsp;&nbsp;'+sItem.name+'</option>');
+                                }
+                            }
+                            mWin.find('select[name="parent"]').append('</optgroup>');
+                        } else {
+                            pItem && pChooser.append('<option value='+pItem.id+'>'+pItem.name+'</option>');
+                        }
+                    }
+                }
+                mWin.modal();
+
+                if (id > 0) {
+                    $.ajax({
+                        url: "/console/materials/profile/" + id,
+                        type: "GET",
+                        dataType:'json',
+                        success:function(data){
+                            for (var key in data) {
+                                if (data.hasOwnProperty(key)) {
+                                    var value = data[key];
+                                    mWin.find('[name="'+key+'"]').val(value);
+                                }
+                            }
+
+                            $("#materialType").trigger('change');
+                        },
+                        error:function(error) {
+                            alert('获取材质信息失败。');
+                        }
+                    });
+                } else {
+                    $("#materialType").trigger('change');
+                }
+            },
+            error:function(error) {
+                //pChooser.chosen();
+            }
+        });
     }
+
+    $(function(){
+        $("#materialType").change(function(){
+            if ($("#materialParent").val() > 0 && $(this).val() == 1) {
+                $("#metalBox").removeClass('hide');
+                $("#materialMineralBox").hide();
+            } else {
+                !$("#metalBox").hasClass('hide') && $("#metalBox").addClass('hide');
+                $("#materialMineralBox").show();
+            }
+        });
+    })
 </script>
 @stop

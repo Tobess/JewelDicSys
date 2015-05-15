@@ -37,6 +37,7 @@ class CreateMaterialTable extends Migration {
             $table->string('chinese', 50);// 中文名字
             $table->string('english', 50);// 英语名字
             $table->tinyInteger('metal');// 贵金属类型
+            $table->primary('material_id');
         });
 	}
 
