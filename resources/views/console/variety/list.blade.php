@@ -99,14 +99,15 @@
                     if (data.hasOwnProperty(i)) {
                         var pItem = data[i];
                         if (pItem.children && pItem.children.length > 0) {
-                            pChooser.append('<optgroup label="'+pItem.name+'">');
+                            var $tpl = ['<optgroup label="'+pItem.name+'">'];
                             for (var s = 0; s < pItem.children.length; s++) {
-                                if (pItem.children.hasOwnProperty(i)) {
+                                if (pItem.children.hasOwnProperty(s)) {
                                     var sItem = pItem.children[s];
-                                    sItem && pChooser.append('<option value='+sItem.id+'>&nbsp;&nbsp;&nbsp;&nbsp;'+sItem.name+'</option>');
+                                    sItem && $tpl.push('<option value='+sItem.id+'>&nbsp;&nbsp;&nbsp;&nbsp;'+sItem.name+'</option>');
                                 }
                             }
-                            mWin.find('select[name="parent"]').append('</optgroup>');
+                            $tpl.push('</optgroup>');
+                            pChooser.append($tpl.join(''));
                         } else {
                             pItem && pChooser.append('<option value='+pItem.id+'>'+pItem.name+'</option>');
                         }

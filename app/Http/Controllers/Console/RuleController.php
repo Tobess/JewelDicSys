@@ -33,7 +33,7 @@ class RuleController extends ConsoleController {
             $rule->name = $name;
             $rule->configure = $configure;
             $rule->save();
-            \Cache::forget('rules');
+            \Cache::forget(\App\WRef::CACHE_KEY_RULE_IDX);
         }
 
         return redirect('console/rules');
@@ -65,7 +65,7 @@ class RuleController extends ConsoleController {
             $rule->name = $name;
             $rule->configure = $configure;
             $rule->save();
-            \Cache::forget('rules');
+            \Cache::forget(\App\WRef::CACHE_KEY_RULE_IDX);
         }
 
         return redirect('console/rules');
@@ -82,7 +82,7 @@ class RuleController extends ConsoleController {
         $rule = \App\Rule::find($id);
         if ($rule) {
             $rule->delete();
-            \Cache::forget('rules');
+            \Cache::forget(\App\WRef::CACHE_KEY_RULE_IDX);
         }
 
         return redirect('console/rules');

@@ -332,7 +332,7 @@ class Word extends Model {
                         $relTypes[$index][] = $link->rel_type;
                     }
 
-                    if ($mCount > 2) {
+                    if ($mCount > 10) {
                         abort(200, '', []);
                     }
                 }

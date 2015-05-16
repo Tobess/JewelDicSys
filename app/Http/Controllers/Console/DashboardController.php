@@ -70,8 +70,8 @@ class DashboardController extends ConsoleController {
         // 对所有别名进行链接
         $aliases = \App\WAlias::all();
         foreach ($aliases as $alias) {
-            \App\Word::wordRefToLink($alias->rel_type, $alias->rel_id, $row->pinyin);
-            \App\Word::wordRefToLink($alias->rel_type, $alias->rel_id, $row->letter, false);
+            \App\Word::wordRefToLink($alias->rel_type, $alias->rel_id, $alias->pinyin);
+            \App\Word::wordRefToLink($alias->rel_type, $alias->rel_id, $alias->letter, false);
         }
 
         return redirect()->back();
