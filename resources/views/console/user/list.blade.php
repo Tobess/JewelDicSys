@@ -33,8 +33,6 @@
                             <td>{{ $admin->name }}</td>
                             <td>{{ $admin->updated_at }}</td>
                             <td>
-                                <button class="btn btn-xs btn-info m-b-none" type="button">编辑</button>
-                                <button class="btn btn-xs btn-danger m-b-none" type="button">删除</button>
                             </td>
                         </tr>
                         @endforeach
