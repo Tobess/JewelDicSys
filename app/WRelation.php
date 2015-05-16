@@ -34,19 +34,13 @@ class WRelation extends Model {
     /**
      * 移除拼音链接关系
      *
-     * @param int 拼音ID
      * @param int $relType 名称元素类型
-     * @param int $relId   名称元素类型ID
      *
      * @return mixed
      */
-    public static function unlink($wId, $rType, $rId)
+    public static function unlinkByType($rType)
     {
-        if ($wId == 0 || $rType == 0 || $rId == 0) {
-            return false;
-        }
-
-        return self::where('word_id', $wId)->where('rel_type', $rType)->where('rel_id', $rId)->delete();
+        return self::where('rel_type', $rType)->delete();
     }
 
     /**
@@ -59,7 +53,7 @@ class WRelation extends Model {
         } else {
             $links = self::where('word_id', $wId)->get();
             if (count($links)) {
-                //\Cache::put(\App\WRef::CACHE_KEY_WORD_LINK.$wId, serialize($links), \App\WRef::CACHE_KEY_WORD_SEARCH_EXPIRE);
+                \Cache::put(\App\WRef::CACHE_KEY_WORD_LINK.$wId, serialize($links), \App\WRef::CACHE_KEY_WORD_SEARCH_EXPIRE);
             }
         }
 

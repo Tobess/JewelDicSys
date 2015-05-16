@@ -105,7 +105,8 @@ class Word extends Model {
             $lenMatched = count($words);
             self::match($strings, $words, $positive);
             if (count($words) > $lenMatched) {
-                \Cache::forever(\App\WRef::CACHE_KEY_WORD_MATCH.intval($positive).':'.md5(implode('', $strings)), serialize(array_slice($words, $lenMatched)));
+                \Cache::put(\App\WRef::CACHE_KEY_WORD_MATCH.intval($positive).':'.md5(implode('', $strings)),
+                    serialize(array_slice($words, $lenMatched)), \App\WRef::CACHE_KEY_WORD_SEARCH_EXPIRE);
             }
         }
     }
@@ -240,6 +241,14 @@ class Word extends Model {
         \App\WRelation::link($py->id, $relType, $relId);
     }
 
+    /**
+     * 词库匹配搜索
+     *
+     * @param string $query 简拼或全拼
+     * @param bool $positive 是否正向搜索
+     *
+     * @return array
+     */
     public static function search($query, $positive = true)
     {
         // 从缓存中确定匹配结果
@@ -255,7 +264,8 @@ class Word extends Model {
         } else {
             self::match($query, $words, $positive);
             if (count($words)) {
-                \Cache::forever(\App\WRef::CACHE_KEY_WORD_MATCH.intval($positive).':'.md5($query), serialize($words));
+                \Cache::put(\App\WRef::CACHE_KEY_WORD_MATCH.intval($positive).':'.md5($query),
+                    serialize($words), \App\WRef::CACHE_KEY_WORD_SEARCH_EXPIRE);
             }
         }
 
@@ -309,21 +319,33 @@ class Word extends Model {
     private static function getWordsLinkRelation($words, &$relTypeQue, &$relTypes, $positive = true)
     {
         $words = $positive ? $words : array_reverse($words);
+        $mCount = 0;
         foreach ($words as $index => $pinyin) {
             if (($wId = self::getOrCacheByKey($pinyin, $positive)) !== false) {
                 $links = \App\WRelation::getLinksAndCacheByWordID($wId);
                 foreach ($links as $link) {
                     if (!isset($relTypeQue[$link->rel_type]) || !in_array($link->rel_id, $relTypeQue[$link->rel_type])) {
                         $relTypeQue[$link->rel_type][] = $link->rel_id;
+                        $mCount++;
                     }
                     if (!isset($relTypes[$index]) || !in_array($link->rel_type, $relTypes[$index])) {
                         $relTypes[$index][] = $link->rel_type;
+                    }
+
+                    if ($mCount > 2) {
+                        abort(200, '', []);
                     }
                 }
             }
         }
     }
 
+    /**
+     * 规则匹配
+     *
+     * @param array $types 已匹配到的元素类型
+     * @return array false for fail
+     */
     private static function matchRules($types)
     {
         if (!count($types)) return false;

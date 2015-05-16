@@ -37,6 +37,11 @@ class WRef {
         ['id'=>9, 'name'=>'珠宝寓意', 'table'=>'morals']
     ];
 
+    public static function allRefs()
+    {
+        return self::$wTypes;
+    }
+
     /**
      * 获得名称生成规则元素类型
      *
@@ -48,6 +53,15 @@ class WRef {
         return $id > 0 ? self::$wTypes[$id - 1] : false;
     }
 
+    /**
+     * 获得拼音的关联元素
+     *
+     * @param $type
+     * @param string $where
+     * @param string $key
+     *
+     * @return bool
+     */
     public static function getRelationNameByType($type, $where = '', $key = 'name')
     {
         $wRef = self::getRefById($type);

@@ -14,7 +14,7 @@ class MaterialController extends ConsoleController {
 	 */
 	public function getIndex()
 	{
-        $que = \App\Material::select('code', 'name', 'description', 'pinyin', 'id', 'type');
+        $que = \App\Material::select('code', 'name', 'description', 'pinyin', 'letter', 'id', 'type');
         $query = \Input::get('query', '');
         if ($query) {
             $que->where('code', '=', $query)->orWhere('name', '=', $query);
@@ -42,6 +42,8 @@ class MaterialController extends ConsoleController {
         $material->type = \Input::get('type');
         $material->description = \Input::get('description');
         $material->mineral = \Input::get('mineral');
+        $material->pinyin = pinyin($material->name);
+        $material->letter = letter($material->name);
         $material->save();
 
         if ($material->id && $material->type == 1) {
@@ -147,6 +149,8 @@ class MaterialController extends ConsoleController {
         $material->code = \Input::get('code');
         $material->description = \Input::get('description');
         $material->mineral = \Input::get('mineral');
+        $material->pinyin = pinyin($material->name);
+        $material->letter = letter($material->name);
         $material->save();
 
         if ($material->type == 1) {

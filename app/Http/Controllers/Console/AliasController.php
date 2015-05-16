@@ -43,6 +43,8 @@ class AliasController extends Controller {
         $alias->name = \Input::get('name');
         $alias->rel_type = \Input::get('rel_type');
         $alias->rel_id = \Input::get('rel_id');
+        $alias->pinyin = pinyin($alias->name);
+        $alias->letter = letter($alias->name);
         $alias->save();
 
         return redirect()->back();
@@ -71,23 +73,9 @@ class AliasController extends Controller {
 	{
         $alias = \App\WAlias::find($id);
         $alias->name = \Input::get('name');
+        $alias->pinyin = pinyin($alias->name);
+        $alias->letter = letter($alias->name);
         $alias->save();
-
-        return redirect()->back();
-	}
-
-	/**
-	 * Remove the specified resource from storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function getDestroy($id)
-	{
-        $alias = \App\WAlias::find($id);
-        if ($alias) {
-            $alias->delete();
-        }
 
         return redirect()->back();
 	}
