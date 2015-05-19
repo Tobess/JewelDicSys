@@ -19,6 +19,10 @@ class WRef {
     const CACHE_KEY_RULE_IDX = 'rules:index:';// 名称规则索引缓存
     const CACHE_KEY_RULE_MATCH = 'rules:match:';// 名称规则索引缓存
 
+    const CACHE_KEY_ALIAS = 'aliases:';// 别名缓存
+
+    const CACHE_KEY_WORD_PARENT = 'words:parent:';// 属于父级节点的元素
+
     const CACHE_KEY_WORD_SEARCH_EXPIRE = 30;//21600;
 
     /**
@@ -80,6 +84,37 @@ class WRef {
         }
 
         return false;
+    }
+
+    /**
+     * 盘点词根是否是父级节点
+     *
+     * @param $type
+     * @param $id
+     *
+     * @return bool
+     */
+    public static function relationHasParentByTypeAndId($type, $id)
+    {
+        if (\Cache::has(\App\WRef::CACHE_KEY_WORD_PARENT.$type.':'.$id)) {
+            return true;
+        } else {
+            $wRef = self::getRefById($type);
+            if (is_array($wRef)) {
+                $dQue = \DB::table($wRef['table']);
+                if (isset($wRef['where'])) {
+                    $dQue->whereRaw($wRef['where']);
+                }
+                $dQue->where('parent', $id);
+                $count = $dQue->count();
+                if ($count > 0) {
+                    \Cache::forever(\App\WRef::CACHE_KEY_WORD_PARENT.$type.':'.$id, 1);
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 
 }

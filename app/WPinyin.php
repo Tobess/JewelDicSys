@@ -32,10 +32,44 @@ class WPinyin extends Model {
      */
     public static function getPinyinIndex()
     {
-        return self::$pinyinInndex;
+        return array_merge(self::$pinyinIndex, self::$metalPinyinIndex);
     }
 
-    private static $pinyinInndex = [
+    /**
+     * 不满足全拼规则词根
+     *
+     * @var array
+     */
+    private static $metalPinyinIndex = [
+        '9k',
+        '14k',
+        '18k',
+        '22k',
+        '99.5',
+        '99.99',
+        '800',
+        '925',
+        '990',
+        '999',
+        '999.5',
+        '999.9',
+        '850',
+        '900',
+        '950',
+        '990',
+        '999',
+        '500',
+        '950',
+        '990',
+        '999'
+    ];
+
+    /**
+     * 拼音音节索引
+     *
+     * @var array
+     */
+    private static $pinyinIndex = [
         'a',
         'ai',
         'an',

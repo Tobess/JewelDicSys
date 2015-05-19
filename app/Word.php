@@ -275,37 +275,79 @@ class Word extends Model {
             $types = [];
             $typeLinks = [];
             // 取出词根包含的名称组成元素类型集合
-            self::getWordsLinkRelation($words, $typeLinks, $types, $positive);
-
+            $wordIndexLinkToTypes = self::getWordsLinkRelation($words, $typeLinks, $types, $positive);
             // 用词条的匹配的类型集合与系统名称规则定义的配置对比分析找出与之匹配的规则
-            if (count($types)) {
-                $matchRules = self::matchRules($types);
+            if (count($types) >= 2) {
+                // 过滤掉无效的匹配元素
+                $newTypes = array_merge($types);
+                $first = array_shift($newTypes);
+                $typeToRuleString = count($newTypes) ? self::typeToRuleModel($first, array_shift($newTypes), $newTypes) : $first;
+
+                $matchRules = self::matchRules($types, $typeToRuleString);
                 if ($matchRules) {
-                    foreach ($matchRules as $rule) {
+                    $relValTree = [];// 匹配的相关元素
+                    $ruleTree = [];// 匹配的名称规则
+                    $matchedResults = [];// 合成的商品名称
+                    foreach ($matchRules as $ruleObj) {
                         $gName = [];
+                        $ruleId = $ruleObj['ruleId'];
+                        $rule = $ruleObj['rule'];// 系统设置名称规则
+                        $realRule = $ruleObj['realRule'];// 匹配到的名称规则中的部分
                         $rCfg = explode('+', $rule);
-                        foreach ($rCfg as $rel) {
+                        $gNameCount = 1;
+                        foreach ($rCfg as $index => $rel) {
                             $rel = trim($rel);
                             if (is_array(\App\WRef::getRefById($rel))) {
+                                // 根据真实的规则取出无效的匹配元素对象
+                                $relValues = [];
+                                if (isset($typeLinks[$rel])) {
+                                    foreach ($typeLinks[$rel] as $relId => $relIdx) {
+                                        foreach ($realRule as $rRule) {
+                                            if ($rRule[$relIdx] == $rel) {
+                                                $relValues[] = $relId;
+                                            }
+                                        }
+                                    }
+                                }
+
                                 $tValues = \App\WRef::getRelationNameByType($rel,
-                                    isset($typeLinks[$rel]) ? 'id in ('.implode(',', $typeLinks[$rel]).')' : '');
-                                $gName[] = ['type'=>$rel, 'data'=>$tValues];
+                                    count($relValues) ? 'id in ('.implode(',', $relValues).')' : '');
+                                $tRelIds = [];
+                                foreach ($tValues as $relObj) {
+                                    if (in_array($rel, [1,2,3]) && \App\WRef::relationHasParentByTypeAndId($rel, $relObj->id)) continue;
+
+                                    $relObj->rel_type = $rel;
+                                    $relValTree[$rel][$relObj->id] = $relObj;
+                                    if (!in_array($relObj->id, $tRelIds)) {
+                                        $tRelIds[] = $relObj->id;
+                                    }
+                                }
+                                $gNameCount *= count($tRelIds);
+                                $gName[] = ['type'=>$rel, 'data'=>$tRelIds];
+                                $prevRel = $rel;
                             } else {
                                 $gName[] = $rel;
                             }
                         }
-                        if (count($gName)) {
-                            $results[] = $gName;
+                        if (count($gName) && $gNameCount <= 40) {
+                            $ruleTree[$ruleId] = $gName;
+                            // 用规则生成结果列表
+                            $newGNames = array_merge($gName);
+                            $item = array_shift($newGNames);
+                            $first = self::parseGNameItem($item, $relValTree);
+                            $dicWords = count($newGNames) ? self::mergeDicWords($first, self::parseGNameItem(array_shift($newGNames), $relValTree), $newGNames, $relValTree) : $first;
+                            $matchedResults = array_merge($matchedResults, $dicWords);
                         }
                     }
+
+                    $matchedResults = array_sort($matchedResults, function($item)
+                    {
+                        return count($item['refs']);
+                    });
+                    $results = ['relTree'=>$relValTree, 'words'=>array_values($matchedResults)];
                 }
-                // 用规则生成结果列表
             }
         }
-
-        // 结合名称生成规则分析元素合成名称待选项目
-        $rules = \App\Rule::getRulesAndCache();
-
 
         // 缓存数据
         \Cache::put(\App\WRef::CACHE_KEY_WORD_SEARCH.md5($query), serialize($results), \App\WRef::CACHE_KEY_WORD_SEARCH_EXPIRE);
@@ -314,39 +356,104 @@ class Word extends Model {
     }
 
     /**
+     * 解析一个匹配部分用于名称生成
+     */
+    private static function parseGNameItem($item, &$relValTree)
+    {
+        if (is_array($item)) {
+            $items = [];
+            foreach ($item['data'] as $id) {
+                $type = $item['type'];
+                $items[] = ['title'=>$relValTree[$type][$id]->name, 'refs'=>[$id.':'.$type]];
+                if (in_array($type, [1,2,3])) {
+                    // 检测别名是否存在并加入名称生成中
+                    $aliases = \App\WAlias::getAliasesByTypeAndId($type, $id);
+                    if (count($aliases)) {
+                        foreach ($aliases as $alias) {
+                            $items[] = ['title'=>$alias->name, 'refs'=>[$id.':'.$type]];
+                        }
+                    }
+                }
+            }
+        } else {
+            $items = [['title'=>$item, 'refs'=>[]]];
+        }
+
+        return $items;
+    }
+
+    /**
+     * 珠宝名称合成
+     */
+    private static function mergeDicWords($first, $second, &$sources, &$relValTree) {
+        $newFirst = [];
+        foreach ($first as $fEle) {
+            foreach ($second as $sEle) {
+                $title = $fEle['title'].$sEle['title'];
+                $refs = array_merge($fEle['refs'], $sEle['refs']);
+                $newFirst[] = ['title'=>$title, 'refs'=>$refs];
+            }
+        }
+
+        return count($sources) ? self::mergeDicWords($newFirst, self::parseGNameItem(array_shift($sources), $relValTree), $sources, $relValTree) : $newFirst;
+    }
+
+    /**
+     * 将匹配的元素类型组成各种规则组合
+     */
+    private static function typeToRuleModel($first, $second, &$sources)
+    {
+        $newFirst = [];
+        foreach ($first as $fEle) {
+            foreach ($second as $sEle) {
+                $newFirst[] = $fEle.','.$sEle;
+            }
+        }
+
+        return count($sources) ? self::typeToRuleModel($newFirst, array_shift($sources), $sources) : $newFirst;
+    }
+
+    /**
      * 获取已匹配的词根的词汇组成关系
      */
     private static function getWordsLinkRelation($words, &$relTypeQue, &$relTypes, $positive = true)
     {
+        $realWordLinkToMatchedTypes = [];// 匹配出来的词根的索引顺序与有效的元素类型的位置链接
         $words = $positive ? $words : array_reverse($words);
         $mCount = 0;
+        $rIndex = 0;
         foreach ($words as $index => $pinyin) {
             if (($wId = self::getOrCacheByKey($pinyin, $positive)) !== false) {
                 $links = \App\WRelation::getLinksAndCacheByWordID($wId);
                 foreach ($links as $link) {
-                    if (!isset($relTypeQue[$link->rel_type]) || !in_array($link->rel_id, $relTypeQue[$link->rel_type])) {
-                        $relTypeQue[$link->rel_type][] = $link->rel_id;
+                    if (!isset($relTypeQue[$link->rel_type]) || !isset($relTypeQue[$link->rel_type][$link->rel_id])) {
+                        $relTypeQue[$link->rel_type][$link->rel_id] = $rIndex;
                         $mCount++;
                     }
-                    if (!isset($relTypes[$index]) || !in_array($link->rel_type, $relTypes[$index])) {
-                        $relTypes[$index][] = $link->rel_type;
+                    if (!isset($relTypes[$rIndex]) || !in_array($link->rel_type, $relTypes[$rIndex])) {
+                        $relTypes[$rIndex][] = $link->rel_type;
                     }
 
+                    $realWordLinkToMatchedTypes[$index] = $rIndex;
                     if ($mCount > 10) {
                         abort(200, '', []);
                     }
                 }
+                $rIndex++;
             }
         }
+
+        return $realWordLinkToMatchedTypes;
     }
 
     /**
      * 规则匹配
      *
      * @param array $types 已匹配到的元素类型
+     * @param array $typeToRules 用元素匹配类型生成的可能的规则组合
      * @return array false for fail
      */
-    private static function matchRules($types)
+    private static function matchRules($types, $typeToRules)
     {
         if (!count($types)) return false;
 
@@ -358,7 +465,7 @@ class Word extends Model {
             $regex .= $linkExt.'(\+['.implode(',', $type).']){1}';
             $linkExt = '+(.){0}+';
         }
-        \Log::debug('regex->:'.$regex);
+
         if (!empty($regex)) {
             if (\Cache::has(\App\WRef::CACHE_KEY_RULE_MATCH.md5($regex))) {
                 $matches = unserialize(\Cache::get(\App\WRef::CACHE_KEY_RULE_MATCH.md5($regex)));
@@ -367,7 +474,7 @@ class Word extends Model {
 
             $rules = \App\Rule::getRulesAndCache();
             $matches = [];
-            foreach ($rules as $rule) {
+            foreach ($rules as $ruleId => $rule) {
                 $rCfg = explode('+', $rule);
                 $justEle = [];
                 foreach ($rCfg as $ele) {
@@ -376,9 +483,22 @@ class Word extends Model {
                     }
                 }
                 if (count($justEle) && preg_match('/'.$regex.'/', '+'.implode('+', $justEle))) {
-                    $matches[] = $rule;
+                    // 筛选出正确的匹配规则
+                    $tMatchRule = [];
+                    foreach ($typeToRules as $_rule) {
+                        $_matchEles = [];
+                        $tRuleEle = explode(',', $_rule);
+                        foreach ($justEle as $ele) {
+                            if (in_array($ele, $tRuleEle)) {
+                                $_matchEles[] = $ele;
+                            }
+                        }
+                        if (implode(',', $_matchEles) == $_rule) {
+                            $tMatchRule[] = $tRuleEle;
+                        }
+                    }
+                    $matches[] = ['ruleId'=>$ruleId, 'rule'=>$rule, 'realRule'=>$tMatchRule];
                 }
-                \Log::debug('regex->match:'.$regex.'=>'.'+'.$rule);
             }
             if (count($matches)) {
                 \Cache::put(\App\WRef::CACHE_KEY_RULE_MATCH.md5($regex), serialize($matches), \App\WRef::CACHE_KEY_WORD_SEARCH_EXPIRE);

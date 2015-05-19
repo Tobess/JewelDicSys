@@ -16,7 +16,8 @@ class DatabaseSeeder extends Seeder {
 
 		// $this->call('UserTableSeeder');
 
-        $this->call('PinyinTableSeeder');
+        //$this->call('PinyinTableSeeder');
+        $this->call('StandardTableSeeder');
 	}
 
 }

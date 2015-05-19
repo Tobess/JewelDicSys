@@ -36,18 +36,19 @@
                         data: {query:val},
                         type: "GET",
                         dataType:'json',
-                        success:function(data){
-                            var len;
-                            if (data && (len = data.length) > 0) {
+                        success:function(result){
+                            var data = result.words || [],
+                                len = data.length;
+                            if (data && len > 0) {
                                 $("#countBox").html('系统已经为您找到<strong>' + len + '</strong>条记录');
                                 var $results = [];
                                 for (var i = 0; i < len; i++) {
                                     if (data.hasOwnProperty(i)) {
                                         var item = data[i];
-                                        $results.push('');
+                                        $results.push('<li class="list-group-item"><a href="#" class="h4 text-primary m-b-sm m-t-sm block">'+item.title+'</a><p>'+item.refs+'</p></li>');
                                     }
                                 }
-                                $("#resultBox").html($results.join());
+                                $("#resultBox").html($results.join(''));
                             } else {
                                 clear();
                             }
