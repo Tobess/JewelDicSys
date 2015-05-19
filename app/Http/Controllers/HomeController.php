@@ -32,6 +32,12 @@ class HomeController extends Controller {
     public function getSearch()
     {
         $query = \Input::get('query');
-        return \Response::json(\App\Word::search($query));
+        $posResults = \App\Word::search($query);
+        if (!count($posResults['words'])) {
+            $results = \App\Word::search($query, false);
+        } else {
+            $results = $posResults;
+        }
+        return \Response::json($results);
     }
 }

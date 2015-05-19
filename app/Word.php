@@ -252,8 +252,8 @@ class Word extends Model {
     public static function search($query, $positive = true)
     {
         // 从缓存中确定匹配结果
-        if (\Cache::has(\App\WRef::CACHE_KEY_WORD_SEARCH.md5($query))) {
-            $results = unserialize(\Cache::get(\App\WRef::CACHE_KEY_WORD_SEARCH.md5($query)));
+        if (\Cache::has(\App\WRef::CACHE_KEY_WORD_SEARCH.intval($positive).':'.md5($query))) {
+            $results = unserialize(\Cache::get(\App\WRef::CACHE_KEY_WORD_SEARCH.intval($positive).':'.md5($query)));
             return $results;
         }
 
@@ -329,7 +329,7 @@ class Word extends Model {
                                 $gName[] = $rel;
                             }
                         }
-                        if (count($gName) && $gNameCount <= 40) {
+                        if (count($gName) && $gNameCount <= 400000) {
                             $ruleTree[$ruleId] = $gName;
                             // 用规则生成结果列表
                             $newGNames = array_merge($gName);
@@ -349,8 +349,10 @@ class Word extends Model {
             }
         }
 
-        // 缓存数据
-        \Cache::put(\App\WRef::CACHE_KEY_WORD_SEARCH.md5($query), serialize($results), \App\WRef::CACHE_KEY_WORD_SEARCH_EXPIRE);
+        if (count($results['words'])) {
+            // 缓存数据
+            \Cache::put(\App\WRef::CACHE_KEY_WORD_SEARCH.intval($positive).':'.md5($query), serialize($results), \App\WRef::CACHE_KEY_WORD_SEARCH_EXPIRE);
+        }
 
         return $results;
     }
