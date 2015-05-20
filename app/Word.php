@@ -349,7 +349,7 @@ class Word extends Model {
             }
         }
 
-        if (count($results['words'])) {
+        if (isset($results['words']) && count($results['words'])) {
             // 缓存数据
             \Cache::put(\App\WRef::CACHE_KEY_WORD_SEARCH.intval($positive).':'.md5($query), serialize($results), \App\WRef::CACHE_KEY_WORD_SEARCH_EXPIRE);
         }
