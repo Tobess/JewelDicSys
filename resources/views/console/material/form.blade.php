@@ -40,7 +40,7 @@
                         <option value="6">人造宝石</option>
                         <option value="7">拼合宝石</option>
                         <option value="8">再造宝石</option>
-                        <option value="8">其他</option>
+                        <option value="9">其他</option>
                     </select>
                 </div>
             </div>

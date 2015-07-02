@@ -32,7 +32,15 @@ class WPinyin extends Model {
      */
     public static function getPinyinIndex()
     {
-        return array_merge(self::$pinyinIndex, self::$metalPinyinIndex);
+        return array_merge(self::$pinyinIndex);
+    }
+
+    /**
+     * 贵金属特殊拼音音节
+     */
+    public static function getMetalPinyinIndex()
+    {
+        return self::$metalPinyinIndex;
     }
 
     /**
@@ -45,23 +53,95 @@ class WPinyin extends Model {
         '14k',
         '18k',
         '22k',
-        '99.5',
-        '99.99',
+        '999.5',
+        '999.99',
         '800',
         '925',
         '990',
         '999',
-        '999.5',
-        '999.9',
+        '9995',
+        '9999',
         '850',
         '900',
+        '916',
         '950',
         '990',
         '999',
         '500',
         '950',
         '990',
-        '999'
+        '999',
+
+        // 黄金
+        'Au375',
+        'G375',
+        '9KJ',
+        '14KJ',
+        'Au585',
+        'G585',
+        '18KJ',
+        'Au750',
+        'G750',
+        'G18K',
+        '22KJ',
+        'Au916',
+        'G916',
+        '22K',
+        'ZJ',
+        'Au990',
+        'G990',
+        'Au995',
+        'G995',
+        'QZJ',
+        'Au999',
+        'G999',
+        'Au999.5',
+        'G999.5',
+        'Au999.9',
+        'G999.9',
+        'WCJ',
+
+        // Ag 银
+        // 银925
+        'Ag925',
+        'S925',
+        // 足银
+        'Ag990',
+        'S990',
+        'ZY',
+        // 千足银
+        'Ag999',
+        'S999',
+        'QZY',
+        // 银999.5
+        'Ag999.5',
+        'S999.5',
+        // 银999.9
+        'Ag999.9',
+        'S999.9',
+
+        // 铂金
+        // 铂850
+        'Pt850',
+        // 铂900
+        'Pt900',
+        // 铂950
+        'Pt950',
+        // 铂990
+        'Pt990',
+        'ZB',
+        // 铂999
+        'Pt999',
+        'QZB',
+        // 铂999.5
+        'Pt999.5',
+
+        // 钯金
+        'Pd500',
+        'Pd950',
+        'Pd990',
+        'Pd999',
+
     ];
 
     /**

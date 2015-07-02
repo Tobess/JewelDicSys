@@ -80,4 +80,20 @@ class AliasController extends Controller {
         return redirect()->back();
 	}
 
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function getDestroy($id)
+    {
+        $alias = \App\WAlias::find($id);
+        if ($alias) {
+            $alias->delete();
+        }
+
+        return redirect()->back();
+    }
+
 }

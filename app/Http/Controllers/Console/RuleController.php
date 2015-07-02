@@ -28,10 +28,12 @@ class RuleController extends ConsoleController {
     {
         $name = \Input::get('name');
         $configure = \Input::get('configure');
-        if ($name && $configure) {
+        $elements = \Input::get('elements');
+        if ($name && $configure && $elements) {
             $rule = new \App\Rule;
             $rule->name = $name;
             $rule->configure = $configure;
+            $rule->elements = $elements;
             $rule->save();
             \Cache::forget(\App\WRef::CACHE_KEY_RULE_IDX);
         }
@@ -60,10 +62,12 @@ class RuleController extends ConsoleController {
     {
         $name = \Input::get('name');
         $configure = \Input::get('configure');
+        $elements = \Input::get('elements');
         $rule = \App\Rule::find($id);
-        if ($name && $configure && $rule) {
+        if ($name && $configure && $rule && $elements) {
             $rule->name = $name;
             $rule->configure = $configure;
+            $rule->elements = $elements;
             $rule->save();
             \Cache::forget(\App\WRef::CACHE_KEY_RULE_IDX);
         }

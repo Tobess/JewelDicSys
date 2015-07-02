@@ -54,10 +54,26 @@ class WRelation extends Model {
             $links = self::where('word_id', $wId)->get();
             if (count($links)) {
                 \Cache::put(\App\WRef::CACHE_KEY_WORD_LINK.$wId, serialize($links), \App\WRef::CACHE_KEY_WORD_SEARCH_EXPIRE);
+            } else {
+                $links = [];
             }
         }
 
         return $links;
+    }
+
+    /**
+     * 判断指定的词根ID和指定的元数据存在绑定关系
+     */
+    public static function wordIsRefToTypeID($wId, $relType, $relId)
+    {
+        foreach (self::getLinksAndCacheByWordID($wId) as $link) {
+            if ($link->rel_id == $relId && $link->rel_type == $relType) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

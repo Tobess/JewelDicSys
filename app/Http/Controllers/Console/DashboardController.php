@@ -17,32 +17,6 @@ class DashboardController extends ConsoleController {
         return view('console.main');
     }
 
-//    /**
-//     * Generate words pinyin cache & pinyin link relations
-//     *
-//     * @param  int $type
-//     * @return \Illuminate\Http\Response
-//     */
-//    public function getGenerateCache($type)
-//    {
-//        $wRef = \App\WRef::getRefById($type);
-//        if (is_array($wRef)) {
-//            $dQue = \DB::table($wRef['table']);
-//            if (isset($wRef['where'])) {
-//                $dQue->whereRaw($wRef['where']);
-//            }
-//            $data = $dQue->get();
-//            foreach ($data as $row) {
-//                \App\Word::wordRefToLink($type, $row->id, $row->pinyin);
-//                \App\Word::wordRefToLink($type, $row->id, $row->letter, false);
-//            }
-//
-//            return \Response::json([]);
-//        } else {
-//            return \Response::json(['message'=>'无效的类型']);
-//        }
-//    }
-
     /**
      * Generate words pinyin cache & pinyin link relations
      *
@@ -73,6 +47,9 @@ class DashboardController extends ConsoleController {
             \App\Word::wordRefToLink($alias->rel_type, $alias->rel_id, $alias->pinyin);
             \App\Word::wordRefToLink($alias->rel_type, $alias->rel_id, $alias->letter, false);
         }
+
+        // 生成所有数据关联关系
+        \App\DLink::generateCache();
 
         return redirect()->back();
     }

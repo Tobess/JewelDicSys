@@ -23,7 +23,7 @@
     <th>名称</th>
     <th>拼音</th>
     <th>简拼</th>
-    <th style="width:106px;"></th>
+    <th style="width:159px;"></th>
 @stop
 
 @section('tableRows')
@@ -35,6 +35,7 @@
         <td>{{ $row->letter }}</td>
         <td>
             <button class="btn btn-xs btn-info m-b-none" type="button" onClick="save({{ $row->id }})">编辑</button>
+            <a class="btn btn-xs btn-danger m-b-none" type="button" href="/console/links?rel_type_src=8&rel_id_src={{ $row->id }}">链接</a>
             <a class="btn btn-xs btn-danger m-b-none" type="button" href="/console/styles/destroy/{{ $row->id }}">删除</a>
         </td>
     </tr>

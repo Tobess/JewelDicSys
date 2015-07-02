@@ -22,6 +22,7 @@
     </th>
     <th>名称</th>
     <th>配置</th>
+    <th>构成元素</th>
     <th>拼音</th>
     <th style="width:106px;"></th>
 @stop
@@ -32,6 +33,7 @@
         <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
         <td id="ruleName{{ $row->id }}">{{ $row->name }}</td>
         <td id="ruleCfg{{ $row->id }}">{{ $row->configure }}</td>
+        <td id="ruleEles{{ $row->id }}">{{ $row->elements }}</td>
         <td>{{ $row->pinyin }}</td>
         <td>
             <button class="btn btn-xs btn-info m-b-none" type="button" onClick="save({{ $row->id }})">编辑</button>
@@ -63,6 +65,7 @@
         if (id > 0) {
             mWin.find('[name="name"]').val($("#ruleName"+id).text());
             mWin.find('[name="configure"]').val($("#ruleCfg"+id).text());
+            mWin.find('[name="elements"]').val($("#ruleEles"+id).text());
         }
         mWin.find('[name="name"]').focus();
 

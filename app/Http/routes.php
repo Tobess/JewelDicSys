@@ -19,6 +19,7 @@ Route::controllers([
 	'password' => 'Auth\PasswordController',
 ]);
 
+// 管理后台
 Route::group(['namespace' => 'Console', 'prefix' => 'console'], function()
 {
     Route::get('/', 'DashboardController@getIndex');
@@ -34,4 +35,11 @@ Route::group(['namespace' => 'Console', 'prefix' => 'console'], function()
     Route::controller('styles', 'StyleController');
     Route::controller('varieties', 'VarietyController');
     Route::controller('aliases', 'AliasController');
+    Route::controller('links', 'DLinksController');
+});
+
+// 内网公开接口
+Route::group(['domain' => env('APP_DEBUG', false) ? '192.168.2.33' : '192.168.1.11'], function()
+{
+    Route::get('analyse/{identify}', 'HomeController@getAnalyse');
 });

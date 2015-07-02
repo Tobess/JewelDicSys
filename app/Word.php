@@ -10,6 +10,8 @@ class Word extends Model {
     private static $typeOpp = 2;// 反向拆分的拼音词根
     private static $typePos = 1;// 正向拆分的拼音词根
 
+    private static $currentPositive = 1;// 当前拆分方式(方向)
+
     /**
      * 拼音码的相关联的元素
      */
@@ -41,6 +43,21 @@ class Word extends Model {
         return isset($id) ? $id : false;
     }
 
+    /**
+     * 设置当前拆分方式(方向)
+     */
+    private static function _setCurrentPosition($pos)
+    {
+        switch (intval($pos)) {
+            case 0: self::$currentPositive = 0;break;
+            case 2: self::$currentPositive = 2;break;
+            default:
+            case 1: self::$currentPositive = 1;
+        }
+
+        return self::$currentPositive;
+    }
+
     /*
      * 通过拼音匹配出与拼音相关联的词汇元素
      */
@@ -50,7 +67,7 @@ class Word extends Model {
         if (is_array($pinyin)) {
             $cPinyin = implode('', $pinyin);
         } else {
-            $cPinyin = $pinyin =trim($pinyin);
+            $cPinyin = $pinyin = trim($pinyin);
         }
         if (\Cache::has(\App\WRef::CACHE_KEY_WORD_MATCH.intval($positive).':'.md5($cPinyin))) {
             $cWords = unserialize(\Cache::get(\App\WRef::CACHE_KEY_WORD_MATCH.intval($positive).':'.md5($cPinyin)));
@@ -133,8 +150,37 @@ class Word extends Model {
             $chars[] = substr($pinyin, $i, 1);
         }
         $pinyins = \App\WPinyin::getPinyinIndex();// 获得所有音节
+        $metalPinyins = \App\WPinyin::getMetalPinyinIndex();// 贵金属音节
         $matches = [];
         while ($char = array_shift($chars)) {
+            // 关于贵金属特殊拼音组合预先处理
+            if ($string == '') {
+                $mChar = $char;
+                $mLen = 0;
+                foreach ($chars as $_idx => $_char) {
+                    $mChar .= $_char;
+                    if (in_array($mChar, $metalPinyins)) {
+                        $mLen = $_idx+1;
+                        continue;
+                    }
+
+                    if ($_idx == 7) {
+                        break;
+                    }
+                }
+                if ($mLen > 0) {
+                    $string .= $char;
+                    while ($mLen > 0) {
+                        $string .= array_shift($chars);
+                        $mLen--;
+                    }
+                    array_push($matches, $string);
+                    $string = '';
+                    continue;
+                }
+            }
+
+            // 正常的拼音拆分匹配
             $string .= $char;
             if (in_array($string, $pinyins)) {
                 $cLen = count($chars);
@@ -251,6 +297,8 @@ class Word extends Model {
      */
     public static function search($query, $positive = true)
     {
+        self::_setCurrentPosition($positive);
+
         // 从缓存中确定匹配结果
         if (\Cache::has(\App\WRef::CACHE_KEY_WORD_SEARCH.intval($positive).':'.md5($query))) {
             $results = unserialize(\Cache::get(\App\WRef::CACHE_KEY_WORD_SEARCH.intval($positive).':'.md5($query)));
@@ -282,7 +330,6 @@ class Word extends Model {
                 $newTypes = array_merge($types);
                 $first = array_shift($newTypes);
                 $typeToRuleString = count($newTypes) ? self::typeToRuleModel($first, array_shift($newTypes), $newTypes) : $first;
-
                 $matchRules = self::matchRules($types, $typeToRuleString);
                 if ($matchRules) {
                     $relValTree = [];// 匹配的相关元素
@@ -298,14 +345,12 @@ class Word extends Model {
                         foreach ($rCfg as $index => $rel) {
                             $rel = trim($rel);
                             if (is_array(\App\WRef::getRefById($rel))) {
-                                // 根据真实的规则取出无效的匹配元素对象
+                                // 根据真实的规则去除无效的匹配元素对象
                                 $relValues = [];
                                 if (isset($typeLinks[$rel])) {
                                     foreach ($typeLinks[$rel] as $relId => $relIdx) {
-                                        foreach ($realRule as $rRule) {
-                                            if ($rRule[$relIdx] == $rel) {
-                                                $relValues[] = $relId;
-                                            }
+                                        if ($realRule[$relIdx] == $rel) {
+                                            $relValues[] = $relId;
                                         }
                                     }
                                 }
@@ -314,7 +359,7 @@ class Word extends Model {
                                     count($relValues) ? 'id in ('.implode(',', $relValues).')' : '');
                                 $tRelIds = [];
                                 foreach ($tValues as $relObj) {
-                                    if (in_array($rel, [1,2,3]) && \App\WRef::relationHasParentByTypeAndId($rel, $relObj->id)) continue;
+                                    if (in_array($rel, [1,2,3]) && \App\WRef::relationIsParentNodeByTypeAndId($rel, $relObj->id)) continue;
 
                                     $relObj->rel_type = $rel;
                                     $relValTree[$rel][$relObj->id] = $relObj;
@@ -329,13 +374,18 @@ class Word extends Model {
                                 $gName[] = $rel;
                             }
                         }
-                        if (count($gName) && $gNameCount <= 400000) {
+                        if (count($gName) && $gNameCount <= 20) {
                             $ruleTree[$ruleId] = $gName;
                             // 用规则生成结果列表
                             $newGNames = array_merge($gName);
                             $item = array_shift($newGNames);
-                            $first = self::parseGNameItem($item, $relValTree);
-                            $dicWords = count($newGNames) ? self::mergeDicWords($first, self::parseGNameItem(array_shift($newGNames), $relValTree), $newGNames, $relValTree) : $first;
+                            // 通过分析最优匹配来生成排序
+                            $prevMatchSubPYIdx = -1;
+                            $first = self::parseGNameItem($item, $relValTree, $prevMatchSubPYIdx, $words);
+                            $dicWords = count($newGNames) ?
+                                self::mergeDicWords($first,
+                                    self::parseGNameItem(array_shift($newGNames), $relValTree, $prevMatchSubPYIdx, $words),
+                                    $newGNames, $relValTree, $prevMatchSubPYIdx, $words) : $first;
                             $matchedResults = array_merge($matchedResults, $dicWords);
                         }
                     }
@@ -344,6 +394,10 @@ class Word extends Model {
                     {
                         return count($item['refs']);
                     });
+
+                    // 检测生成结果中的组成元素是否还能确定出为饱含在规则的元素
+                    self::checkLinkData($matchedResults, $relValTree);
+
                     $results = ['relTree'=>$relValTree, 'words'=>array_values($matchedResults)];
                 }
             }
@@ -358,21 +412,67 @@ class Word extends Model {
     }
 
     /**
+     * 通过分析生成的返回结果确定是否存在不包含在规则中的元素
+     */
+    private static function checkLinkData(&$words, &$relTree)
+    {
+        foreach ($words as &$word) {
+            // 获得数据的链接关系
+            $linkRefs = [];
+            foreach ($word['refs'] as $ref) {
+                $refArr = explode(':', $ref);
+                if (count($refArr) == 2) {
+                    $links = \App\DLink::getLinksBySrcTypeID($refArr[1], $refArr[0]);
+                    foreach ($links as $link) {
+                        if (!isset($relTree[$link->rel_type][$link->id])) {
+                            $relTree[$link->rel_type][$link->id] = $link;
+                        }
+                        $linkRefs[] = $link->id.':'.$link->rel_type;
+                    }
+                }
+            }
+
+            // 将通过关联数据确定的数据合并的返回结果中
+            $word['refs'] = array_merge($word['refs'], $linkRefs);
+        }
+    }
+
+    /**
      * 解析一个匹配部分用于名称生成
      */
-    private static function parseGNameItem($item, &$relValTree)
+    private static function parseGNameItem($item, &$relValTree, &$prevMatchSubPYIdx, &$words)
     {
+        $currentMatchWordIdx = $prevMatchSubPYIdx + 1;// 当前要匹配的拼音子词
+        $prevMatchSubPYIdx = $currentMatchWordIdx;
+        $items = [];
+
         if (is_array($item)) {
-            $items = [];
-            foreach ($item['data'] as $id) {
-                $type = $item['type'];
-                $items[] = ['title'=>$relValTree[$type][$id]->name, 'refs'=>[$id.':'.$type]];
-                if (in_array($type, [1,2,3])) {
-                    // 检测别名是否存在并加入名称生成中
-                    $aliases = \App\WAlias::getAliasesByTypeAndId($type, $id);
-                    if (count($aliases)) {
-                        foreach ($aliases as $alias) {
-                            $items[] = ['title'=>$alias->name, 'refs'=>[$id.':'.$type]];
+            // 词条存在
+            if (isset($words[$currentMatchWordIdx])) {
+                $_mWord = $words[$currentMatchWordIdx];
+                foreach ($item['data'] as $id) {
+                    $type = $item['type'];
+
+                    // TODO 当前匹配名称是严格模式，每次无论标准名称还是别名只会从中找出真实确认的那一个
+                    // TODO 后期是否需要支持通过真实匹配取出其标准名称及所有别名
+                    $strictMode = true;
+                    // 匹配标准名称
+                    if (!$strictMode ||
+                        ($_mWord == $relValTree[$type][$id]->pinyin || $_mWord == $relValTree[$type][$id]->letter)) {
+                        $items[] = ['title'=>$relValTree[$type][$id]->name, 'refs'=>[$id.':'.$type]];
+                    }
+
+                    // 当标准名称无法匹配时则匹配别名
+                    if (!count($items) && in_array($type, [1,2,3])) {
+                        // 检测别名是否存在并加入名称生成中
+                        $aliases = \App\WAlias::getAliasesByTypeAndId($type, $id);
+                        if (count($aliases)) {
+                            foreach ($aliases as $alias) {
+                                if (!$strictMode ||
+                                    ($_mWord == $alias->pinyin || $_mWord == $alias->letter)) {
+                                    $items[] = ['title'=>$alias->name, 'refs'=>[$id.':'.$type]];
+                                }
+                            }
                         }
                     }
                 }
@@ -387,7 +487,7 @@ class Word extends Model {
     /**
      * 珠宝名称合成
      */
-    private static function mergeDicWords($first, $second, &$sources, &$relValTree) {
+    private static function mergeDicWords($first, $second, &$sources, &$relValTree, &$prevMatchSubPYIdx, &$words) {
         $newFirst = [];
         foreach ($first as $fEle) {
             foreach ($second as $sEle) {
@@ -397,7 +497,9 @@ class Word extends Model {
             }
         }
 
-        return count($sources) ? self::mergeDicWords($newFirst, self::parseGNameItem(array_shift($sources), $relValTree), $sources, $relValTree) : $newFirst;
+        return count($sources) ?
+            self::mergeDicWords($newFirst, self::parseGNameItem(array_shift($sources), $relValTree, $prevMatchSubPYIdx, $words),
+                $sources, $relValTree, $prevMatchSubPYIdx, $words) : $newFirst;
     }
 
     /**
@@ -453,7 +555,7 @@ class Word extends Model {
      *
      * @param array $types 已匹配到的元素类型
      * @param array $typeToRules 用元素匹配类型生成的可能的规则组合
-     * @return array false for fail
+     * @return array | false for fail
      */
     private static function matchRules($types, $typeToRules)
     {
@@ -463,6 +565,7 @@ class Word extends Model {
         // 将已经匹配的名称组合元素生成正则匹配表达式
         $regex = '';
         $linkExt = '';
+        $lenTypeEles = count($types);
         foreach ($types as $type) {
             $regex .= $linkExt.'(\+['.implode(',', $type).']){1}';
             $linkExt = '+(.){0}+';
@@ -476,30 +579,25 @@ class Word extends Model {
 
             $rules = \App\Rule::getRulesAndCache();
             $matches = [];
-            foreach ($rules as $ruleId => $rule) {
-                $rCfg = explode('+', $rule);
-                $justEle = [];
-                foreach ($rCfg as $ele) {
-                    if (is_array(\App\WRef::getRefById($ele))) {
-                        $justEle[] = $ele;
-                    }
-                }
-                if (count($justEle) && preg_match('/'.$regex.'/', '+'.implode('+', $justEle))) {
+            foreach ($rules as $ruleId => $rItem) {
+                $rExp = $rItem['exp'];
+                $rElesExp = $rItem['elements'];
+                $rEles = explode(',', $rElesExp);
+                $rCfg = explode('+', $rExp);
+                $lenEles = count($rEles);
+                if ($lenEles > 0 && $lenEles == $lenTypeEles && preg_match('/'.$regex.'/', '+'.implode('+', $rEles))) {
                     // 筛选出正确的匹配规则
-                    $tMatchRule = [];
-                    foreach ($typeToRules as $_rule) {
-                        $_matchEles = [];
-                        $tRuleEle = explode(',', $_rule);
-                        foreach ($justEle as $ele) {
-                            if (in_array($ele, $tRuleEle)) {
-                                $_matchEles[] = $ele;
-                            }
-                        }
-                        if (implode(',', $_matchEles) == $_rule) {
-                            $tMatchRule[] = $tRuleEle;
+                    $hasMatched = true;
+                    foreach ($types as $_idx => $_type) {
+                        if (!in_array($rEles[$_idx], $_type)) {
+                            $hasMatched = false;
+                            break;
                         }
                     }
-                    $matches[] = ['ruleId'=>$ruleId, 'rule'=>$rule, 'realRule'=>$tMatchRule];
+
+                    if ($hasMatched) {
+                        $matches[] = ['ruleId'=>$ruleId, 'rule'=>$rExp, 'realRule'=>$rEles];
+                    }
                 }
             }
             if (count($matches)) {

@@ -23,7 +23,9 @@ class WRef {
 
     const CACHE_KEY_WORD_PARENT = 'words:parent:';// 属于父级节点的元素
 
-    const CACHE_KEY_WORD_SEARCH_EXPIRE = 30;//21600;
+    const CACHE_KEY_DATA_LINK = 'data:links:';// 数据与数据之间的链接关系
+
+    const CACHE_KEY_WORD_SEARCH_EXPIRE = 21600;
 
     /**
      * 名称生成规则元素类型
@@ -62,11 +64,10 @@ class WRef {
      *
      * @param $type
      * @param string $where
-     * @param string $key
      *
      * @return bool
      */
-    public static function getRelationNameByType($type, $where = '', $key = 'name')
+    public static function getRelationNameByType($type, $where = '')
     {
         $wRef = self::getRefById($type);
         if (is_array($wRef)) {
@@ -94,7 +95,7 @@ class WRef {
      *
      * @return bool
      */
-    public static function relationHasParentByTypeAndId($type, $id)
+    public static function relationIsParentNodeByTypeAndId($type, $id)
     {
         if (\Cache::has(\App\WRef::CACHE_KEY_WORD_PARENT.$type.':'.$id)) {
             return true;

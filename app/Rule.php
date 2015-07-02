@@ -17,7 +17,7 @@ class Rule extends Model {
             $rList = self::all();
             $rules = [];
             foreach ($rList as $rule) {
-                $rule->configure && ($rules[$rule->id] = $rule->configure);
+                $rule->configure && ($rules[$rule->id] = ['exp'=>$rule->configure, 'elements'=>$rule->elements]);
             }
             if (count($rules)) {
                 \Cache::put(\App\WRef::CACHE_KEY_RULE_IDX, serialize($rules), \App\WRef::CACHE_KEY_WORD_SEARCH_EXPIRE);

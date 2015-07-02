@@ -132,6 +132,11 @@ return [
 			'database' => 0,
 		],
 
+        'serve' => [
+            'host'     => env('REDIS_DB_HOST', '192.168.2.16'),
+            'port'     => env('REDIS_DB_PORT', 6379),
+            'database' => env('REDIS_DB_DATABASE', 0),
+        ]
 	],
 
 ];
