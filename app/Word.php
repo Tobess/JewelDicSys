@@ -319,6 +319,7 @@ class Word extends Model {
 
         // 如果存在匹配元素则进行规则匹配流程
         $results = [];
+        \Log::info('word:>'.print_r($words, true));
         if (count($words)) {
             $types = [];
             $typeLinks = [];
@@ -331,6 +332,7 @@ class Word extends Model {
                 $first = array_shift($newTypes);
                 $typeToRuleString = count($newTypes) ? self::typeToRuleModel($first, array_shift($newTypes), $newTypes) : $first;
                 $matchRules = self::matchRules($types, $typeToRuleString);
+                \Log::info('matchRulesword:>'.print_r($matchRules, true).'-'.print_r($wordIndexLinkToTypes, true));
                 if ($matchRules) {
                     $relValTree = [];// 匹配的相关元素
                     $ruleTree = [];// 匹配的名称规则
