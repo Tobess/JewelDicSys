@@ -23,7 +23,6 @@
     <th>名称</th>
     <th>配置</th>
     <th>构成元素</th>
-    <th>拼音</th>
     <th style="width:106px;"></th>
 @stop
 
@@ -34,7 +33,6 @@
         <td id="ruleName{{ $row->id }}">{{ $row->name }}</td>
         <td id="ruleCfg{{ $row->id }}">{{ $row->configure }}</td>
         <td id="ruleEles{{ $row->id }}">{{ $row->elements }}</td>
-        <td>{{ $row->pinyin }}</td>
         <td>
             <button class="btn btn-xs btn-info m-b-none" type="button" onClick="save({{ $row->id }})">编辑</button>
             <a class="btn btn-xs btn-danger m-b-none" type="button" href="/console/rules/destroy/{{ $row->id }}">删除</a>
