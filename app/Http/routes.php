@@ -39,7 +39,8 @@ Route::group(['namespace' => 'Console', 'prefix' => 'console'], function()
 });
 
 // 内网公开接口
-Route::group(['domain' => env('APP_DEBUG', false) ? '192.168.2.33' : '192.168.1.11'], function()
+Route::group(['domain' => env('APP_DEBUG', false) ? 'dictionary.app' : '192.168.1.11'], function()
 {
     Route::get('analyse/{identify}', 'HomeController@getAnalyse');
+    Route::controller('resource', 'ResourcesController');
 });

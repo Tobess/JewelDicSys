@@ -325,7 +325,7 @@ class Word extends Model {
             // 取出词根包含的名称组成元素类型集合
             $wordIndexLinkToTypes = self::getWordsLinkRelation($words, $typeLinks, $types, $positive);
             // 用词条的匹配的类型集合与系统名称规则定义的配置对比分析找出与之匹配的规则
-            if (count($types) >= 2) {
+            if ($wordIndexLinkToTypes !== false && count($types) >= 2) {
                 // 过滤掉无效的匹配元素
                 $newTypes = array_merge($types);
                 $first = array_shift($newTypes);
@@ -540,7 +540,7 @@ class Word extends Model {
 
                     $realWordLinkToMatchedTypes[$index] = $rIndex;
                     if ($mCount > 10) {
-                        abort(200, '', []);
+                        return false;
                     }
                 }
                 $rIndex++;

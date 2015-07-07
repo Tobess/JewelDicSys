@@ -55,27 +55,41 @@ class HomeController extends Controller {
             $gNames = $redis->get($redisIdentify);
             if ($gNames) {
                 $gNameArr = explode(',', $gNames);
+                $sKey = $redisIdentify.':status';
+                $redis->del($sKey);
+
                 foreach ($gNameArr as $gName) {
                     // 商品名称拆分队列
-                    \Queue::push(function($job) use ($gName, $redisIdentify, $redis)
+                    \Queue::push(function($job) use ($gName, $redisIdentify, $sKey)
                     {
-                        $gNameKey = $mainKey . ':'. md5($gName);
+                        $redis = \Redis::connection('serve');
+
+                        \Log::info('----------------');
+                        $gNameKey = $redisIdentify . ':'. md5($gName);
                         // S1 生成商品名称全拼码
                         $pinyin = pinyin($gName);
+                        \Log::info('--------'.$gName.'|'.$pinyin.'--------');
+                        \Log::info('-------'.$gNameKey.'---------');
                         // S2 拆分分析
                         $results = \App\Word::search($pinyin);
                         if (isset($results['words']) && count($results['words'])) {
-                            $_tmpWords = [];
-                            foreach ($results['words'] as $word) {
-                                $_tmpWords[] = implode(',', $word['refs']);
-                            }
-                            $redis->put($gNameKey, implode(';', $_tmpWords));
+                            $redis->set($gNameKey, json_encode($results));
+                            $redis->expire($gNameKey, 24*60*60);
                         }
+                        \Log::info(print_r($results, true));
+
+                        $count = 1;
+                        if ($redis->exists($sKey)) {
+                            $count = 1+intval($redis->get($sKey));
+                        }
+                        $redis->set($sKey, ''.$count);
+                        $redis->expire($sKey, 24*60*60);
+
                         $job->delete();
                     });
                 }
 
-                return \Response::json(['state'=>true, 'message'=>'拆分请求已推送至队列中，请使用'.$redisIdentify.':{md5(商品名称)}的key从Redis中获取拆分结果']);
+                return \Response::json(['state'=>true, 'message'=>'拆分请求已推送至队列中，请使用'.$redisIdentify.':status获取生成进度,使用'.$redisIdentify.':{md5(商品名称)}的key从Redis中获取拆分结果']);
             }
         }
 
