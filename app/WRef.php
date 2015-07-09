@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class WRef {
 
+    const CACHE_KEY_PY_CHINESE = 'pinyin:chinese:';// 汉子拼音转换缓存
+
     const CACHE_KEY_WORD_SEARCH = 'words:search:';// 拼音搜索缓存
     const CACHE_KEY_WORD_DIC = 'words:dic:';// 词根缓存
     const CACHE_KEY_WORD_MATCH = 'words:match:';// 拼音匹配缓存

@@ -93,7 +93,7 @@ class Word extends Model {
             }
             $wordList = array_merge($strings);
         }
-
+\Log::info('split:'.print_r($strings, true));
         // 匹配词条
         $word = '';
         $matches = [];
@@ -330,6 +330,7 @@ class Word extends Model {
                 $newTypes = array_merge($types);
                 $first = array_shift($newTypes);
                 $typeToRuleString = count($newTypes) ? self::typeToRuleModel($first, array_shift($newTypes), $newTypes) : $first;
+                \Log::info('types:'.print_r($types, true));
                 $matchRules = self::matchRules($types, $typeToRuleString);
                 if ($matchRules) {
                     $relValTree = [];// 匹配的相关元素
@@ -539,12 +540,13 @@ class Word extends Model {
                     }
 
                     $realWordLinkToMatchedTypes[$index] = $rIndex;
-                    if ($mCount > 10) {
-                        return false;
-                    }
                 }
                 $rIndex++;
             }
+        }
+
+        if ($mCount > 100) {
+            return false;
         }
 
         return $realWordLinkToMatchedTypes;
@@ -607,5 +609,24 @@ class Word extends Model {
         }
 
         return false;
+    }
+
+    /**
+     * Conver chinese word to pinyin if exist cache and get it in cache , or not and cache.
+     *
+     * @return string chinese pinyin
+     */
+    public static function getPinyinAndCache($chinese)
+    {
+        $chinese = trim($chinese);
+        $cKey = \App\WRef::CACHE_KEY_PY_CHINESE.md5($chinese);
+        if (\Cache::has($cKey)) {
+            $pinyin = \Cache::get($cKey);
+        } else {
+            $pinyin = pinyin($chinese);
+            \Cache::forever($cKey, $pinyin);
+        }
+
+        return $pinyin;
     }
 }

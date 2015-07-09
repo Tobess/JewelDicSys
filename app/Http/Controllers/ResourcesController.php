@@ -9,7 +9,42 @@ class ResourcesController extends Controller {
 
     public static function response($data)
     {
-        return \Response::json(is_array($data) ? $data : null);
+        return \Response::json($data);
+    }
+
+    /**
+     * Get the material by id.
+     *
+     * @param int $id
+     *
+     * @return Response
+     */
+    public function getMaterial($id)
+    {
+        $stone = \App\Material::getMaterialByID($id);
+
+        return self::response($stone);
+    }
+
+    /**
+     * Get the all materials.
+     *
+     * @return Response
+     */
+    public function getMaterials()
+    {
+        $ids = \Input::get('ids');
+        return self::response(\App\Material::allMaterials($ids));
+    }
+
+    /**
+     * Get the all parent nodes of material.
+     *
+     * @return Response
+     */
+    public function getMaterialsParent()
+    {
+        return self::response(\App\Material::getMaterialParentNodes());
     }
 
 	/**
@@ -25,17 +60,6 @@ class ResourcesController extends Controller {
 
         return self::response($stone);
 	}
-
-    /**
-     * Get the all materials.
-     *
-     * @return Response
-     */
-    public function getMaterials()
-    {
-        $ids = \Input::get('ids');
-        return self::response(\App\Material::allMaterials($ids));
-    }
 
     /**
      * Get the stone materials.
@@ -107,7 +131,7 @@ class ResourcesController extends Controller {
     {
         $brand = \App\Brand::getBrandByID($id);
 
-        return self::response($variety);
+        return self::response($brand);
     }
 
     /**

@@ -56,7 +56,7 @@ class HomeController extends Controller {
             if ($gNames) {
                 $gNameArr = explode(',', $gNames);
                 $sKey = $redisIdentify.':status';
-                $redis->del($sKey);
+                $redis->set($sKey, 0);
 
                 foreach ($gNameArr as $gName) {
                     // 商品名称拆分队列
@@ -64,25 +64,18 @@ class HomeController extends Controller {
                     {
                         $redis = \Redis::connection('serve');
 
-                        \Log::info('----------------');
                         $gNameKey = $redisIdentify . ':'. md5($gName);
                         // S1 生成商品名称全拼码
-                        $pinyin = pinyin($gName);
-                        \Log::info('--------'.$gName.'|'.$pinyin.'--------');
-                        \Log::info('-------'.$gNameKey.'---------');
+                        $pinyin = \App\Word::getPinyinAndCache($gName);
                         // S2 拆分分析
                         $results = \App\Word::search($pinyin);
                         if (isset($results['words']) && count($results['words'])) {
                             $redis->set($gNameKey, json_encode($results));
                             $redis->expire($gNameKey, 24*60*60);
                         }
-                        \Log::info(print_r($results, true));
 
                         $count = 1;
-                        if ($redis->exists($sKey)) {
-                            $count = 1+intval($redis->get($sKey));
-                        }
-                        $redis->set($sKey, ''.$count);
+                        $redis->incr($sKey);
                         $redis->expire($sKey, 24*60*60);
 
                         $job->delete();
