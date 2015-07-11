@@ -31,8 +31,8 @@
     <tr>
         <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
         <td id="styleName{{ $row->id }}">{{ $row->name }}</td>
-        <td>{{ $row->pinyin }}</td>
-        <td>{{ $row->letter }}</td>
+        <td id="stylePinyin{{ $row->id }}">{{ $row->pinyin }}</td>
+        <td id="styleLetter{{ $row->id }}">{{ $row->letter }}</td>
         <td>
             <button class="btn btn-xs btn-info m-b-none" type="button" onClick="save({{ $row->id }})">编辑</button>
             <a class="btn btn-xs btn-danger m-b-none" type="button" href="/console/links?rel_type_src=8&rel_id_src={{ $row->id }}">链接</a>
@@ -63,6 +63,8 @@
         mWin.find('form').attr('action', "/console/styles/" + (id > 0 ? ('update/' + id) : 'store'));
         if (id > 0) {
             mWin.find('[name="name"]').val($("#styleName"+id).text());
+            mWin.find('[name="pinyin"]').val($("#stylePinyin"+id).text());
+            mWin.find('[name="letter"]').val($("#styleLetter"+id).text());
         }
         mWin.find('[name="name"]').focus();
 

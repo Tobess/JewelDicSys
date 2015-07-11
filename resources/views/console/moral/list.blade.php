@@ -31,8 +31,8 @@
     <tr>
         <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
         <td id="moralName{{ $row->id }}">{{ $row->name }}</td>
-        <td>{{ $row->pinyin }}</td>
-        <td>{{ $row->letter }}</td>
+        <td id="moralPinyin{{ $row->id }}">{{ $row->pinyin }}</td>
+        <td id="moralLetter{{ $row->id }}">{{ $row->letter }}</td>
         <td>
             <button class="btn btn-xs btn-info m-b-none" type="button" onClick="save({{ $row->id }})">编辑</button>
             <a class="btn btn-xs btn-danger m-b-none" type="button" href="/console/morals/destroy/{{ $row->id }}">删除</a>
@@ -62,6 +62,8 @@
         mWin.find('form').attr('action', "/console/morals/" + (id > 0 ? ('update/' + id) : 'store'));
         if (id > 0) {
             mWin.find('[name="name"]').val($("#moralName"+id).text());
+            mWin.find('[name="pinyin"]').val($("#moralPinyin"+id).text());
+            mWin.find('[name="letter"]').val($("#moralLetter"+id).text());
         }
         mWin.find('[name="name"]').focus();
 

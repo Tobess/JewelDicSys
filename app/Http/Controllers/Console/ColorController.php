@@ -30,8 +30,8 @@ class ColorController extends ConsoleController {
         if ($name) {
             $color = new \App\Color;
             $color->name = $name;
-            $color->pinyin = pinyin($name);
-            $color->letter = letter($name);
+            $color->pinyin = \Input::get('pinyin')?:pinyin($name);
+            $color->letter = \Input::get('letter')?:letter($name);
             $color->save();
         }
 
@@ -61,8 +61,8 @@ class ColorController extends ConsoleController {
         $color = \App\Color::find($id);
         if ($name && $color) {
             $color->name = $name;
-            $color->pinyin = pinyin($name);
-            $color->letter = letter($name);
+            $color->pinyin = \Input::get('pinyin')?:pinyin($name);
+            $color->letter = \Input::get('letter')?:letter($name);
             $color->save();
         }
 

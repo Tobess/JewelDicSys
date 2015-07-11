@@ -31,8 +31,8 @@
     <tr>
         <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
         <td id="colorName{{ $row->id }}">{{ $row->name }}</td>
-        <td>{{ $row->pinyin }}</td>
-        <td>{{ $row->letter }}</td>
+        <td id="colorPinyin{{ $row->id }}">{{ $row->pinyin }}</td>
+        <td id="colorLetter{{ $row->id }}">{{ $row->letter }}</td>
         <td>
             <button class="btn btn-xs btn-info m-b-none" type="button" onClick="save({{ $row->id }})">编辑</button>
             <a class="btn btn-xs btn-danger m-b-none" type="button" href="/console/colors/destroy/{{ $row->id }}">删除</a>
@@ -62,6 +62,8 @@
         mWin.find('form').attr('action', "/console/colors/" + (id > 0 ? ('update/' + id) : 'store'));
         if (id > 0) {
             mWin.find('[name="name"]').val($("#colorName"+id).text());
+            mWin.find('[name="pinyin"]').val($("#colorPinyin"+id).text());
+            mWin.find('[name="letter"]').val($("#colorLetter"+id).text());
         }
         mWin.find('[name="name"]').focus();
 

@@ -30,8 +30,8 @@ class GradeController extends ConsoleController {
         if ($name) {
             $grade = new \App\Grade;
             $grade->name = $name;
-            $grade->pinyin = pinyin($name);
-            $grade->letter = letter($name);
+            $grade->pinyin = \Input::get('pinyin')?:pinyin($name);
+            $grade->letter = \Input::get('letter')?:letter($name);
             $grade->save();
         }
 
@@ -61,8 +61,8 @@ class GradeController extends ConsoleController {
         $grade = \App\Grade::find($id);
         if ($name && $grade) {
             $grade->name = $name;
-            $grade->pinyin = pinyin($name);
-            $grade->letter = letter($name);
+            $grade->pinyin = \Input::get('pinyin')?:pinyin($name);
+            $grade->letter = \Input::get('letter')?:letter($name);
             $grade->save();
         }
 

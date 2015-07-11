@@ -32,8 +32,8 @@
     <tr>
         <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
         <td id="aliasName{{ $row->id }}">{{ $row->name }}</td>
-        <td>{{ $row->pinyin }}</td>
-        <td>{{ $row->letter }}</td>
+        <td id="aliasPinyin{{ $row->id }}">{{ $row->pinyin }}</td>
+        <td id="aliasLetter{{ $row->id }}">{{ $row->letter }}</td>
         <td>
             <button class="btn btn-xs btn-info m-b-none" type="button" onClick="save({{ $row->id }})">编辑</button>
             <a class="btn btn-xs btn-danger m-b-none" type="button" href="/console/aliases/destroy/{{ $row->id }}">删除</a>
@@ -43,11 +43,11 @@
 @stop
 
 @section('footerLeft')
-    @include('layouts.blocks.jumper', ['paginator' => $rows, 'queries'=>''])
+    @include('layouts.blocks.jumper', ['paginator' => $rows, 'queries'=>'&type='.$tItem['id'].'&parent='.$pItem->id])
 @stop
 
 @section('footerRight')
-    @include('layouts.blocks.pager', ['paginator' =>$rows])
+    @include('layouts.blocks.pager', ['paginator' =>$rows->appends(['type' => $tItem['id'], 'parent' => $pItem->id])])
 @stop
 
 <!--编辑页面-->
@@ -63,7 +63,8 @@
             mWin.find('form').attr('action', "/console/aliases/" + (id > 0 ? ('update/' + id) : 'store'));
             if (id > 0) {
                 mWin.find('[name="name"]').val($("#aliasName"+id).text());
-
+                mWin.find('[name="pinyin"]').val($("#aliasPinyin"+id).text());
+                mWin.find('[name="letter"]').val($("#aliasLetter"+id).text());
             }
             mWin.find('[name="rel_type"]').val('{{ $tItem['id'] }}');
             mWin.find('[name="rel_id"]').val('{{ $pItem->id }}');

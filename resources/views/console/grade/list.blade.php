@@ -31,8 +31,8 @@
     <tr>
         <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
         <td id="gradeName{{ $row->id }}">{{ $row->name }}</td>
-        <td>{{ $row->pinyin }}</td>
-        <td>{{ $row->letter }}</td>
+        <td id="gradePinyin{{ $row->id }}">{{ $row->pinyin }}</td>
+        <td id="gradeLetter{{ $row->id }}">{{ $row->letter }}</td>
         <td>
             <button class="btn btn-xs btn-info m-b-none" type="button" onClick="save({{ $row->id }})">编辑</button>
             <a class="btn btn-xs btn-danger m-b-none" type="button" href="/console/grades/destroy/{{ $row->id }}">删除</a>
@@ -62,6 +62,8 @@
         mWin.find('form').attr('action', "/console/grades/" + (id > 0 ? ('update/' + id) : 'store'));
         if (id > 0) {
             mWin.find('[name="name"]').val($("#gradeName"+id).text());
+            mWin.find('[name="pinyin"]').val($("#gradePinyin"+id).text());
+            mWin.find('[name="letter"]').val($("#gradeLetter"+id).text());
         }
         mWin.find('[name="name"]').focus();
 

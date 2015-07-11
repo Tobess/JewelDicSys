@@ -30,8 +30,8 @@ class CraftController extends ConsoleController {
         if ($name) {
             $craft = new \App\Craft;
             $craft->name = $name;
-            $craft->pinyin = pinyin($name);
-            $craft->letter = letter($name);
+            $craft->pinyin = \Input::get('pinyin')?:pinyin($name);
+            $craft->letter = \Input::get('letter')?:letter($name);
             $craft->save();
         }
 
@@ -61,8 +61,8 @@ class CraftController extends ConsoleController {
         $craft = \App\Craft::find($id);
         if ($name && $craft) {
             $craft->name = $name;
-            $craft->pinyin = pinyin($name);
-            $craft->letter = letter($name);
+            $craft->pinyin = \Input::get('pinyin')?:pinyin($name);
+            $craft->letter = \Input::get('letter')?:letter($name);
             $craft->save();
         }
 

@@ -49,8 +49,8 @@
         <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
         <td id="materialCode{{ $row->id }}">{{ $row->code }}</td>
         <td id="materialName{{ $row->id }}">{{ $row->name }}</td>
-        <td>{{ $row->pinyin }}</td>
-        <td>{{ $row->letter }}</td>
+        <td id="materialPinyin{{ $row->id }}">{{ $row->pinyin }}</td>
+        <td id="materialLetter{{ $row->id }}">{{ $row->letter }}</td>
         <td id="materialDesc{{ $row->id }}">{{ $row->description }}</td>
         <td>
             <a href="/console/aliases?type={{ $row->type == 1 ? 2 : 1}}&parent={{ $row->id }}" class="btn btn-xs btn-info m-b-none" type="button">别名</a>
@@ -82,6 +82,8 @@
         mWin.find('form').attr('action', "/console/materials/" + (id > 0 ? ('update/' + id) : 'store'));
         if (id > 0) {
             mWin.find('[name="name"]').val($("#materialName"+id).text());
+            mWin.find('[name="pinyin"]').val($("#materialPinyin"+id).text());
+            mWin.find('[name="letter"]').val($("#materialLetter"+id).text());
         }
         mWin.find('[name="name"]').focus();
 

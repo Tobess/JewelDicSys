@@ -30,8 +30,8 @@ class StyleController extends ConsoleController {
         if ($name || $code) {
             $style = new \App\Style;
             $style->name = $name;
-            $style->pinyin = pinyin($name);
-            $style->letter = letter($name);
+            $style->pinyin = \Input::get('pinyin')?:pinyin($name);
+            $style->letter = \Input::get('letter')?:letter($name);
             $style->save();
         }
 
@@ -61,8 +61,8 @@ class StyleController extends ConsoleController {
         $style = \App\Style::find($id);
         if (($name || $code) && $style) {
             $style->name = $name;
-            $style->pinyin = pinyin($name);
-            $style->letter = letter($name);
+            $style->pinyin = \Input::get('pinyin')?:pinyin($name);
+            $style->letter = \Input::get('letter')?:letter($name);
             $style->save();
         }
 

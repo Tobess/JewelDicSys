@@ -41,8 +41,8 @@ class VarietyController extends ConsoleController {
         $variety->code = \Input::get('code');
         $variety->type = \Input::get('type');
         $variety->description = \Input::get('description');
-        $variety->pinyin = pinyin($variety->name);
-        $variety->letter = letter($variety->name);
+        $variety->pinyin = \Input::get('pinyin')?:pinyin($variety->name);
+        $variety->letter = \Input::get('letter')?:letter($variety->name);
         $variety->save();
 
         return redirect()->back();
@@ -128,8 +128,8 @@ class VarietyController extends ConsoleController {
         $variety->name = \Input::get('name');
         $variety->code = \Input::get('code');
         $variety->description = \Input::get('description');
-        $variety->pinyin = pinyin($variety->name);
-        $variety->letter = letter($variety->name);
+        $variety->pinyin = \Input::get('pinyin')?:pinyin($variety->name);
+        $variety->letter = \Input::get('letter')?:letter($variety->name);
         $variety->save();
 
         return redirect()->back();

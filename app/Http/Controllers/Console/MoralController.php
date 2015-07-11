@@ -30,8 +30,8 @@ class MoralController extends ConsoleController {
         if ($name) {
             $moral = new \App\Moral;
             $moral->name = $name;
-            $moral->pinyin = pinyin($name);
-            $moral->letter = letter($name);
+            $moral->pinyin = \Input::get('pinyin')?:pinyin($name);
+            $moral->letter = \Input::get('letter')?:letter($name);
             $moral->save();
         }
 
@@ -61,8 +61,8 @@ class MoralController extends ConsoleController {
         $moral = \App\Moral::find($id);
         if ($name && $moral) {
             $moral->name = $name;
-            $moral->pinyin = pinyin($name);
-            $moral->letter = letter($name);
+            $moral->pinyin = \Input::get('pinyin')?:pinyin($name);
+            $moral->letter = \Input::get('letter')?:letter($name);
             $moral->save();
         }
 

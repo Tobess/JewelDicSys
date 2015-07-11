@@ -40,6 +40,22 @@
             </div>
         </div>
         <div>
+            <div class="col-sm-6 wrapper-xs">
+                <div class="form-group" id="materialParentBox">
+                    <label>拼音</label>
+                    <div >
+                        <input name="pinyin" type="text" class="form-control" placeholder="请输入拼音">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 wrapper-xs">
+                <div class="form-group">
+                    <label>简拼</label>
+                    <input name="letter" type="text" class="form-control" placeholder="请输入简拼">
+                </div>
+            </div>
+        </div>
+        <div>
             <div class="col-sm-12 wrapper-xs">
                 <div class="form-group">
                     <label>描述</label>

@@ -49,8 +49,8 @@
         <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
         <td id="varietyCode{{ $row->id }}">{{ $row->code }}</td>
         <td id="varietyName{{ $row->id }}">{{ $row->name }}</td>
-        <td>{{ $row->pinyin }}</td>
-        <td>{{ $row->letter }}</td>
+        <td id="varietyPinyin{{ $row->id }}">{{ $row->pinyin }}</td>
+        <td id="varietyLetter{{ $row->id }}">{{ $row->letter }}</td>
         <td id="varietyDesc{{ $row->id }}">{{ $row->description }}</td>
         <td>
             <a href="/console/aliases?type=3&parent={{ $row->id }}" class="btn btn-xs btn-info m-b-none" type="button">别名</a>
@@ -84,6 +84,8 @@
             mWin.find('[name="code"]').val($("#varietyCode"+id).text());
             mWin.find('[name="name"]').val($("#varietyName"+id).text());
             mWin.find('[name="descrition"]').val($("#varietyDesc"+id).text());
+            mWin.find('[name="pinyin"]').val($("#varietyPinyin"+id).text());
+            mWin.find('[name="letter"]').val($("#varietyLetter"+id).text());
         }
         mWin.find('[name="name"]').focus();
 

@@ -30,8 +30,8 @@ class BrandController extends ConsoleController {
         if ($name) {
             $brand = new \App\Brand;
             $brand->name = $name;
-            $brand->pinyin = pinyin($name);
-            $brand->letter = letter($name);
+            $brand->pinyin = \Input::get('pinyin')?:pinyin($name);
+            $brand->letter = \Input::get('letter')?:letter($name);
             $brand->save();
         }
 
@@ -61,8 +61,8 @@ class BrandController extends ConsoleController {
         $brand = \App\Brand::find($id);
         if ($name && $brand) {
             $brand->name = $name;
-            $brand->pinyin = pinyin($name);
-            $brand->letter = letter($name);
+            $brand->pinyin = \Input::get('pinyin')?:pinyin($name);
+            $brand->letter = \Input::get('letter')?:letter($name);
             $brand->save();
         }
 
