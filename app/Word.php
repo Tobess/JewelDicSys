@@ -6,12 +6,6 @@ class Word extends Model {
 
     public $timestamps = false;
 
-    private static $typeDef = 0;// 完整拼音型
-    private static $typeOpp = 2;// 反向拆分的拼音词根
-    private static $typePos = 1;// 正向拆分的拼音词根
-
-    private static $currentPositive = 1;// 当前拆分方式(方向)
-
     /**
      * 拼音码的相关联的元素
      */
@@ -28,11 +22,9 @@ class Word extends Model {
         if (\Cache::has(\App\WRef::CACHE_KEY_WORD_DIC.md5($key))) {
             $id = \Cache::get(\App\WRef::CACHE_KEY_WORD_DIC.md5($key));
         } else {
-            $typeDef = self::$typeDef;
-            $typeDes = $positive ? self::$typePos : self::$typeOpp;
             $word = self::where('key', $key)
-                ->where(function($query) use ($typeDef, $typeDes) {
-                    $query->where('type', $typeDef)->orWhere('type', $typeDes);
+                ->where(function($query) use ($positive) {
+                    $query->where('fullable', 1)->orWhere($positive ? 'positive' : 'reverse', 1);
                 })->first();
             if ($word && $word->id > 0) {
                 $id = $word->id;
@@ -41,21 +33,6 @@ class Word extends Model {
         }
 
         return isset($id) ? $id : false;
-    }
-
-    /**
-     * 设置当前拆分方式(方向)
-     */
-    private static function _setCurrentPosition($pos)
-    {
-        switch (intval($pos)) {
-            case 0: self::$currentPositive = 0;break;
-            case 2: self::$currentPositive = 2;break;
-            default:
-            case 1: self::$currentPositive = 1;
-        }
-
-        return self::$currentPositive;
     }
 
     /*
@@ -93,7 +70,7 @@ class Word extends Model {
             }
             $wordList = array_merge($strings);
         }
-
+\Log::info('split:'.print_r($strings, true));
         // 匹配词条
         $word = '';
         $matches = [];
@@ -245,7 +222,7 @@ class Word extends Model {
      */
     public static function wordRefToLink($relType, $relId, $pinyin, $isFullPy = true)
     {
-        self::wordLinkSave($relType, $relId, $pinyin);
+        self::wordLinkSave($relType, $relId, $pinyin, true);
         if ($isFullPy) {
             $pySplits = [];
             self::split($pinyin, $pySplits);
@@ -258,7 +235,7 @@ class Word extends Model {
                 array_pop($posPySplits);
                 while ($word = array_shift($posPySplits)) {
                     $pinyin .= $word;
-                    self::wordLinkSave($relType, $relId, $pinyin, self::$typePos);
+                    self::wordLinkSave($relType, $relId, $pinyin, false, true, false);
                 }
 
                 // 反向拆分
@@ -266,7 +243,7 @@ class Word extends Model {
                 $pinyin = '';
                 while ($word = array_pop($oppPySplits)) {
                     $pinyin = $word.$pinyin;
-                    self::wordLinkSave($relType, $relId, $pinyin, self::$typeOpp);
+                    self::wordLinkSave($relType, $relId, $pinyin, false, false, true);
                 }
             }
         }
@@ -275,14 +252,24 @@ class Word extends Model {
     /**
      * 添加词根并保存拼音链接关系
      */
-    private static function wordLinkSave($relType, $relId, $pinyin, $pyType = 0) {
+    private static function wordLinkSave($relType, $relId, $pinyin,
+                                         $fullable = false, $positive = false, $reverse = false) {
         $py = self::where('key', $pinyin)->first();
         if (!$py || !$py->id) {
             $py = new self;
             $py->key = strtolower($pinyin);
-            $py->type = in_array($pyType, [1, 2]) ? $pyType : 0;
-            $py->save();
         }
+
+        if ($fullable) {
+            $py->fullable = 1;
+        }
+        if ($positive) {
+            $py->positive = 1;
+        }
+        if ($reverse) {
+            $py->reverse = 1;
+        }
+        $py->save();
 
         \App\WRelation::link($py->id, $relType, $relId);
     }
@@ -297,8 +284,6 @@ class Word extends Model {
      */
     public static function search($query, $positive = true)
     {
-        self::_setCurrentPosition($positive);
-
         // 从缓存中确定匹配结果
         if (\Cache::has(\App\WRef::CACHE_KEY_WORD_SEARCH.intval($positive).':'.md5($query))) {
             $results = unserialize(\Cache::get(\App\WRef::CACHE_KEY_WORD_SEARCH.intval($positive).':'.md5($query)));
@@ -330,7 +315,7 @@ class Word extends Model {
                 $newTypes = array_merge($types);
                 $first = array_shift($newTypes);
                 $typeToRuleString = count($newTypes) ? self::typeToRuleModel($first, array_shift($newTypes), $newTypes) : $first;
-
+                \Log::info('types:'.print_r($words, true));
                 $matchRules = self::matchRules($types, $typeToRuleString);
                 if ($matchRules) {
                     $relValTree = [];// 匹配的相关元素
