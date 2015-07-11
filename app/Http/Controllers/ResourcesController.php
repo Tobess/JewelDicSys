@@ -27,6 +27,30 @@ class ResourcesController extends Controller {
     }
 
     /**
+     * Get the material by alias.
+     *
+     * @param string $alias
+     *
+     * @return Response
+     */
+    public function getMaterialAlias($alias)
+    {
+        return self::response(\App\Material::getMaterialByAlias($alias));
+    }
+
+    /**
+     * Get the metal by alias.
+     *
+     * @param string $alias
+     *
+     * @return Response
+     */
+    public function getMetalAlias($alias)
+    {
+        return self::response(\App\Material::getMaterialByAlias($alias, true));
+    }
+
+    /**
      * Get the all materials.
      *
      * @return Response
@@ -109,6 +133,18 @@ class ResourcesController extends Controller {
         $variety = \App\Variety::getVarietyByID($id);
 
         return self::response($variety);
+    }
+
+    /**
+     * Get the variety by alias.
+     *
+     * @param string $alias
+     *
+     * @return Response
+     */
+    public function getVarietyAlias($alias)
+    {
+        return self::response(\App\Variety::getVarietyByAlias($alias));
     }
 
     /**
@@ -258,6 +294,28 @@ class ResourcesController extends Controller {
     {
         $ids = \Input::get('ids');
         return self::response(\App\Style::allStyles($ids));
+    }
+
+    /**
+     * Get rule by id.
+     *
+     * @return Response
+     */
+    public function getRule($id)
+    {
+        $item = \App\Rule::find($id);
+
+        return self::response($item);
+    }
+
+    /**
+     * Get the rules.
+     *
+     * @return Response
+     */
+    public function getRules()
+    {
+        return self::response(\App\Rule::all());
     }
 
 }

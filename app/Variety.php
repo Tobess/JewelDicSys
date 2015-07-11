@@ -29,4 +29,31 @@ class Variety extends Model {
         return false;
     }
 
+    /**
+     * 获得材质通过名称
+     */
+    public static function getVarietyByAlias($alias)
+    {
+        $variety = self::where('name', $alias)->first();
+        if ($variety) {
+            $vItem = $variety->toArray();
+
+            return \App\Material::_convert($vItem, true, 'variety_');
+        } else {
+            // 通过别名搜索
+            $aliases = \App\WAlias::where('name', $alias)->where('rel_type', 3)->get();
+            if (count($aliases)) {
+                $relIdArr = [];
+                foreach ($aliases as $aItem) {
+                    !in_array($aItem->rel_id, $relIdArr) && ($relIdArr[] = $aItem->rel_id);
+                }
+                if (count($relIdArr) == 1) {
+                    return self::getVarietyByID(array_shift($relIdArr));
+                }
+            }
+        }
+
+        return false;
+    }
+
 }

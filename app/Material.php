@@ -92,24 +92,66 @@ class Material extends Model {
         return self::_convert($ids ? self::whereRaw('id in ('.$ids.')')->get() : self::all());
     }
 
-        /**
+    /**
      * 获得指定材质的信息
      */
     public static function getMaterialByID($id)
     {
         $material = self::find($id);
         if ($material) {
-            $mItem = $material->toArray();
-            // 如果为贵金属，则获取贵金属详细信息
-            if ($material->type == 1) {
-                $metal = \App\MMetal::find($id);
-                if ($metal) {
-                    $metal->type_sub = $metal->metal;
-                    $mItem = array_merge($mItem, self::_convert($metal, true));
+            return self::parseMaterial($material);
+        }
+
+        return false;
+    }
+
+    private static function parseMaterial($material)
+    {
+        $mItem = $material->toArray();
+        // 如果为贵金属，则获取贵金属详细信息
+        if ($material->type == 1) {
+            $metal = \App\MMetal::find($material->id);
+            if ($metal) {
+                $metal->type_sub = $metal->metal;
+                $mItem = array_merge($mItem, self::_convert($metal, true));
+            }
+        }
+
+        return self::_convert($mItem, true);
+    }
+
+    /**
+     * 获得材质通过名称
+     */
+    public static function getMaterialByAlias($alias, $isMetal = false)
+    {
+        if ($isMetal) {
+            $material = self::where('name', $alias)->where('type', 1)->first();
+        } else {
+            $material = self::where('name', $alias)->first();
+        }
+
+        if ($material) {
+            return self::parseMaterial($material);
+        } else {
+            // 通过别名搜索
+            $aliasesQue = \App\WAlias::where('name', $alias);
+            if ($isMetal) {
+                $aliasesQue->where('rel_type', 2);
+            } else {
+                $aliasesQue->whereRaw('rel_type in (1, 2)');
+            }
+            $aliases = $aliasesQue->get();
+
+            if (count($aliases)) {
+                $relIdArr = [];
+                foreach ($aliases as $aItem) {
+                    !in_array($aItem->rel_id, $relIdArr) && ($relIdArr[] = $aItem->rel_id);
+                }
+                if (count($relIdArr) == 1) {
+                    return self::getMaterialByID(array_shift($relIdArr));
                 }
             }
-
-            return self::_convert($mItem, true);
         }
 
         return false;

@@ -15,7 +15,7 @@ class Brand extends Model {
      */
     public static function allBrands($ids)
     {
-        return \App\Material::_convert($ids ? self::whereRaw('id in ('.$ids.')')->get() : self::all(), false, 'brand_');
+        return \App\Material::_convert($ids ? self::whereRaw('id in ('.$ids.')')->orderBy('name')->get() : self::orderBy('name')->get(), false, 'brand_');
     }
 
     /**
