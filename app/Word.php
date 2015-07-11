@@ -93,7 +93,7 @@ class Word extends Model {
             }
             $wordList = array_merge($strings);
         }
-\Log::info('split:'.print_r($strings, true));
+
         // 匹配词条
         $word = '';
         $matches = [];
@@ -330,7 +330,7 @@ class Word extends Model {
                 $newTypes = array_merge($types);
                 $first = array_shift($newTypes);
                 $typeToRuleString = count($newTypes) ? self::typeToRuleModel($first, array_shift($newTypes), $newTypes) : $first;
-                \Log::info('types:'.print_r($types, true));
+
                 $matchRules = self::matchRules($types, $typeToRuleString);
                 if ($matchRules) {
                     $relValTree = [];// 匹配的相关元素
