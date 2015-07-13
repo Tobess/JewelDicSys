@@ -304,7 +304,7 @@ class Word extends Model {
                     serialize($words), \App\WRef::CACHE_KEY_WORD_SEARCH_EXPIRE);
             }
         }
-
+\Log::info(print_r($words, true));
         // 如果存在匹配元素则进行规则匹配流程
         $results = [];
         if (count($words)) {
@@ -312,13 +312,13 @@ class Word extends Model {
             $typeLinks = [];
             // 取出词根包含的名称组成元素类型集合
             $wordIndexLinkToTypes = self::getWordsLinkRelation($words, $typeLinks, $types, $positive);
+            \Log::info(print_r($types, true));
             // 用词条的匹配的类型集合与系统名称规则定义的配置对比分析找出与之匹配的规则
             if ($wordIndexLinkToTypes !== false && count($types) >= 2) {
                 // 过滤掉无效的匹配元素
                 $newTypes = array_merge($types);
                 $first = array_shift($newTypes);
                 $typeToRuleString = count($newTypes) ? self::typeToRuleModel($first, array_shift($newTypes), $newTypes) : $first;
-
                 $matchRules = self::matchRules($types, $typeToRuleString);
                 if ($matchRules) {
                     $relValTree = [];// 匹配的相关元素
@@ -363,6 +363,7 @@ class Word extends Model {
                                 $gName[] = $rel;
                             }
                         }
+
                         if (count($gName) && $gNameCount <= 20) {
                             $ruleTree[$ruleId] = $gName;
                             // 用规则生成结果列表
@@ -375,6 +376,7 @@ class Word extends Model {
                                 self::mergeDicWords($first,
                                     self::parseGNameItem(array_shift($newGNames), $relValTree, $prevMatchSubPYIdx, $words),
                                     $newGNames, $relValTree, $prevMatchSubPYIdx, $words) : $first;
+                            \Log::info('>>>'.print_r($first, true));
                             $matchedResults = array_merge($matchedResults, $dicWords);
                         }
                     }
@@ -447,7 +449,7 @@ class Word extends Model {
                     $strictMode = true;
                     // 匹配标准名称
                     if (!$strictMode ||
-                        ($_mWord == $relValTree[$type][$id]->pinyin || $_mWord == $relValTree[$type][$id]->letter)) {
+                        (strcasecmp($_mWord, $relValTree[$type][$id]->pinyin) === 0 || strcasecmp($_mWord, $relValTree[$type][$id]->letter) === 0)) {
                         $items[] = ['title'=>$relValTree[$type][$id]->name, 'refs'=>[$id.':'.$type]];
                     }
 
@@ -458,7 +460,7 @@ class Word extends Model {
                         if (count($aliases)) {
                             foreach ($aliases as $alias) {
                                 if (!$strictMode ||
-                                    ($_mWord == $alias->pinyin || $_mWord == $alias->letter)) {
+                                    (strcasecmp($_mWord, $alias->pinyin) === 0 || strcasecmp($_mWord, $alias->letter) === 0)) {
                                     $items[] = ['title'=>$alias->name, 'refs'=>[$id.':'.$type]];
                                 }
                             }

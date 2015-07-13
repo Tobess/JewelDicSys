@@ -34,7 +34,7 @@ class HomeController extends Controller {
         $query = \Input::get('query');
         $posResults = \App\Word::search($query);
         if (isset($posResults['words']) && !count($posResults['words'])) {
-            $results = \App\Word::search($query, false);
+            $results = [];//\App\Word::search($query, false);
         } else {
             $results = $posResults;
         }
