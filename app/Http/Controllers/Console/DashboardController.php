@@ -25,16 +25,17 @@ class DashboardController extends ConsoleController {
     public function getGenerateCache()
     {
         // 清除缓存
-        $keysPinyin = \Redis::keys('pinyin*');
-        \Redis::forgot($keysPinyin);
-        $keysWords = \Redis::keys('words*');
-        \Redis::forgot($keysWords);
-        $keysRules = \Redis::keys('rules*');
-        \Redis::forgot($keysRules);
-        $keysAlias = \Redis::keys('aliases*');
-        \Redis::forgot($keysAlias);
-        $keysData = \Redis::keys('data*');
-        \Redis::forgot($keysData);
+        $redis = Redis::connection();
+        $keysPinyin = $redis->keys('pinyin*');
+        $redis->forgot($keysPinyin);
+        $keysWords = $redis->keys('words*');
+        $redis->forgot($keysWords);
+        $keysRules = $redis->keys('rules*');
+        $redis->forgot($keysRules);
+        $keysAlias = $redis->keys('aliases*');
+        $redis->forgot($keysAlias);
+        $keysData = $redis->keys('data*');
+        $redis->forgot($keysData);
 
         // 生成所有词根
         $wRefs = \App\WRef::allRefs();
