@@ -304,7 +304,7 @@ class Word extends Model {
                     serialize($words), \App\WRef::CACHE_KEY_WORD_SEARCH_EXPIRE);
             }
         }
-\Log::info(print_r($words, true));
+
         // 如果存在匹配元素则进行规则匹配流程
         $results = [];
         if (count($words)) {
@@ -312,7 +312,7 @@ class Word extends Model {
             $typeLinks = [];
             // 取出词根包含的名称组成元素类型集合
             $wordIndexLinkToTypes = self::getWordsLinkRelation($words, $typeLinks, $types, $positive);
-            \Log::info(print_r($types, true));
+
             // 用词条的匹配的类型集合与系统名称规则定义的配置对比分析找出与之匹配的规则
             if ($wordIndexLinkToTypes !== false && count($types) >= 2) {
                 // 过滤掉无效的匹配元素
@@ -376,7 +376,7 @@ class Word extends Model {
                                 self::mergeDicWords($first,
                                     self::parseGNameItem(array_shift($newGNames), $relValTree, $prevMatchSubPYIdx, $words),
                                     $newGNames, $relValTree, $prevMatchSubPYIdx, $words) : $first;
-                            \Log::info('>>>'.print_r($first, true));
+
                             $matchedResults = array_merge($matchedResults, $dicWords);
                         }
                     }
