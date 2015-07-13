@@ -27,15 +27,15 @@ class DashboardController extends ConsoleController {
         // 清除缓存
         $redis = \Redis::connection();
         $keysPinyin = $redis->keys('pinyin*');
-        $redis->forgot($keysPinyin);
+        $redis->del($keysPinyin);
         $keysWords = $redis->keys('words*');
-        $redis->forgot($keysWords);
+        $redis->del($keysWords);
         $keysRules = $redis->keys('rules*');
-        $redis->forgot($keysRules);
+        $redis->del($keysRules);
         $keysAlias = $redis->keys('aliases*');
-        $redis->forgot($keysAlias);
+        $redis->del($keysAlias);
         $keysData = $redis->keys('data*');
-        $redis->forgot($keysData);
+        $redis->del($keysData);
 
         // 生成所有词根
         $wRefs = \App\WRef::allRefs();
