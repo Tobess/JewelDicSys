@@ -108,7 +108,7 @@ class Word extends Model {
     /*
      * 全拼拼音分词处理
      */
-    public static function split($pinyin, &$words)
+    public static function split($pinyin, &$words, $positive = true)
     {
         $pinyin = trim($pinyin);
         if (\Cache::has(\App\WRef::CACHE_KEY_WORD_SPLIT.md5($pinyin))) {
@@ -128,27 +128,38 @@ class Word extends Model {
         }
         $pinyins = \App\WPinyin::getPinyinIndex();// 获得所有音节
         $metalPinyins = \App\WPinyin::getMetalPinyinIndex();// 贵金属音节
+        $maxMetalPinyinLen = 1;
+        foreach ($metalPinyins as $mPinyin) {
+            $maxMetalPinyinLen = max($maxMetalPinyinLen, strlen($mPinyin));
+        }
         $matches = [];
-        while ($char = array_shift($chars)) {
+        while ($char = (!$positive ? array_pop($chars) : array_shift($chars))) {
             // 关于贵金属特殊拼音组合预先处理
             if ($string == '') {
                 $mChar = $char;
-                $mLen = 0;
-                foreach ($chars as $_idx => $_char) {
-                    $mChar .= $_char;
+                $mLen = [];
+                $mChars = !$positive ? array_reverse($chars) : $chars;
+                foreach ($mChars as $_idx => $_char) {
+                    $positive ? ($mChar .= $_char) : ($mChar = $_char.$mChar);
                     if (in_array($mChar, $metalPinyins)) {
-                        $mLen = $_idx+1;
+                        $mLen[] = $_idx+1;
                         continue;
                     }
 
-                    if ($_idx == 7) {
+                    if ($_idx == $maxMetalPinyinLen) {
                         break;
                     }
                 }
-                if ($mLen > 0) {
+
+                if (count($mLen) > 0) {
+                    $mLen = array_pop($mLen);
                     $string .= $char;
                     while ($mLen > 0) {
-                        $string .= array_shift($chars);
+                        if ($positive) {
+                            $string .= array_shift($chars);
+                        } else {
+                            $string = array_pop($chars).$string;
+                        }
                         $mLen--;
                     }
                     array_push($matches, $string);
@@ -158,16 +169,16 @@ class Word extends Model {
             }
 
             // 正常的拼音拆分匹配
-            $string .= $char;
+            $positive ? ($string .= $char) : ($string = $char.$string);
             if (in_array($string, $pinyins)) {
                 $cLen = count($chars);
                 if ($cLen &&
                     (// 尝试向后推演，判断是否是一个完整的拼音的部分，因为拼音长度最多6故推演5次尝试
-                        ($cLen >= 1 && in_array($string.$chars[0], $pinyins)) ||
-                        ($cLen >= 2 && in_array($string.$chars[1], $pinyins)) ||
-                        ($cLen >= 3 && in_array($string.$chars[2], $pinyins)) ||
-                        ($cLen >= 4 && in_array($string.$chars[3], $pinyins)) ||
-                        ($cLen >= 5 && in_array($string.$chars[4], $pinyins))
+                        ($cLen >= 1 && in_array($positive ? $string.$chars[0] : $chars[$cLen - 1].$string, $pinyins)) ||
+                        ($cLen >= 2 && in_array($positive ? $string.$chars[1] : $chars[$cLen - 2].$string, $pinyins)) ||
+                        ($cLen >= 3 && in_array($positive ? $string.$chars[2] : $chars[$cLen - 3].$string, $pinyins)) ||
+                        ($cLen >= 4 && in_array($positive ? $string.$chars[3] : $chars[$cLen - 4].$string, $pinyins)) ||
+                        ($cLen >= 5 && in_array($positive ? $string.$chars[4] : $chars[$cLen - 5].$string, $pinyins))
                     )) {
                     continue;
                 } else {
@@ -177,12 +188,16 @@ class Word extends Model {
             }
         }
 
+        if (!$positive) {
+            $matches = array_reverse($matches);
+        }
+
         if (count($matches) && implode('', $matches) == $pinyin) {
             $words = $matches;
             \Cache::forever(\App\WRef::CACHE_KEY_WORD_SPLIT.md5($pinyin), implode('|', $matches));
             return true;
         } else {
-            return false;
+            return $positive ? self::split($pinyin, $words, false) : false;
         }
     }
 

@@ -81,6 +81,7 @@ class WPinyin extends Model {
         'g585',
         '18kj',
         'au750',
+        'jinau750',
         'g750',
         'g18K',
         '22kj',
@@ -141,6 +142,9 @@ class WPinyin extends Model {
         'pd950',
         'pd990',
         'pd999',
+
+        // 其他
+        'bixi',
 
     ];
 
