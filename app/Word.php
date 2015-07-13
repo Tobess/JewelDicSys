@@ -284,6 +284,8 @@ class Word extends Model {
      */
     public static function search($query, $positive = true)
     {
+        $query = strtolower($query);
+
         // 从缓存中确定匹配结果
         if (\Cache::has(\App\WRef::CACHE_KEY_WORD_SEARCH.intval($positive).':'.md5($query))) {
             $results = unserialize(\Cache::get(\App\WRef::CACHE_KEY_WORD_SEARCH.intval($positive).':'.md5($query)));
