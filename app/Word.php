@@ -254,10 +254,11 @@ class Word extends Model {
      */
     private static function wordLinkSave($relType, $relId, $pinyin,
                                          $fullable = false, $positive = false, $reverse = false) {
+        $pinyin = strtolower($pinyin);
         $py = self::where('key', $pinyin)->first();
         if (!$py || !$py->id) {
             $py = new self;
-            $py->key = strtolower($pinyin);
+            $py->key = $pinyin;
         }
 
         if ($fullable) {
