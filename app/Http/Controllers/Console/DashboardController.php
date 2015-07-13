@@ -25,42 +25,47 @@ class DashboardController extends ConsoleController {
     public function getGenerateCache()
     {
         // 清除缓存
-        $redis = \Redis::connection();
-        $keysPinyin = $redis->keys('pinyin*');
-        $keysWords = $redis->keys('words*');
-        $keysRules = $redis->keys('rules*');
-        $keysAlias = $redis->keys('aliases*');
-        $keysData = $redis->keys('data*');
-        foreach (array_merge($keysPinyin, $keysWords, $keysRules, $keysAlias, $keysData) as $key) {
-            $redis->del($key);
+        $keyPrefix = 'laravel:dictionary:';
+        foreach (['pinyin*', 'words*', 'rules*', 'aliases*', 'data*'] as $key) {
+            $exitCode = \Artisan::call('redis:clear', ['key' => $keyPrefix.$key]);
         }
 
-        // 生成所有词根
-        $wRefs = \App\WRef::allRefs();
-        foreach ($wRefs as $wRef) {
-            if (is_array($wRef)) {
-                $dQue = \DB::table($wRef['table']);
-                if (isset($wRef['where'])) {
-                    $dQue->whereRaw($wRef['where']);
-                }
-                $data = $dQue->get();
-                \App\WRelation::unlinkByType($wRef['id']);
-                foreach ($data as $row) {
-                    \App\Word::wordRefToLink($wRef['id'], $row->id, $row->pinyin);
-                    \App\Word::wordRefToLink($wRef['id'], $row->id, $row->letter, false);
+        \DB::transaction(function()
+        {
+            // 生成所有词根
+            if (\App\WRelation::count()) {
+                \DB::table('words_relations')->delete();
+            }
+            if (\App\Word::count()) {
+                \DB::table('words')->delete();
+            }
+
+            $wRefs = \App\WRef::allRefs();
+            foreach ($wRefs as $wRef) {
+                if (is_array($wRef)) {
+                    $dQue = \DB::table($wRef['table']);
+                    if (isset($wRef['where'])) {
+                        $dQue->whereRaw($wRef['where']);
+                    }
+                    $data = $dQue->get();
+                    \App\WRelation::unlinkByType($wRef['id']);
+                    foreach ($data as $row) {
+                        \App\Word::wordRefToLink($wRef['id'], $row->id, $row->pinyin);
+                        \App\Word::wordRefToLink($wRef['id'], $row->id, $row->letter, false);
+                    }
                 }
             }
-        }
 
-        // 对所有别名进行链接
-        $aliases = \App\WAlias::all();
-        foreach ($aliases as $alias) {
-            \App\Word::wordRefToLink($alias->rel_type, $alias->rel_id, $alias->pinyin);
-            \App\Word::wordRefToLink($alias->rel_type, $alias->rel_id, $alias->letter, false);
-        }
+            // 对所有别名进行链接
+            $aliases = \App\WAlias::all();
+            foreach ($aliases as $alias) {
+                \App\Word::wordRefToLink($alias->rel_type, $alias->rel_id, $alias->pinyin);
+                \App\Word::wordRefToLink($alias->rel_type, $alias->rel_id, $alias->letter, false);
+            }
 
-        // 生成所有数据关联关系
-        \App\DLink::generateCache();
+            // 生成所有数据关联关系
+            \App\DLink::generateCache();
+        });
 
         return redirect()->back();
     }
