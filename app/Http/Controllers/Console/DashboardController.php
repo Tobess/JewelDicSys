@@ -25,7 +25,7 @@ class DashboardController extends ConsoleController {
     public function getGenerateCache()
     {
         // 清除缓存
-        $redis = Redis::connection();
+        $redis = \Redis::connection();
         $keysPinyin = $redis->keys('pinyin*');
         $redis->forgot($keysPinyin);
         $keysWords = $redis->keys('words*');
