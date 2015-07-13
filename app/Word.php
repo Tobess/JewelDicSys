@@ -424,7 +424,7 @@ class Word extends Model {
             }
 
             // 将通过关联数据确定的数据合并的返回结果中
-            $word['refs'] = array_merge($word['refs'], $linkRefs);
+            //$word['refs'] = array_merge($word['refs'], $linkRefs);
         }
     }
 
