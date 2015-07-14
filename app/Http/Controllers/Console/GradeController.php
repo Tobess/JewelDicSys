@@ -14,9 +14,20 @@ class GradeController extends ConsoleController {
 	 */
 	public function getIndex()
 	{
-        $rows = \App\Grade::paginate(10);
+        $query = \Input::get('query', '');
+        if ($query) {
+            $rows = \App\Grade::
+                where(function($que) use ($query) {
+                    $que->where('pinyin', 'like', $query.'%')
+                        ->orWhere('letter', 'like', $query.'%')
+                        ->orWhere('name', 'like', $query.'%');
+                })
+                ->paginate(20);
+        } else {
+            $rows = \App\Grade::paginate(10);
+        }
 
-        return view('console.grade.list', ['rows'=>$rows]);
+        return view('console.grade.list', ['rows'=>$rows, 'query'=>$query]);
 	}
 
     /**

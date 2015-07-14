@@ -14,6 +14,15 @@
     </span>
 @stop
 
+@section('toolRight')
+<div class="input-group">
+    <input id="searchQueryBox" type="text" class="input-sm form-control" placeholder="请输入品牌查询" value="{{ isset($query) && $query ? $query : ''}}">
+        <span class="input-group-btn">
+          <button class="btn btn-sm btn-default" type="button" onclick="window.location.href='?query='+$('#searchQueryBox').val();">搜!</button>
+        </span>
+</div>
+@stop
+
 @section('tableTitle')
     <th style="width:20px;">
         <label class="i-checks m-b-none">

@@ -14,9 +14,20 @@ class BrandController extends ConsoleController {
 	 */
 	public function getIndex()
 	{
-        $rows = \App\Brand::paginate(20);
+        $query = \Input::get('query', '');
+        if ($query) {
+            $rows = \App\Brand::
+                where(function($que) use ($query) {
+                    $que->where('pinyin', 'like', $query.'%')
+                        ->orWhere('letter', 'like', $query.'%')
+                        ->orWhere('name', 'like', $query.'%');
+                })
+                ->paginate(20);
+        } else {
+            $rows = \App\Brand::paginate(20);
+        }
 
-        return view('console.brand.list', ['rows'=>$rows]);
+        return view('console.brand.list', ['rows'=>$rows, 'query'=>$query]);
 	}
 
 	/**

@@ -22,7 +22,7 @@
 
 @section('toolRight')
     <div class="input-group">
-        <input id="searchQueryBox" type="text" class="input-sm form-control" placeholder="请输入材质编号、名称" {{ isset($query) && $query ? 'value="'.$query.'"' : ''}}>
+        <input id="searchQueryBox" type="text" class="input-sm form-control" placeholder="请输入材质编号、名称" value="{{ isset($query) && $query ? $query : ''}}">
         <span class="input-group-btn">
           <button class="btn btn-sm btn-default" type="button" onclick="window.location.href='?query='+$('#searchQueryBox').val();">搜!</button>
         </span>

@@ -14,9 +14,20 @@ class CraftController extends ConsoleController {
 	 */
 	public function getIndex()
 	{
-        $rows = \App\Craft::paginate(10);
+        $query = \Input::get('query', '');
+        if ($query) {
+            $rows = \App\Craft::
+                where(function($que) use ($query) {
+                    $que->where('pinyin', 'like', $query.'%')
+                        ->orWhere('letter', 'like', $query.'%')
+                        ->orWhere('name', 'like', $query.'%');
+                })
+                ->paginate(20);
+        } else {
+            $rows = \App\Craft::paginate(10);
+        }
 
-        return view('console.craft.list', ['rows'=>$rows]);
+        return view('console.craft.list', ['rows'=>$rows, 'query'=>$query]);
 	}
 
     /**

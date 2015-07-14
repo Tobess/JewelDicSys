@@ -9,9 +9,34 @@ class Variety extends Model {
     /**
      * 获得所有的样式分类
      */
-    public static function allVarieties($ids)
+    public static function allVarieties($ids, $containAlias = false)
     {
-        return \App\Material::_convert($ids ? self::whereRaw('id in ('.$ids.')')->get() : self::all(), false, 'variety_');
+        $vList = $ids ? self::whereRaw('id in ('.$ids.')')->get() : self::all();
+        if ($containAlias) {
+            $aQue = \DB::table('aliases')
+                ->select(\DB::raw('group_concat(`name`) as `name`'),
+                    \DB::raw('group_concat(`pinyin`) as `pinyin`'),
+                    \DB::raw('group_concat(`letter`) as `letter`'),
+                    'rel_id')
+                ->where('rel_type', 3);
+            if ($ids) {
+                $aQue->whereRaw('rel_id in ('.$ids.')');
+            }
+            $aList = $aQue->groupBy('rel_id')->get();
+            $aTree = [];
+            foreach ($aList as $aItem) {
+                $aTree[$aItem->rel_id] = $aItem;
+            }
+            foreach ($vList as &$vItem) {
+                if (isset($aTree[$vItem->id])) {
+                    $vItem->alias_name = $aTree[$vItem->id]->name;
+                    $vItem->alias_pinyin = $aTree[$vItem->id]->pinyin;
+                    $vItem->alias_letter = $aTree[$vItem->id]->letter;
+                }
+            }
+        }
+
+        return \App\Material::_convert($vList, false, 'variety_');
     }
 
     /**
@@ -23,7 +48,9 @@ class Variety extends Model {
         if ($variety) {
             $vItem = $variety->toArray();
 
-            return \App\Material::_convert($vItem, true, 'variety_');
+            if (!($notParentNode && self::isParentNode($id))) {
+                return \App\Material::_convert($vItem, true, 'variety_');
+            }
         }
 
         return false;
@@ -32,13 +59,15 @@ class Variety extends Model {
     /**
      * 获得材质通过名称
      */
-    public static function getVarietyByAlias($alias)
+    public static function getVarietyByAlias($alias, $notParentNode = true)
     {
         $variety = self::where('name', $alias)->first();
         if ($variety) {
             $vItem = $variety->toArray();
 
-            return \App\Material::_convert($vItem, true, 'variety_');
+            if (!($notParentNode && self::isParentNode($variety->id))) {
+                return \App\Material::_convert($vItem, true, 'variety_');
+            }
         } else {
             // 通过别名搜索
             $aliases = \App\WAlias::where('name', $alias)->where('rel_type', 3)->get();
@@ -48,12 +77,23 @@ class Variety extends Model {
                     !in_array($aItem->rel_id, $relIdArr) && ($relIdArr[] = $aItem->rel_id);
                 }
                 if (count($relIdArr) == 1) {
-                    return self::getVarietyByID(array_shift($relIdArr));
+                    $vId = array_shift($relIdArr);
+                    if (!($notParentNode && self::isParentNode($vId))) {
+                        return self::getVarietyByID($vId);
+                    }
                 }
             }
         }
 
         return false;
+    }
+
+    /**
+     * 检测指定节点是否是父级节点
+     */
+    public static function isParentNode($id)
+    {
+        return self::where('parent', $id)->count() > 0;
     }
 
 }

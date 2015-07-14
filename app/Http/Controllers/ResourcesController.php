@@ -93,7 +93,8 @@ class ResourcesController extends Controller {
     public function getStones()
     {
         $ids = \Input::get('ids');
-        return self::response(\App\Material::allStones($ids));
+        $hasAlias = \Input::get('hasAlias', 'N') == 'Y';
+        return self::response(\App\Material::allStones($ids, $hasAlias));
     }
 
     /**
@@ -118,7 +119,8 @@ class ResourcesController extends Controller {
     public function getMetals()
     {
         $ids = \Input::get('ids');
-        return self::response(\App\Material::allMetals($ids));
+        $hasAlias = \Input::get('hasAlias', 'N') == 'Y';
+        return self::response(\App\Material::allMetals($ids, $hasAlias));
     }
 
     /**
@@ -155,7 +157,8 @@ class ResourcesController extends Controller {
     public function getVarieties()
     {
         $ids = \Input::get('ids');
-        return self::response(\App\Variety::allVarieties($ids));
+        $hasAlias = \Input::get('hasAlias', 'N') == 'Y';
+        return self::response(\App\Variety::allVarieties($ids, $hasAlias));
     }
 
     /**

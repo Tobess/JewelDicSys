@@ -14,9 +14,20 @@ class ColorController extends ConsoleController {
 	 */
 	public function getIndex()
 	{
-        $rows = \App\Color::paginate(10);
+        $query = \Input::get('query', '');
+        if ($query) {
+            $rows = \App\Color::
+                where(function($que) use ($query) {
+                    $que->where('pinyin', 'like', $query.'%')
+                        ->orWhere('letter', 'like', $query.'%')
+                        ->orWhere('name', 'like', $query.'%');
+                })
+                ->paginate(20);
+        } else {
+            $rows = \App\Color::paginate(10);
+        }
 
-        return view('console.color.list', ['rows'=>$rows]);
+        return view('console.color.list', ['rows'=>$rows, 'query'=>$query]);
 	}
 
     /**

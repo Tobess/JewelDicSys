@@ -14,9 +14,20 @@ class StyleController extends ConsoleController {
 	 */
 	public function getIndex()
 	{
-        $rows = \App\Style::paginate(10);
+        $query = \Input::get('query', '');
+        if ($query) {
+            $rows = \App\Style::
+                where(function($que) use ($query) {
+                    $que->where('pinyin', 'like', $query.'%')
+                        ->orWhere('letter', 'like', $query.'%')
+                        ->orWhere('name', 'like', $query.'%');
+                })
+                ->paginate(20);
+        } else {
+            $rows = \App\Style::paginate(10);
+        }
 
-        return view('console.style.list', ['rows'=>$rows]);
+        return view('console.style.list', ['rows'=>$rows, 'query'=>$query]);
 	}
 
     /**

@@ -45,19 +45,45 @@ class Material extends Model {
     /**
      * 获得所有的宝石分类
      */
-    public static function allStones($ids)
+    public static function allStones($ids, $containAlias = false)
     {
         $que = self::whereRaw('type<>1');
         if ($ids) {
             $que->whereRaw('id in ('.$ids.')');
         }
-        return self::_convert($que->get());
+        $sList = $que->get();
+
+        if ($containAlias) {
+            $aQue = \DB::table('aliases')
+                ->select(\DB::raw('group_concat(`name`) as `name`'),
+                    \DB::raw('group_concat(`pinyin`) as `pinyin`'),
+                    \DB::raw('group_concat(`letter`) as `letter`'),
+                    'rel_id')
+                ->where('rel_type', 1);
+            if ($ids) {
+                $aQue->whereRaw('rel_id in ('.$ids.')');
+            }
+            $aList = $aQue->groupBy('rel_id')->get();
+            $aTree = [];
+            foreach ($aList as $aItem) {
+                $aTree[$aItem->rel_id] = $aItem;
+            }
+            foreach ($sList as &$sItem) {
+                if (isset($aTree[$sItem->id])) {
+                    $sItem->alias_name = $aTree[$sItem->id]->name;
+                    $sItem->alias_pinyin = $aTree[$sItem->id]->pinyin;
+                    $sItem->alias_letter = $aTree[$sItem->id]->letter;
+                }
+            }
+        }
+
+        return self::_convert($sList);
     }
 
     /**
      * 获得所有的贵金属分类
      */
-    public static function allMetals($ids)
+    public static function allMetals($ids, $containAlias = false)
     {
         $que = self::whereRaw('type=1');
         if ($ids) {
@@ -66,7 +92,32 @@ class Material extends Model {
         } else {
             $extend = \App\MMetal::all();
         }
-        $main = self::_convert($que->get());
+        $mList = $que->get();
+        if ($containAlias) {
+            $aQue = \DB::table('aliases')
+                ->select(\DB::raw('group_concat(`name`) as `name`'),
+                    \DB::raw('group_concat(`pinyin`) as `pinyin`'),
+                    \DB::raw('group_concat(`letter`) as `letter`'),
+                    'rel_id')
+                ->where('rel_type', 2);
+            if ($ids) {
+                $aQue->whereRaw('rel_id in ('.$ids.')');
+            }
+            $aList = $aQue->groupBy('rel_id')->get();
+            $aTree = [];
+            foreach ($aList as $aItem) {
+                $aTree[$aItem->rel_id] = $aItem;
+            }
+            foreach ($mList as &$mItem) {
+                if (isset($aTree[$mItem->id])) {
+                    $mItem->alias_name = $aTree[$mItem->id]->name;
+                    $mItem->alias_pinyin = $aTree[$mItem->id]->pinyin;
+                    $mItem->alias_letter = $aTree[$mItem->id]->letter;
+                }
+            }
+        }
+
+        $main = self::_convert($mList);
 
         $extendTree = [];
         $extend = self::_convert($extend);
@@ -95,11 +146,13 @@ class Material extends Model {
     /**
      * 获得指定材质的信息
      */
-    public static function getMaterialByID($id)
+    public static function getMaterialByID($id, $notParentNode = true)
     {
         $material = self::find($id);
         if ($material) {
-            return self::parseMaterial($material);
+            if (!($notParentNode && self::isParentNode($id))) {
+                return self::parseMaterial($material);
+            }
         }
 
         return false;
@@ -123,7 +176,7 @@ class Material extends Model {
     /**
      * 获得材质通过名称
      */
-    public static function getMaterialByAlias($alias, $isMetal = false)
+    public static function getMaterialByAlias($alias, $isMetal = false, $notParentNode = true)
     {
         if ($isMetal) {
             $material = self::where('name', $alias)->where('type', 1)->first();
@@ -132,7 +185,9 @@ class Material extends Model {
         }
 
         if ($material) {
-            return self::parseMaterial($material);
+            if (!($notParentNode && self::isParentNode($material->id))) {
+                return self::parseMaterial($material);
+            }
         } else {
             // 通过别名搜索
             $aliasesQue = \App\WAlias::where('name', $alias);
@@ -149,7 +204,10 @@ class Material extends Model {
                     !in_array($aItem->rel_id, $relIdArr) && ($relIdArr[] = $aItem->rel_id);
                 }
                 if (count($relIdArr) == 1) {
-                    return self::getMaterialByID(array_shift($relIdArr));
+                    $mId = array_shift($relIdArr);
+                    if (!($notParentNode && self::isParentNode($mId))) {
+                        return self::getMaterialByID($mId);
+                    }
                 }
             }
         }
@@ -178,6 +236,14 @@ class Material extends Model {
         }
 
         return $pItems;
+    }
+
+    /**
+     * 检测指定节点是否是父级节点
+     */
+    public static function isParentNode($id)
+    {
+        return self::where('parent', $id)->count() > 0;
     }
 
 }
