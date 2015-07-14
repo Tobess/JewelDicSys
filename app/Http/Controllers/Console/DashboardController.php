@@ -65,8 +65,16 @@ class DashboardController extends ConsoleController {
 
             // 生成所有数据关联关系
             \App\DLink::generateCache();
+
+            // 生成拼音词根缓存文件
+            \App\WPinyin::generateDict();
         });
 
         return redirect()->back();
+    }
+
+    public function getTest($pinyin)
+    {
+        \App\WPinyin::match($pinyin);
     }
 }

@@ -8,6 +8,8 @@ class WPinyin extends Model {
 
     public $timestamps = false;
 
+    private static $_dict = [];
+
     /*
      * 获得拼音音节
      */
@@ -40,7 +42,11 @@ class WPinyin extends Model {
      */
     public static function getMetalPinyinIndex()
     {
-        return self::$metalPinyinIndex;
+        if (!count(self::$_dict)) {
+            self::$_dict = self::getDicts();
+        }
+
+        return self::$_dict;
     }
 
     /**
@@ -147,6 +153,33 @@ class WPinyin extends Model {
         'bixi',
 
     ];
+
+    /**
+     * 生成词根
+     */
+    public static function generateDict()
+    {
+        // 生成拼音词根缓存文件
+        $wDictList = \DB::table('words')->where('key', '<>', '')->lists('key');
+        $wDictCentents = "<?php return ['" . implode("','", $wDictList) . "']; ?>";
+        \Storage::put('WDict.php', $wDictCentents);
+
+        return \Storage::exists('WDict.php');
+    }
+
+    /**
+     * 获得拼音词根
+     */
+    private static function getDicts()
+    {
+        if (!\Storage::exists('WDict.php')) {
+            self::generateDict();
+        }
+
+        $dict = include(storage_path().'/app/'.'WDict.php');
+
+        return is_array($dict) ? $dict : [];
+    }
 
     /**
      * 拼音音节索引
@@ -572,4 +605,24 @@ class WPinyin extends Model {
         'zun',
         'zuo',
     ];
+
+    public static function match($pinyin)
+    {
+        $pinyin = trim($pinyin);
+        $pLen = strlen($pinyin);
+
+        $cPinyin = self::$pinyinIndex;
+        $indexes = [];
+        foreach ($cPinyin as $cDic) {
+            $offset = 0;
+            while ($offset < $pLen && ($pos = stripos($pinyin, $cDic, $offset)) !== false) {
+                if (!isset($indexes[$pos]) || !is_array($indexes[$pos]) || !in_array($cDic, $indexes[$pos])) {
+                    $indexes[$pos][] = $cDic;
+                }
+                $offset += strlen($cDic);
+            }
+        }
+        ksort($indexes);
+        print_r($indexes);
+    }
 }
