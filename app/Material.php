@@ -203,9 +203,7 @@ class Material extends Model {
                 }
                 if (count($relIdArr) == 1) {
                     $mId = array_shift($relIdArr);
-                    if (!($notParentNode && self::isParentNode($mId))) {
-                        return self::getMaterialByID($mId);
-                    }
+                    return self::getMaterialByID($mId, $notParentNode);
                 }
             }
         }

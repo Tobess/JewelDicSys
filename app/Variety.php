@@ -42,7 +42,7 @@ class Variety extends Model {
     /**
      * 根据样式ID获取样式信息
      */
-    public static function getVarietyByID($id)
+    public static function getVarietyByID($id, $notParentNode = true)
     {
         $variety = self::find($id);
         if ($variety) {
@@ -76,9 +76,7 @@ class Variety extends Model {
                 }
                 if (count($relIdArr) == 1) {
                     $vId = array_shift($relIdArr);
-                    if (!($notParentNode && self::isParentNode($vId))) {
-                        return self::getVarietyByID($vId);
-                    }
+                    return self::getVarietyByID($vId, $notParentNode);
                 }
             }
         }
