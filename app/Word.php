@@ -76,7 +76,9 @@ class Word extends Model {
         $matches = [];
         $matchToIdx = 1;
         $idx = 1;
-        while ($string = (!$positive ? array_pop($strings) : array_shift($strings))) {
+        while (count($strings) > 0) {
+            $string = (!$positive ? array_pop($strings) : array_shift($strings));
+
             $word .= $string;
             $wordId = self::getOrCacheByKey($word, $positive);
 
@@ -133,9 +135,11 @@ class Word extends Model {
             $maxMetalPinyinLen = max($maxMetalPinyinLen, strlen($mPinyin));
         }
         $matches = [];
-        while ($char = (!$positive ? array_pop($chars) : array_shift($chars))) {
+        while (count($chars) > 0) {
+            $char = (!$positive ? array_pop($chars) : array_shift($chars));
+
             // 关于贵金属特殊拼音组合预先处理
-            if ($string == '') {
+            if ('' == $string) {
                 $mChar = $char;
                 $mLen = [];
                 $mChars = !$positive ? array_reverse($chars) : $chars;
@@ -174,11 +178,11 @@ class Word extends Model {
                 $cLen = count($chars);
                 if ($cLen &&
                     (// 尝试向后推演，判断是否是一个完整的拼音的部分，因为拼音长度最多6故推演5次尝试
-                        ($cLen >= 1 && in_array($positive ? $string.$chars[0] : $chars[$cLen - 1].$string, $pinyins)) ||
-                        ($cLen >= 2 && in_array($positive ? $string.$chars[1] : $chars[$cLen - 2].$string, $pinyins)) ||
-                        ($cLen >= 3 && in_array($positive ? $string.$chars[2] : $chars[$cLen - 3].$string, $pinyins)) ||
-                        ($cLen >= 4 && in_array($positive ? $string.$chars[3] : $chars[$cLen - 4].$string, $pinyins)) ||
-                        ($cLen >= 5 && in_array($positive ? $string.$chars[4] : $chars[$cLen - 5].$string, $pinyins))
+                        ($cLen >= 1 && in_array($positive ? $string.self::_getMaybeChars($chars, 0, 1) : self::_getMaybeChars($chars, $cLen - 1, 1).$string, $pinyins)) ||
+                        ($cLen >= 2 && in_array($positive ? $string.self::_getMaybeChars($chars, 0, 2) : self::_getMaybeChars($chars, $cLen - 2, 2).$string, $pinyins)) ||
+                        ($cLen >= 3 && in_array($positive ? $string.self::_getMaybeChars($chars, 0, 3) : self::_getMaybeChars($chars, $cLen - 3, 3).$string, $pinyins)) ||
+                        ($cLen >= 4 && in_array($positive ? $string.self::_getMaybeChars($chars, 0, 4) : self::_getMaybeChars($chars, $cLen - 4, 4).$string, $pinyins)) ||
+                        ($cLen >= 5 && in_array($positive ? $string.self::_getMaybeChars($chars, 0, 5) : self::_getMaybeChars($chars, $cLen - 5, 5).$string, $pinyins))
                     )) {
                     continue;
                 } else {
@@ -199,6 +203,11 @@ class Word extends Model {
         } else {
             return $positive ? self::split($pinyin, $words, false) : false;
         }
+    }
+
+    private static function _getMaybeChars($chars, $start, $len)
+    {
+        return implode('', array_slice($chars, $start, $len));
     }
 
     /**
@@ -300,7 +309,7 @@ class Word extends Model {
      */
     public static function search($query, $positive = true)
     {
-        $query = strtolower($query);
+        $query = strtolower(str_replace(' ', '', $query));
 
         // 从缓存中确定匹配结果
         if (\Cache::has(\App\WRef::CACHE_KEY_WORD_SEARCH.intval($positive).':'.md5($query))) {

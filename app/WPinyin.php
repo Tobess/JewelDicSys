@@ -605,24 +605,4 @@ class WPinyin extends Model {
         'zun',
         'zuo',
     ];
-
-    public static function match($pinyin)
-    {
-        $pinyin = trim($pinyin);
-        $pLen = strlen($pinyin);
-
-        $cPinyin = self::$pinyinIndex;
-        $indexes = [];
-        foreach ($cPinyin as $cDic) {
-            $offset = 0;
-            while ($offset < $pLen && ($pos = stripos($pinyin, $cDic, $offset)) !== false) {
-                if (!isset($indexes[$pos]) || !is_array($indexes[$pos]) || !in_array($cDic, $indexes[$pos])) {
-                    $indexes[$pos][] = $cDic;
-                }
-                $offset += strlen($cDic);
-            }
-        }
-        ksort($indexes);
-        print_r($indexes);
-    }
 }

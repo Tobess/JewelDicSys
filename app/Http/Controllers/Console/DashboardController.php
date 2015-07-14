@@ -73,8 +73,26 @@ class DashboardController extends ConsoleController {
         return redirect()->back();
     }
 
-    public function getTest($pinyin)
+    /**
+     * 修复部分拼音生成错误
+     */
+    public function getFixPinyin()
     {
-        \App\WPinyin::match($pinyin);
+        $wRefs = \App\WRef::allRefs();
+        foreach ($wRefs as $wRef) {
+            if (is_array($wRef)) {
+                $dQue = \DB::table($wRef['table']);
+                if (isset($wRef['where'])) {
+                    $dQue->whereRaw($wRef['where']);
+                }
+                $data = $dQue->where('name', 'like', '%足%')->get();
+                foreach ($data as $row) {
+                    $row->pinyin = pinyin($row->name);
+                    $row->letter = letter($row->name);
+                    $row->save();
+                }
+            }
+        }
     }
+
 }
