@@ -62,12 +62,10 @@ class Variety extends Model {
     public static function getVarietyByAlias($alias, $notParentNode = true)
     {
         $variety = self::where('name', $alias)->first();
-        if ($variety) {
+        if ($variety && !($notParentNode && self::isParentNode($variety->id))) {
             $vItem = $variety->toArray();
 
-            if (!($notParentNode && self::isParentNode($variety->id))) {
-                return \App\Material::_convert($vItem, true, 'variety_');
-            }
+            return \App\Material::_convert($vItem, true, 'variety_');
         } else {
             // 通过别名搜索
             $aliases = \App\WAlias::where('name', $alias)->where('rel_type', 3)->get();

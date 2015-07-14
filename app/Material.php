@@ -184,10 +184,8 @@ class Material extends Model {
             $material = self::where('name', $alias)->first();
         }
 
-        if ($material) {
-            if (!($notParentNode && self::isParentNode($material->id))) {
-                return self::parseMaterial($material);
-            }
+        if ($material && !($notParentNode && self::isParentNode($material->id))) {
+            return self::parseMaterial($material);
         } else {
             // 通过别名搜索
             $aliasesQue = \App\WAlias::where('name', $alias);
