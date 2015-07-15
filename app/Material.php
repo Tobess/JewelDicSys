@@ -49,7 +49,7 @@ class Material extends Model {
     {
         $que = self::whereRaw('type<>1');
         if ($ids) {
-            $que->whereRaw('id in ('.$ids.')');
+            $que->whereRaw('id in ('.$ids.')')->whereRaw('id not in (select parent from materials)');
         }
         $sList = $que->get();
 
@@ -88,7 +88,9 @@ class Material extends Model {
         $que = self::whereRaw('type=1');
         if ($ids) {
             $que->whereRaw('id in ('.$ids.')');
-            $extend = \App\MMetal::whereRaw('material_id in ('.$ids.')')->get();
+            $extend = \App\MMetal::whereRaw('material_id in ('.$ids.')')
+                ->whereRaw('id not in (select parent from materials)')
+                ->get();
         } else {
             $extend = \App\MMetal::all();
         }
@@ -140,7 +142,9 @@ class Material extends Model {
      */
     public static function allMaterials($ids)
     {
-        return self::_convert($ids ? self::whereRaw('id in ('.$ids.')')->get() : self::all());
+        return self::_convert($ids ? self::whereRaw('id in ('.$ids.')')
+            ->whereRaw('id not in (select parent from materials)')
+            ->get() : self::all());
     }
 
     /**
