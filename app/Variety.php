@@ -61,7 +61,7 @@ class Variety extends Model {
      */
     public static function getVarietyByAlias($alias, $notParentNode = true)
     {
-        $variety = self::where('name', $alias)->first();
+        $variety = self::where('name', $alias)->orderBy('code', 'desc')->first();
         if ($variety && !($notParentNode && self::isParentNode($variety->id))) {
             $vItem = $variety->toArray();
 

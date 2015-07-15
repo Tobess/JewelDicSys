@@ -179,9 +179,9 @@ class Material extends Model {
     public static function getMaterialByAlias($alias, $isMetal = false, $notParentNode = true)
     {
         if ($isMetal) {
-            $material = self::where('name', $alias)->where('type', 1)->first();
+            $material = self::where('name', $alias)->where('type', 1)->orderBy('code', 'desc')->first();
         } else {
-            $material = self::where('name', $alias)->first();
+            $material = self::where('name', $alias)->orderBy('code', 'desc')->first();
         }
 
         if ($material && !($notParentNode && self::isParentNode($material->id))) {
