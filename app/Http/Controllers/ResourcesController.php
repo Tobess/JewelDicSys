@@ -27,6 +27,20 @@ class ResourcesController extends Controller {
     }
 
     /**
+     * Check the material is parent node.
+     *
+     * @param int $id
+     *
+     * @return Response
+     */
+    public function getMaterialIsParent($id)
+    {
+        $isParentNode = \App\Material::isParentNode($id);
+
+        return self::response(['isParentNode'=>$isParentNode]);
+    }
+
+    /**
      * Get the material by alias.
      *
      * @param string $alias
@@ -135,6 +149,20 @@ class ResourcesController extends Controller {
         $variety = \App\Variety::getVarietyByID($id);
 
         return self::response($variety);
+    }
+
+    /**
+     * Check the variety is parent node.
+     *
+     * @param int $id
+     *
+     * @return Response
+     */
+    public function getVarietyIsParent($id)
+    {
+        $isParentNode = \App\Variety::isParentNode($id);
+
+        return self::response(['isParentNode'=>$isParentNode]);
     }
 
     /**
