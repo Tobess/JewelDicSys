@@ -36,6 +36,7 @@ Route::group(['namespace' => 'Console', 'prefix' => 'console'], function()
     Route::controller('varieties', 'VarietyController');
     Route::controller('aliases', 'AliasController');
     Route::controller('links', 'DLinksController');
+    Route::controller('jerror', 'JErrorController');
 });
 
 // 内网公开接口

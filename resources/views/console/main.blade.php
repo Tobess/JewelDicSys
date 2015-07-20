@@ -4,7 +4,7 @@
 
 @section('container')
 <!--Main Container-->
-<div class="app app-header-fixed  ">
+<div class="app app-header-fixed app-aside-fixed">
     @include('layouts.blocks.header')
 
     @include('layouts.blocks.aside')

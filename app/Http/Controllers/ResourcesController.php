@@ -349,4 +349,27 @@ class ResourcesController extends Controller {
         return self::response(\App\Rule::all());
     }
 
+    /**
+     * Post the feedback
+     *
+     * @return Response
+     */
+    public function getFeedback()
+    {
+        $file = \Input::get('file_id');
+        $domain = \Input::get('domain');
+        $mobile = \Input::get('mobile');
+        $userName = \Input::get('userName');
+        $contents = \Input::get('contents');
+
+        $redis = \Redis::connection('serve');
+        if ($redis->exists($contents)) {
+            $contents = $redis->get($contents);
+        } else {
+            return self::response(['state'=>false, 'message'=>'无效的参数.']);
+        }
+
+        return self::response(\App\JError::feedback($file, $domain, $mobile, $userName, $contents));
+    }
+
 }

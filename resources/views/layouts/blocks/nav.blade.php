@@ -12,6 +12,7 @@
         '系统管理',
         ['path'=>'/console/users', 'title'=>'账户管理', 'icon'=>'icon icon-users'],
         ['path'=>'/console/rules', 'title'=>'名称规则', 'icon'=>'icon icon-link'],
+        ['path'=>'/console/jerror', 'title'=>'错误反馈', 'icon'=>'fa fa-exclamation-triangle'],
     ];
     $selectedNav = '/'.Route::getCurrentRoute()->getPath();
 ?>
