@@ -89,7 +89,7 @@ class Material extends Model {
         if ($ids) {
             $que->whereRaw('id in ('.$ids.')');
             $extend = \App\MMetal::whereRaw('material_id in ('.$ids.')')
-                ->whereRaw('id not in (select parent from materials)')
+                ->whereRaw('material_id not in (select parent from materials)')
                 ->get();
         } else {
             $extend = \App\MMetal::all();
