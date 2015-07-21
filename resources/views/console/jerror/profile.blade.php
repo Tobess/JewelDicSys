@@ -15,7 +15,7 @@
                     <ul class="nav pull-right">
                         <li><a href="http://file.fromai.cn/{{ $row->file_group }}/{{ $row->file_name }}" target="_blank" tabindex="0">下载EXCEL</a></li>
                     </ul>
-                    <h4 class="m-n font-thin h4">{{ $row->companyName }}({{ $row->domain }})</h4>
+                    <h4 class="m-n font-thin h4">{{ $row->companyName }}({{ $row->domain }})<span class="badge {{ $row->checked ? 'bg-success' : 'bg-danger' }}">{{ $row->checked ? '已阅' : '未阅'}}</span></h4>
                     <small class="text-muted">{{ $row->mobile }}({{ $row->userName }})</small>
                 </div>
                 <div class="table-responsive">

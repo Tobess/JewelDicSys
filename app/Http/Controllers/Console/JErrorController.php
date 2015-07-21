@@ -21,9 +21,9 @@ class JErrorController extends ConsoleController {
                     $que->where('domain', 'like', $query.'%')
                         ->orWhere('mobile', 'like', $query.'%');
                 })
-                ->paginate(20);
+                ->orderBy('updated_at', 'desc')->paginate(20);
         } else {
-            $rows = \App\JError::paginate(10);
+            $rows = \App\JError::orderBy('updated_at', 'desc')->paginate(10);
         }
 
         return view('console.jerror.list', ['rows'=>$rows, 'query'=>$query]);
@@ -66,6 +66,9 @@ class JErrorController extends ConsoleController {
         $rows = json_decode($error->contents, true);
         $dicError = $rows['dicError'];
         unset($rows['dicError']);
+
+        $error->checked = 1;
+        $error->save();
 
         return view('console.jerror.profile', ['row'=>$error, 'rows'=>$rows, 'dicError'=>$dicError]);
     }

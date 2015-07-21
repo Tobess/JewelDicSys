@@ -22,6 +22,7 @@
     </th>
     <th>企业号</th>
     <th>手机号</th>
+    <th>状态</th>
     <th>上报时间</th>
     <th style="width:106px;"></th>
 @stop
@@ -32,6 +33,7 @@
         <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
         <td>{{ $row->domain }}({{ $row->companyName }})</td>
         <td>{{ $row->mobile }}({{ $row->userName }})</td>
+        <td><span class="badge {{ $row->checked ? 'bg-success' : 'bg-danger' }}">{{ $row->checked ? '已阅' : '未阅'}}</span></td>
         <td>{{ $row->updated_at }}</td>
         <td>
             <a class="btn btn-xs btn-info m-b-none" type="button" href="/console/jerror/profile/{{ $row->file_id }}">详情</a>
