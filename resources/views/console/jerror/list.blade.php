@@ -30,7 +30,7 @@
     @foreach ($rows as $row)
     <tr>
         <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
-        <td>{{ $row->domain }}</td>
+        <td>{{ $row->domain }}({{ $row->companyName }})</td>
         <td>{{ $row->mobile }}({{ $row->userName }})</td>
         <td>{{ $row->updated_at }}</td>
         <td>

@@ -15,7 +15,10 @@ class CreateJErrorsTable extends Migration {
 		Schema::create('j_errors', function(Blueprint $table)
 		{
             $table->bigInteger('file_id')->primary();
+            $table->string('file_group')->nullable();
+            $table->string('file_name')->nullable();
             $table->string('domain');
+            $table->string('companyName')->nullable();
             $table->string('mobile');
             $table->string('userName');
             $table->longText('contents');

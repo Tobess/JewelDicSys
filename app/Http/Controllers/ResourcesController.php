@@ -358,9 +358,12 @@ class ResourcesController extends Controller {
     {
         $file = \Input::get('file_id');
         $domain = \Input::get('domain');
+        $companyName = \Input::get('companyName');
         $mobile = \Input::get('mobile');
         $userName = \Input::get('userName');
         $contents = \Input::get('contents');
+        $fileGroup = \Input::get('file_group');
+        $fileName = \Input::get('file_name');
 
         $redis = \Redis::connection('serve');
         if ($redis->exists($contents)) {
@@ -369,7 +372,7 @@ class ResourcesController extends Controller {
             return self::response(['state'=>false, 'message'=>'无效的参数.']);
         }
 
-        return self::response(\App\JError::feedback($file, $domain, $mobile, $userName, $contents));
+        return self::response(\App\JError::feedback($file, $domain, $companyName, $mobile, $userName, $contents, $fileGroup, $fileName));
     }
 
 }

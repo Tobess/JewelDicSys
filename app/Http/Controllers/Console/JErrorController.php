@@ -1,11 +1,11 @@
 <?php namespace App\Http\Controllers\Console;
 
 use App\Http\Requests;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\ConsoleController;
 
 use Illuminate\Http\Request;
 
-class JErrorController extends Controller {
+class JErrorController extends ConsoleController {
 
 	/**
 	 * Display a listing of the resource.
@@ -63,7 +63,11 @@ class JErrorController extends Controller {
             return redirect()->back();
         }
 
-        return view('console.jerror.profile', ['row'=>$error]);
+        $rows = json_decode($error->contents, true);
+        $dicError = $rows['dicError'];
+        unset($rows['dicError']);
+
+        return view('console.jerror.profile', ['row'=>$error, 'rows'=>$rows, 'dicError'=>$dicError]);
     }
 
 	/**
