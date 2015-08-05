@@ -140,11 +140,11 @@ class Material extends Model {
     /**
      * 获得所有的材质分类
      */
-    public static function allMaterials($ids)
+    public static function allMaterials($ids, $noParentNode = false)
     {
         return self::_convert($ids ? self::whereRaw('id in ('.$ids.')')
             ->whereRaw('id not in (select parent from materials)')
-            ->get() : self::all());
+            ->get() : ($noParentNode ? self::whereRaw('id not in (select parent from materials)')->get() : self::all()));
     }
 
     /**

@@ -9,9 +9,9 @@ class Variety extends Model {
     /**
      * 获得所有的样式分类
      */
-    public static function allVarieties($ids, $containAlias = false)
+    public static function allVarieties($ids, $containAlias = false, $noParentNode = false)
     {
-        $vList = $ids ? self::whereRaw('id in ('.$ids.')')->whereRaw('id not in (select parent from varieties)')->get() : self::all();
+        $vList = $ids ? self::whereRaw('id in ('.$ids.')')->whereRaw('id not in (select parent from varieties)')->get() : ($noParentNode ? self::whereRaw('id not in (select parent from varieties)')->get() : self::all());
         if ($containAlias) {
             $aQue = \DB::table('aliases')
                 ->select(\DB::raw('group_concat(`name`) as `name`'),

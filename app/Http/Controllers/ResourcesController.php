@@ -72,7 +72,8 @@ class ResourcesController extends Controller {
     public function getMaterials()
     {
         $ids = \Input::get('ids');
-        return self::response(\App\Material::allMaterials($ids));
+        $noParentNode = \Input::get('noParentNode', 'N') == 'Y';
+        return self::response(\App\Material::allMaterials($ids, $noParentNode));
     }
 
     /**
@@ -186,7 +187,8 @@ class ResourcesController extends Controller {
     {
         $ids = \Input::get('ids');
         $hasAlias = \Input::get('hasAlias', 'N') == 'Y';
-        return self::response(\App\Variety::allVarieties($ids, $hasAlias));
+        $noParentNode = \Input::get('noParentNode', 'N') == 'Y';
+        return self::response(\App\Variety::allVarieties($ids, $hasAlias, $noParentNode));
     }
 
     /**
