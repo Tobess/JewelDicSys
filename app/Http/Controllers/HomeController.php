@@ -32,6 +32,9 @@ class HomeController extends Controller {
     public function getSearch()
     {
         $query = \Input::get('query');
+        if (preg_match("/[\x7f-\xff]/", $query)) {
+            $query = \App\Word::getPinyinAndCache($query);
+        }
         $posResults = \App\Word::search($query);
         if (isset($posResults['words']) && !count($posResults['words'])) {
             $results = [];//\App\Word::search($query, false);
