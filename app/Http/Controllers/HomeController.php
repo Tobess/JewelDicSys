@@ -32,6 +32,7 @@ class HomeController extends Controller {
     public function getSearch()
     {
         $query = \Input::get('query');
+        $fullMatch = \Input::get('fullMatch') == 'Y';
         if (preg_match("/[\x7f-\xff]/", $query)) {
             $query = \App\Word::getPinyinAndCache($query);
         }
@@ -39,6 +40,18 @@ class HomeController extends Controller {
         if (isset($posResults['words']) && !count($posResults['words'])) {
             $results = [];//\App\Word::search($query, false);
         } else {
+            if ($fullMatch && isset($posResults['words'])) {
+                // 全字匹配
+                $newWords = [];
+                $fullWord = trim(\Input::get('query'));
+                foreach ($posResults['words'] as $item) {
+                    if ($item['title'] == $fullWord) {
+                        $newWords[] = $item;
+                    }
+                }
+                $posResults['words'] = $newWords;
+            }
+
             $results = $posResults;
         }
         return \Response::json($results);
