@@ -84,7 +84,7 @@ class HomeController extends Controller {
                         $gNameKey = $redisIdentify . ':'. md5($gName);
                         // S1 生成商品名称全拼码
                         $pinyin = \App\Word::getPinyinAndCache($gName);
-                        \Log::info($pinyin);
+
                         // S2 拆分分析
                         $results = \App\Word::search($pinyin);
                         if (isset($results['words']) && count($results['words'])) {
@@ -95,7 +95,7 @@ class HomeController extends Controller {
                         $count = 1;
                         $redis->incr($sKey);
                         $redis->expire($sKey, 24*60*60);
-
+                        \Log::info($redis->get($sKey));
                         $job->delete();
                     });
                 }
