@@ -84,6 +84,7 @@ class HomeController extends Controller {
                         $gNameKey = $redisIdentify . ':'. md5($gName);
                         // S1 生成商品名称全拼码
                         $pinyin = \App\Word::getPinyinAndCache($gName);
+                        \Log::info($pinyin);
                         // S2 拆分分析
                         $results = \App\Word::search($pinyin);
                         if (isset($results['words']) && count($results['words'])) {
