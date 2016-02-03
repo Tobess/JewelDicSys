@@ -73,7 +73,7 @@ class HomeController extends Controller {
             if ($gNames) {
                 $gNameArr = explode(',', $gNames);
                 $sKey = $redisIdentify.':status';
-                $redis->set($sKey, 0);
+                //$redis->set($sKey, 0);
 \Log::info(print_r($gNameArr, true));
                 foreach ($gNameArr as $gName) {
                     // 商品名称拆分队列
