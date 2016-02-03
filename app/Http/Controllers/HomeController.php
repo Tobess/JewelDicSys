@@ -74,13 +74,11 @@ class HomeController extends Controller {
                 $gNameArr = explode(',', $gNames);
                 $sKey = $redisIdentify.':status';
                 $redis->del($sKey);
-\Log::info(print_r($gNameArr, true));
+
                 foreach ($gNameArr as $gName) {
                     // 商品名称拆分队列
                     \Queue::push(function($job) use ($gName, $redisIdentify, $sKey, $redis)
                     {
-                        //$redis = \Redis::connection('serve');
-
                         $gNameKey = $redisIdentify . ':'. md5($gName);
                         // S1 生成商品名称全拼码
                         $pinyin = \App\Word::getPinyinAndCache($gName);
@@ -92,10 +90,9 @@ class HomeController extends Controller {
                             $redis->expire($gNameKey, 24*60*60);
                         }
 
-                        $count = 1;
                         $redis->incr($sKey);
                         $redis->expire($sKey, 24*60*60);
-                        \Log::info($sKey.'-'.$redis->get($sKey));
+
                         $job->delete();
                     });
                 }
