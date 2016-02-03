@@ -69,11 +69,12 @@ class HomeController extends Controller {
         $redis = \Redis::connection('serve');
         if ($redis->exists($redisIdentify)) {
             $gNames = $redis->get($redisIdentify);
+            \Log::info($gNames);
             if ($gNames) {
                 $gNameArr = explode(',', $gNames);
                 $sKey = $redisIdentify.':status';
                 $redis->set($sKey, 0);
-
+\Log::info(print_r($gNameArr, true));
                 foreach ($gNameArr as $gName) {
                     // 商品名称拆分队列
                     \Queue::push(function($job) use ($gName, $redisIdentify, $sKey)
