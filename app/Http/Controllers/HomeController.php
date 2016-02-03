@@ -95,7 +95,7 @@ class HomeController extends Controller {
                         $count = 1;
                         $redis->incr($sKey);
                         $redis->expire($sKey, 24*60*60);
-                        \Log::info($redis->get($sKey));
+                        \Log::info($sKey.'-'.$redis->get($sKey));
                         $job->delete();
                     });
                 }
