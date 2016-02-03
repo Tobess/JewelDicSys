@@ -69,7 +69,6 @@ class HomeController extends Controller {
         $redis = \Redis::connection('serve');
         if ($redis->exists($redisIdentify)) {
             $gNames = $redis->get($redisIdentify);
-            \Log::info($gNames);
             if ($gNames) {
                 $gNameArr = explode(',', $gNames);
                 $sKey = $redisIdentify.':status';
