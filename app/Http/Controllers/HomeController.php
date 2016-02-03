@@ -73,13 +73,13 @@ class HomeController extends Controller {
             if ($gNames) {
                 $gNameArr = explode(',', $gNames);
                 $sKey = $redisIdentify.':status';
-                //$redis->set($sKey, 0);
+                $redis->del($sKey);
 \Log::info(print_r($gNameArr, true));
                 foreach ($gNameArr as $gName) {
                     // 商品名称拆分队列
-                    \Queue::push(function($job) use ($gName, $redisIdentify, $sKey)
+                    \Queue::push(function($job) use ($gName, $redisIdentify, $sKey, $redis)
                     {
-                        $redis = \Redis::connection('serve');
+                        //$redis = \Redis::connection('serve');
 
                         $gNameKey = $redisIdentify . ':'. md5($gName);
                         // S1 生成商品名称全拼码
