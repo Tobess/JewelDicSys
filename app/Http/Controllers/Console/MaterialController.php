@@ -61,8 +61,8 @@ class MaterialController extends ConsoleController {
         $material->type = \Input::get('type');
         $material->description = \Input::get('description');
         $material->mineral = \Input::get('mineral');
-        $material->pinyin = \Input::get('pinyin')?:pinyin($material->$name);
-        $material->letter = \Input::get('letter')?:letter($material->$name);
+        $material->pinyin = \Input::get('pinyin')?:pinyin($material->name);
+        $material->letter = \Input::get('letter')?:letter($material->name);
         $material->save();
 
         if ($material->id && $material->type == 1) {
@@ -168,8 +168,8 @@ class MaterialController extends ConsoleController {
         $material->code = \Input::get('code');
         $material->description = \Input::get('description');
         $material->mineral = \Input::get('mineral');
-        $material->pinyin = \Input::get('pinyin')?:pinyin($material->$name);
-        $material->letter = \Input::get('letter')?:letter($material->$name);
+        $material->pinyin = \Input::get('pinyin')?:pinyin($material->name);
+        $material->letter = \Input::get('letter')?:letter($material->name);
         $material->save();
 
         if ($material->type == 1) {
