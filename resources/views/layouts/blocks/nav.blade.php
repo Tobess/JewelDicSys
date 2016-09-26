@@ -9,6 +9,7 @@
         ['path'=>'/console/grades', 'title'=>'宝石等级', 'icon'=>'glyphicon glyphicon-signal'],
         ['path'=>'/console/styles', 'title'=>'珠宝款式', 'icon'=>'icon icon-fire'],
         ['path'=>'/console/morals', 'title'=>'珠宝寓意', 'icon'=>'glyphicon glyphicon-bookmark'],
+        ['path'=>'/console/areas', 'title'=>'地区信息', 'icon'=>'fa fa-location-arrow'],
         '系统管理',
         ['path'=>'/console/users', 'title'=>'账户管理', 'icon'=>'icon icon-users'],
         ['path'=>'/console/rules', 'title'=>'名称规则', 'icon'=>'icon icon-link'],

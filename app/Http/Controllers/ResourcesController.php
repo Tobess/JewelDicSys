@@ -377,4 +377,20 @@ class ResourcesController extends Controller {
         return self::response(\App\JError::feedback($file, $domain, $companyName, $mobile, $userName, $contents, $fileGroup, $fileName));
     }
 
+    public function getCountries()
+    {
+        $district = \Input::get('district');
+
+        $countries = [];
+        if ($district) {
+            $did = \App\Area::where('level', 3)->where('name', 'like', '%'.$district.'%')
+                ->orWhere('short_name', 'like', '%'.$district.'%')->pluck('id');
+            if ($did > 0) {
+                $countries = \App\Area::where('parent_id', $did)->select('id', 'name')->get();
+            }
+        }
+
+        return self::response($countries);
+    }
+
 }
