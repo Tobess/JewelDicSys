@@ -377,16 +377,25 @@ class ResourcesController extends Controller {
         return self::response(\App\JError::feedback($file, $domain, $companyName, $mobile, $userName, $contents, $fileGroup, $fileName));
     }
 
+    /**
+     * 获得县级地的所有乡镇
+     *
+     * @return Response
+     */
     public function getCountries()
     {
+        $city = \Input::get('city');
         $district = \Input::get('district');
 
         $countries = [];
-        if ($district) {
-            $did = \App\Area::where('level', 3)->where('name', 'like', '%'.$district.'%')
-                ->orWhere('short_name', 'like', '%'.$district.'%')->pluck('id');
+        if ($city && $district) {
+            $did = \App\Area::where('level', 3)
+                ->where('name', 'like', '%'.$district.'%')
+                ->orWhere('short_name', 'like', '%'.$district.'%')
+                ->whereIn('parent_id', \App\Area::where('level', 2)->where('name', 'like', '%'.$city.'%')->orWhere('short_name', 'like', '%'.$city.'%')->lists('id'))
+                ->pluck('id');
             if ($did > 0) {
-                $countries = \App\Area::where('parent_id', $did)->select('id', 'name')->get();
+                $countries = \App\Area::where('level', 4)->where('parent_id', $did)->select('id', 'name')->get();
             }
         }
 
