@@ -16,7 +16,7 @@ class UpdateAreasTable extends Migration {
         $areas = file_get_contents($path);
         foreach (explode("\n", $areas) as $sql) {
             if ($sql && strpos($sql, 'INSERT INTO') !== false) {
-                \DB::statement($sql);
+                \DB::statement(strtolower($sql));
             }
         }
 	}
