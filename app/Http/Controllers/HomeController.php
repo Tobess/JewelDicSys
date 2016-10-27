@@ -45,7 +45,7 @@ class HomeController extends Controller {
                 $newWords = [];
                 $fullWord = trim(\Input::get('query'));
                 foreach ($posResults['words'] as $item) {
-                    if ($item['title'] == $fullWord) {
+                    if ($item['title'] == $fullWord || strtolower($item['title']) == strtolower($fullWord)) {
                         $newWords[] = $item;
                     }
                 }
