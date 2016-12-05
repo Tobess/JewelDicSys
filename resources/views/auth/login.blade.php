@@ -9,7 +9,7 @@
     <div class="container w-xxl w-auto-xs" ng-controller="SigninFormController" ng-init="app.settings.container = false;">
         <a href class="navbar-brand block m-t">黄金珠宝行业词库系统</a>
         <div class="m-b-lg">
-            <form name="form" class="form-validation" role="form" method="POST" action="'/auth/login'">
+            <form name="form" class="form-validation" role="form" method="POST" action="/auth/login">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
                 <div class="text-danger wrapper text-center" ng-show="authError">
