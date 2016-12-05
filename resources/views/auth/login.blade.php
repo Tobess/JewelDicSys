@@ -9,7 +9,7 @@
     <div class="container w-xxl w-auto-xs" ng-controller="SigninFormController" ng-init="app.settings.container = false;">
         <a href class="navbar-brand block m-t">黄金珠宝行业词库系统</a>
         <div class="m-b-lg">
-            <form name="form" class="form-validation" role="form" method="POST" action="{{ url('/auth/login') }}">
+            <form name="form" class="form-validation" role="form" method="POST" action="'/auth/login'">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
                 <div class="text-danger wrapper text-center" ng-show="authError">
@@ -30,10 +30,10 @@
                     </div>
                 </div>
                 <button type="submit" class="btn btn-lg btn-primary btn-block">登陆</button>
-                <div class="text-center m-t m-b"><a href="{{ url('/password/email') }}">忘记密码?</a></div>
+                <div class="text-center m-t m-b"><a href="/password/email">忘记密码?</a></div>
                 <div class="line line-dashed"></div>
                 <p class="text-center"><small>没有账号?</small></p>
-                <a href="{{ url('/auth/register') }}" class="btn btn-lg btn-default btn-block">注册账号</a>
+                <a href="/auth/register" class="btn btn-lg btn-default btn-block">注册账号</a>
             </form>
         </div>
         <div class="text-center">
