@@ -109,7 +109,7 @@ return [
 	|
 	*/
 
-	'cookie' => 'laravel_session',
+	'cookie' => env('APP_ENV', null) == 'offline' ? 'f_dic_session' : 'laravel_session',
 
 	/*
 	|--------------------------------------------------------------------------
