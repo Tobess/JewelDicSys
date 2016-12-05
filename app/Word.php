@@ -211,30 +211,6 @@ class Word extends Model {
     }
 
     /**
-     * 获得子字符串在主串中出现的所有位置.
-     *
-     * @param string $haystack
-     * @param string $needle
-     *
-     * @return array
-     */
-    public static function strpos($haystack, $needle)
-    {
-        $offset = 0;
-        $poses = array();
-
-        $count = substr_count($str, $char);
-        for($i = 0; $i < $count; $i++){
-            $offset = strpos($str, $char, $offset);
-            $poses[] = $offset;
-
-            $offset = $offset+1;
-        }
-
-        return $poses;
-    }
-
-    /**
      * 生成拼音与名称元素的关联
      *
      * @param int $relType 名称元素类型
