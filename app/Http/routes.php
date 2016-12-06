@@ -11,6 +11,10 @@
 |
 */
 
+Route::get('test', function () {
+    return print_r($_SERVER, true);
+});
+
 Route::get('/', 'HomeController@getIndex');
 Route::get('search', 'HomeController@getSearch');
 
