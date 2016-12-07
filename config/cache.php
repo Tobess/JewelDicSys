@@ -74,6 +74,6 @@ return [
 	|
 	*/
 
-	'prefix' => 'laravel:dictionary',
+	'prefix' => ('offline' == env('APP_ENV')) ? 'f-offline:dictionary' :  'laravel:dictionary',
 
 ];
