@@ -395,10 +395,11 @@ class ResourcesController extends Controller {
                 $did = \App\Area::where('level', 3)
                     ->where('name', 'like', '%' . $district . '%')
                     ->orWhere('short_name', 'like', '%' . $district . '%')
-                    ->whereIn('parent_id', $ppid)
+                    ->whereRaw("FIND_IN_SET(parent_id, '{".implode(',', $ppid)."}')")
                     ->pluck('id');
                 if ($did > 0) {
-                    $countries = \App\Area::where('level', 4)->where('parent_id', $did)->select('id', 'name')->get();
+                    $countries = \App\Area::where('level', 4)->where('parent_id', $did)
+                        ->select('id', 'name')->get();
                 }
             }
         }
