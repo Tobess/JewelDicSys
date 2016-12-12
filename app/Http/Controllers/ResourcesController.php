@@ -389,21 +389,24 @@ class ResourcesController extends Controller {
 
         $countries = [];
         if ($city && $district) {
-            $ppid = \App\Area::where('level', 2)->where('name', 'like', '%'.$city.'%')
-                ->orWhere('short_name', 'like', '%'.$city.'%')->lists('id');
+            $ppid = \App\Area::where('level', '2')->where(function ($sql) use ($city) {
+                $sql->where('name', 'like', '%'.$city.'%')
+                    ->orWhere('short_name', 'like', '%'.$city.'%');
+            })->lists('id');
             if (count($ppid) > 0) {
-                $did = \App\Area::where('level', 3)
-                    ->where('name', 'like', '%' . $district . '%')
-                    ->orWhere('short_name', 'like', '%' . $district . '%')
+                $did = \App\Area::where('level', '3')
+                    ->where(function ($sql) use ($district) {
+                        $sql->where('name', 'like', '%' . $district . '%')
+                            ->orWhere('short_name', 'like', '%' . $district . '%');
+                    })
                     ->whereRaw("FIND_IN_SET(parent_id, '{".implode(',', $ppid)."}')")
                     ->pluck('id');
                 if ($did > 0) {
-                    //$countries = \App\Area::where('level', 4)->where('parent_id', $did)
-                    //    ->select('id', 'name')->get();
+                    $countries = \App\Area::where('level', 4)->where('parent_id', $did)
+                        ->select('id', 'name')->get();
                 }
             }
         }
-        \Log::info(print_r($countries, true));
 
         return self::response($countries);
     }
