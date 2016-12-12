@@ -398,8 +398,8 @@ class ResourcesController extends Controller {
                     ->whereRaw("FIND_IN_SET(parent_id, '{".implode(',', $ppid)."}')")
                     ->pluck('id');
                 if ($did > 0) {
-                    $countries = \App\Area::where('level', 4)->where('parent_id', $did)
-                        ->select('id', 'name')->get();
+                    //$countries = \App\Area::where('level', 4)->where('parent_id', $did)
+                    //    ->select('id', 'name')->get();
                 }
             }
         }
