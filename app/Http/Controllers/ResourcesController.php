@@ -389,14 +389,17 @@ class ResourcesController extends Controller {
 
         $countries = [];
         if ($city && $district) {
-            $did = \App\Area::where('level', 3)
-                ->where('name', 'like', '%'.$district.'%')
-                ->orWhere('short_name', 'like', '%'.$district.'%')
-                ->whereIn('parent_id', \App\Area::where('level', 2)->where('name', 'like', '%'.$city.'%')->orWhere('short_name', 'like', '%'.$city.'%')->lists('id'))
-                ->pluck('id');
-            \Log::info(print_r($did, true));
-            if ($did > 0) {
-                $countries = \App\Area::where('level', 4)->where('parent_id', $did)->select('id', 'name')->get();
+            $ppid = \App\Area::where('level', 2)->where('name', 'like', '%'.$city.'%')
+                ->orWhere('short_name', 'like', '%'.$city.'%')->lists('id');
+            if (count($ppid) > 0) {
+                $did = \App\Area::where('level', 3)
+                    ->where('name', 'like', '%' . $district . '%')
+                    ->orWhere('short_name', 'like', '%' . $district . '%')
+                    ->whereIn('parent_id', $ppid)
+                    ->pluck('id');
+                if ($did > 0) {
+                    $countries = \App\Area::where('level', 4)->where('parent_id', $did)->select('id', 'name')->get();
+                }
             }
         }
         \Log::info(print_r($countries, true));
