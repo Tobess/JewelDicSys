@@ -83,7 +83,7 @@
             <td>
                 <button class="btn btn-xs btn-info m-b-none" type="button" onClick="save({{ $row->id }})">编辑</button>
                 <a class="btn btn-xs btn-danger m-b-none" type="button"
-                   href="/console/sCertificate/destroy/{{ $row->id }}">删除</a>
+                   href="/console/scertificate/destroy/{{ $row->id }}">删除</a>
             </td>
         </tr>
     @endforeach
@@ -107,7 +107,7 @@
         function save(id) {
             var mWin = $("#modalWin");
             mWin.find('form').get(0).reset();
-            mWin.find('form').attr('action', "/console/sColor/" + (id > 0 ? ('update/' + id) : 'store'));
+            mWin.find('form').attr('action', "/console/scertificate/" + (id > 0 ? ('update/' + id) : 'store'));
             if (id > 0) {
                 mWin.find('[name="name"]').val($("#sCertificateName" + id).text());
                 mWin.find('[name="pinyin"]').val($("#sCertificatePinyin" + id).text());
@@ -121,7 +121,7 @@
         }
         $(function () {
             $.ajax({
-                url: "/console/materials/material-json/",
+                url: "/console/materials/material-json",
                 type: "GET",
                 dataType: 'json',
                 success: function (data) {
