@@ -38,6 +38,12 @@ Route::group(['namespace' => 'Console', 'prefix' => 'console'], function()
     Route::controller('rules', 'RuleController');
     Route::controller('styles', 'StyleController');
     Route::controller('varieties', 'VarietyController');
+    Route::controller('scolor','SColorController');
+    Route::controller('scertificate','SCertificateController');
+    Route::controller('sclarity','SClarityController');
+    Route::controller('scut','SCutController');
+    Route::controller('sgrade','SGradeController');
+    Route::controller('sshape','SShapeController');
     Route::controller('aliases', 'AliasController');
     Route::controller('links', 'DLinksController');
     Route::controller('jerror', 'JErrorController');

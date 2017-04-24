@@ -212,4 +212,13 @@ class MaterialController extends ConsoleController {
         return redirect()->back();
 	}
 
+    public function getMaterialJson(){
+        $materials = \DB::table("materials")->select("id","parent","name")->get();
+        $data = [];
+        foreach($materials as $item){
+            $data[] = ['id'=>$item->id,'title'=>$item->name,'pid'=>$item->parent];
+        }
+        return \Response::json($data);
+    }
+
 }

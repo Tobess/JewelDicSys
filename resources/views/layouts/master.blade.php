@@ -27,6 +27,8 @@
 <script src="{{ asset('build/js/jquery.min.js') }}"></script>
 <script src="{{ asset('build/js/bootstrap.js') }}"></script>
 <script src="{{ elixir("js/all.js") }}"></script>
+<link href="{{ asset('build/js/treeselect/treeselect.css') }}?t={{ time() }}" rel="stylesheet" type="text/css" media="screen">
+<script type="text/javascript" src="{{ asset('build/js/treeselect/treeselect.js') }}?t={{ time() }}"></script>
 
 @yield('scripts')
 
