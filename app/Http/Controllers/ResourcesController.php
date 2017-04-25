@@ -413,4 +413,38 @@ class ResourcesController extends Controller {
         return self::response($countries);
     }
 
+    /**
+     * 获得标准体系分类
+     *
+     * @return Response
+     */
+    public function getStandard()
+    {
+        //s_color:标准颜色
+        $s_color = \DB::table("s_colors")->select(['id','name as title','material_id as mid','pinyin','letter'])->get();
+        $data['s_color'] = $s_color;
+
+        //s_certificate:标准证书
+        $s_certificate = \DB::table("s_certificates")->select(['id','name as title','material_id as mid','pinyin','letter'])->get();
+        $data['s_certificate'] = $s_certificate;
+
+        //s_clarity:标准净度
+        $s_clarity = \DB::table("s_clarities")->select(['id','name as title','material_id as mid','pinyin','letter'])->get();
+        $data['s_clarity'] = $s_clarity;
+
+        //s_cut:标准切工
+        $s_cut = \DB::table("s_cuts")->select(['id','name as title','material_id as mid','pinyin','letter'])->get();
+        $data['s_cut'] = $s_cut;
+
+        //s_grade:标准等级
+        $s_grades = \DB::table("s_grades")->select(['id','name as title','material_id as mid','pinyin','letter'])->get();
+        $data['s_grade'] = $s_grades;
+
+        //s_grade:标准形状
+        $s_shape = \DB::table("s_shapes")->select(['id','name as title','material_id as mid','pinyin','letter'])->get();
+        $data['s_shape'] = $s_shape;
+
+        return self::response($data);
+
+    }
 }
