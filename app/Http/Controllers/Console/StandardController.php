@@ -8,6 +8,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Redirect;
 
 class StandardController extends Controller
 {
@@ -15,14 +16,14 @@ class StandardController extends Controller
      * 标准分类种类
      * @var array
      */
-    private static $modes = ['color', 'certificates', 'clarities', 'cuts', 'grades', 'shapes'];
+    private static $modes = ['color'=>'颜色', 'certificates'=>'证书', 'clarities'=>'净度', 'cuts'=>'切工', 'grades'=>'等级', 'shapes'=>'形状'];
 
     private $mod = null;
 
     public function __construct()
     {
         $mod = \Input::get('mod');
-        if (in_array($mod, self::$modes)) {
+        if (in_array($mod, array_keys(self::$modes))) {
             $this->mod = $mod;
         } else {
             // TODO 404
@@ -68,6 +69,8 @@ class StandardController extends Controller
             'mid' => $mid,
             'mTitle' => $mTitle,
             'query' => $query,
+            'modName' => self::$modes[$this->mod],
+            'mod' => $this->mod
         ]);
     }
 
@@ -91,14 +94,19 @@ class StandardController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * 批量移除标准分类.
      *
-     * @param  int $id
+     * @param  int $ids
      * @return Response
      */
-    public function destroy($id)
+    public function destroy($ids)
     {
-        //
+        // $ids 为index中查询出的ids字段
+        if ($ids) {
+            DB::table($this->getTable())->whereIn('id', explode(',', $ids))->delete();
+        }
+
+        return \redirect()->back();
     }
 
 }
