@@ -16,7 +16,7 @@ class StandardController extends Controller
      * 标准分类种类
      * @var array
      */
-    private static $modes = ['color'=>'颜色', 'certificates'=>'证书', 'clarities'=>'净度', 'cuts'=>'切工', 'grades'=>'等级', 'shapes'=>'形状'];
+    private static $modes = ['colors'=>'颜色', 'certificates'=>'证书', 'clarities'=>'净度', 'cuts'=>'切工', 'grades'=>'等级', 'shapes'=>'形状'];
 
     private $mod = null;
 
@@ -26,7 +26,7 @@ class StandardController extends Controller
         if (in_array($mod, array_keys(self::$modes))) {
             $this->mod = $mod;
         } else {
-            // TODO 404
+            abort(404, '未定义的URL');
         }
     }
 
@@ -41,7 +41,7 @@ class StandardController extends Controller
      *
      * @return Response
      */
-    public function index()
+    public function getIndex()
     {
         $query = \Input::get('query');
         $mid = \Input::get('mid', 0);
@@ -59,11 +59,14 @@ class StandardController extends Controller
             });
         }
         if ($mid > 0) {
-            $que->where('m.id', $mid);
+            $que->where('m.id',$mid);
         }
+
         $lists = $que->paginate(10);
 
-        $mTitle = $mid > 0 ? \DB::table('materials')->where('id', $mid)->value('name') : '';
+        $mTitle = $mid > 0 ? \DB::table('materials')->where('id','=', $mid)->pluck('name') : '';
+
+
         return view('console.standard.list', [
             'rows' => $lists,
             'mid' => $mid,
@@ -72,6 +75,7 @@ class StandardController extends Controller
             'modName' => self::$modes[$this->mod],
             'mod' => $this->mod
         ]);
+
     }
 
     /**
@@ -79,18 +83,44 @@ class StandardController extends Controller
      *
      * @return Response
      */
-    public function store()
+    public function getStore()
     {
+
+
         $name = \Input::get('name');
         $materials = \Input::get('materials');
+
         if (!$name || !$materials) {
-            return Response::json(['state' => false, 'msg' => '无效的参数']);
+            return response()->json(['state' => false, 'msg' => '无效的参数']);
         }
 
+        //
         $mArr = explode(',', $materials);
-        \DB::table($this->getTable())->where('name', $name)->whereNotIn('material_id', $mArr)->delete();
-        $oIdArr = \DB::table();
-        // TODO
+        $tableName = 's_'.$this->mod;
+        \DB::table($tableName)->where('name',$name)->whereNotIn('material_id',$mArr)->delete();
+        $material_id = \DB::table($tableName)->where('name',$name)->select('material_id')->get();
+        $ids = [];
+        foreach($material_id as $item){
+            array_push($ids,$item->material_id);
+        }
+        $saveIds = array_diff($mArr, $ids);
+        if($saveIds){
+            foreach($saveIds as $item){
+                \DB::table($tableName)->insert([
+                    'name'      =>      $name,
+                    'pinyin'    =>      Input::get('pinyin') ? Input::get('pinyin') : pinyin($name),
+                    'letter'    =>      Input::get('letter') ? Input::get('letter') : letter($name),
+                    'material_id'=>     $item
+                ]);
+            }
+        }else{
+            \DB::table($tableName)->where('name',$name)->update([
+                'pinyin'=>Input::get('pinyin') ? Input::get('pinyin') : pinyin($name),
+                'letter'=>Input::get('letter') ? Input::get('letter') : letter($name),
+            ]);
+        }
+        return response()->json(['state' => true, 'msg' => '保存成功']);
+
     }
 
     /**
@@ -99,11 +129,12 @@ class StandardController extends Controller
      * @param  int $ids
      * @return Response
      */
-    public function destroy($ids)
+    public function getDestroy($ids)
     {
         // $ids 为index中查询出的ids字段
+        $tableName = 's_'.$this->mod;
         if ($ids) {
-            DB::table($this->getTable())->whereIn('id', explode(',', $ids))->delete();
+            DB::table($tableName)->whereIn('id',explode(',',$ids))->delete();
         }
 
         return \redirect()->back();

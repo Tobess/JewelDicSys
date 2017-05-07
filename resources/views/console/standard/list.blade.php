@@ -20,7 +20,8 @@
             <label for="firstname" class="col-sm-2 control-label text-muted">材质:</label>
             <div class="col-sm-7">
                 <div class="input-group dropdown">
-                    <input type="text" class="form-control" id="tree" placeholder="请选择材质" value="{{ $materialName }}">
+                    <input type="hidden" id="materialID" name="mid" value="{{ $mid }}">
+                    <input type="text" class="form-control" id="tree" placeholder="请选择材质" value="{{ $mTitle }}">
                     <span class="input-group-addon" id="btn"><span class="glyphicon glyphicon-calendar"></span></span>
                 </div>
             </div>
@@ -49,10 +50,10 @@
 @stop
 @section('toolRight-two')
     <div class="input-group">
-        <input id="searchQueryBox" type="text" value="{{$query}}" class="input-sm form-control" placeholder="请输入颜色名称查询">
+        <input id="searchQueryBox" type="text" name="query" value="{{$query}}" class="input-sm form-control" placeholder="请输入{{ $modName }}名称查询">
         <span class="input-group-btn">
     <button class="btn btn-sm btn-default" type="button"
-            onclick="window.location.href='?query='+$('#searchQueryBox').val();">搜!
+            onclick="window.location.href='?mod={{ $mod }}&query='+$('#searchQueryBox').val();">搜!
     </button>
     </span>
     </div>
@@ -74,7 +75,7 @@
             <td>{{$row->m_titles}}</td>
             <td>
                 <button class="btn btn-xs btn-info m-b-none" type="button"
-                        onClick="save('{{ $row->name }}', '{{ $row->m_ids }}')">编辑
+                        onClick="save('{{ $row->name }}', '{{ $row->m_ids }}','{{$row->m_titles}}','{{$row->pinyin}}','{{$row->letter}}')">编辑
                 </button>
                 <a class="btn btn-xs btn-danger m-b-none" type="button"
                    href="/console/standard/destroy/{{ $row->ids }}?mod={{ $mod }}">删除</a>
@@ -93,19 +94,21 @@
 
 <!--编辑页面-->
 @section('extend')
-    @include('console.scolor.form')
+    @include('console.standard.form')
 @stop
 
 @section('scripts')
     <script>
-        function save(name, m_ids, m_titles) {
+        function save(name, m_ids, m_titles,pinyin,letter) {
             var mWin = $("#modalWin");
             mWin.find('form').get(0).reset();
 
             if (name && name.length > 0) {
                 mWin.find('[name="name"]').val(name);
-                mWin.find('[name="m_ids"]').val(m_ids);
-                mWin.find('[name="m_titles"]').val(m_titles);
+                mWin.find('[name="pinyin"]').val(pinyin);
+                mWin.find('[name="letter"]').val(letter);
+                mWin.find('[name="material"]').val(m_ids);
+                mWin.find('[name="material-show"]').val(m_titles);
                 mWin.find('[name="name"]').attr('readonly', true)
             } else {
                 mWin.find('[name="name"]').focus().attr('readonly', false)
@@ -115,20 +118,22 @@
         }
         $(function () {
             $("#submitBtn").click(function (e) {
-                var name = $("#nameEle").val();
-                var materials = $("#m_ids").val();
+                var name = $("#name").val();
+                var materials = $("#material").val();
+                var pinyin  = $("#pinyin").val();
+                var letter = $("#letter").val();
                 if (!name || name.length <= 0 || !materials || materials.length <= 0) {
                     alert('分类名称或材质不能为空！');
                     return;
                 }
                 $.ajax({
                     url: "/console/standard/store?mod={{ $mod }}",
-                    type: "POST",
+                    type: "GET",
                     dataType: 'json',
-                    data: {'name': name, 'materials': materials},
-                    success: function (data) {
-                        // TODO 处理消息
-                    }
+                    data: {'name': name, 'materials': materials,'pinyin':pinyin,'letter':letter},
+                    success: function () {
+                        document.location.href="?mod={{$mod}}";
+                    },
                 });
             });
 
@@ -167,18 +172,35 @@
                         width: 200,
                         parseListDataFn: function () {
                             return {
-                                header: '测试数据',
+                                header: '选择材质',
                                 data: data
                             }
-                        }, onItemClicked: function (item) {
-                            $("#caiLiao").val(item.title);
-                            $("input[name='material']").val(item.id);
-                        }, parentCanSelect: false
+                        }, itemsSelected: function (item) {
+                            var materialName = "";
+                            var materialID = "";
+                            var i = 0;
+                            var count = item.length;
+                            for (i; i < count; i++) {
+                                if (i == item.length - 1) {
+                                    materialName += item[i].title;
+                                    materialID += item[i].id;
+                                } else {
+                                    materialName += item[i].title + ",";
+                                    materialID += item[i].id + ",";
+                                }
+                            }
+                            $("#caiLiao").val(materialName);
+                            $("input[name='material']").val(materialID);
+                        }, parentCanSelect: false, resourceDir: '/js/treeselect/', multiple: true
                     });
                     /**
                      */
                     $("#btn-form").click(function (e) {
-                        clsTreeEle_form.toggle();
+                        clsTreeEle_form.toggle(function () {
+                            if (clsTreeEle_form.getTree()) {
+                                clsTreeEle_form.getTree().setMultipleSelected($('#material').val().split(','));
+                            }
+                        });
                     });
 
 
@@ -196,7 +218,8 @@
                 if (materialName == '') {
                     materialID = '';
                 }
-                window.location.href = '?query=' + materialID + "&material=" + materialName + "&type=material";
+                window.location.href = '?mod={{$mod}}'+'&query=' + $("#searchQueryBox").val() + "&mid=" + materialID;
+                {{--window.location.href = "?mod={{$mod}}"+"&query="+$("#searchQueryBox").val()+"&mid="+materialID;--}}
             });
 
         });

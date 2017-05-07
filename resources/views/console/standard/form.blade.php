@@ -9,25 +9,25 @@
         <div class="row">
             <div class="form-group">
                 <label>名称</label>
-                <input name="name" type="text" class="form-control" placeholder="请输入{{ $modName }}名称">
+                <input name="name" id="name" type="text" class="form-control" placeholder="请输入{{ $modName }}名称">
+            </div>
+            <div class="form-group">
+                <label>拼音</label>
+                <input name="pinyin" id="pinyin" type="text" class="form-control" placeholder="请输入拼音">
             </div>
             <div class="form-group">
                 <label>材质:</label>
-                <input type="hidden" type="text" name="m_titles" value=""/>
-                <input type="hidden" name="m_ids" class="form-control" value=""/>
                 <div>
-                    <div class="input-group dropdown" data-toggle="collapse" href="#collapseTwo">
-                        <input type="text" name="material-show" id="caiLiao" class="form-control" disabled
-                               placeholder="请选择材料" href="#collapseTwo">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                    </div>
-                    <div id="collapseTwo" class="panel-collapse collapse" data-spy="scroll"
-                         data-target="#material-form">
-                        <div class="panel-body" id="material-form">
-
-                        </div>
+                    <div class="input-group input-append ">
+                        <input type="hidden"  name="material" id="material" value=""/>
+                        <input type="text" name="material-show" id="caiLiao" disabled class="form-control" placeholder="请选择材质">
+                        <span class="input-group-addon" id="btn-form"><span class="glyphicon glyphicon-calendar"></span></span>
                     </div>
                 </div>
+            </div>
+            <div class="form-group">
+                <label>简拼</label>
+                <input name="letter" type="text" id="letter" class="form-control" placeholder="请输入简拼">
             </div>
         </div>
     </div>
