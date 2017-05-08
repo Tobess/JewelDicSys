@@ -10,7 +10,7 @@
             <div class="form-group">
                 <label>名称</label>
                 <input name="name" id="name" type="text" class="form-control" placeholder="请输入{{ $modName }}名称">
-                <input type="hidden" id="origin" name="ids" value="">
+                <input type="hidden" id="origin" name="origin" value="">
             </div>
             <div class="form-group">
                 <label>拼音</label>
