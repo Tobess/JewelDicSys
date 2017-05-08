@@ -89,12 +89,12 @@ class StandardController extends Controller
         $name = \Input::get('name');
         $materials = \Input::get('materials');
 
-        if (!$name || !$materials) {
+        if (!$name) {
             return response()->json(['state' => false, 'msg' => '无效的参数']);
         }
 
-        $pinyin = pinyin($name);
-        $letter = letter($name);
+        $pinyin = \Input::get('pinyin') ?: pinyin($name);
+        $letter = \Input::get('letter') ?: letter($name);
 
         $mArr = explode(',', $materials);
         $tableName = 's_' . $this->mod;

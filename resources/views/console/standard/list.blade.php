@@ -120,6 +120,8 @@
             $("#submitBtn").click(function (e) {
                 var name = $("#name").val();
                 var materials = $("#material").val();
+                var pinyin = $("#pinyin").val();
+                var letter = $("#letter").val();
                 var origin = $("#origin").val();
                 if (!name || name.length <= 0) {
                     alert('分类名称或材质不能为空！');
@@ -129,7 +131,7 @@
                     url: "/console/standard/store?mod={{ $mod }}",
                     type: "GET",
                     dataType: 'json',
-                    data: {'name': name, 'materials': materials, 'origin': origin},
+                    data: {'name': name, 'materials': materials, 'pinyin': pinyin, 'letter': letter, 'origin': origin},
                     success: function () {
                         window.location.reload();
                     },
