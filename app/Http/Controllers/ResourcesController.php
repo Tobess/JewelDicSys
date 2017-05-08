@@ -5,7 +5,8 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 
-class ResourcesController extends Controller {
+class ResourcesController extends Controller
+{
 
     public static function response($data)
     {
@@ -37,7 +38,7 @@ class ResourcesController extends Controller {
     {
         $isParentNode = \App\Material::isParentNode($id);
 
-        return self::response(['isParentNode'=>$isParentNode]);
+        return self::response(['isParentNode' => $isParentNode]);
     }
 
     /**
@@ -86,19 +87,19 @@ class ResourcesController extends Controller {
         return self::response(\App\Material::getMaterialParentNodes());
     }
 
-	/**
-	 * Get the stone material by id.
-	 *
+    /**
+     * Get the stone material by id.
+     *
      * @param int $id
      *
-	 * @return Response
-	 */
-	public function getStone($id)
-	{
-		$stone = \App\Material::getMaterialByID($id);
+     * @return Response
+     */
+    public function getStone($id)
+    {
+        $stone = \App\Material::getMaterialByID($id);
 
         return self::response($stone);
-	}
+    }
 
     /**
      * Get the stone materials.
@@ -163,7 +164,7 @@ class ResourcesController extends Controller {
     {
         $isParentNode = \App\Variety::isParentNode($id);
 
-        return self::response(['isParentNode'=>$isParentNode]);
+        return self::response(['isParentNode' => $isParentNode]);
     }
 
     /**
@@ -371,7 +372,7 @@ class ResourcesController extends Controller {
         if ($redis->exists($contents)) {
             $contents = $redis->get($contents);
         } else {
-            return self::response(['state'=>false, 'message'=>'无效的参数.']);
+            return self::response(['state' => false, 'message' => '无效的参数.']);
         }
 
         return self::response(\App\JError::feedback($file, $domain, $companyName, $mobile, $userName, $contents, $fileGroup, $fileName));
@@ -390,8 +391,8 @@ class ResourcesController extends Controller {
         $countries = [];
         if ($city && $district) {
             $ppid = \App\Area::where('level', 2)->where(function ($sql) use ($city) {
-                $sql->where('name', 'like', '%'.$city.'%')
-                    ->orWhere('short_name', 'like', '%'.$city.'%');
+                $sql->where('name', 'like', '%' . $city . '%')
+                    ->orWhere('short_name', 'like', '%' . $city . '%');
             })->lists('id');
             \Log::info(print_r($ppid, true));
             if (count($ppid) > 0) {
@@ -422,13 +423,13 @@ class ResourcesController extends Controller {
     {
         $mid = \Input::get('mid');
         $data = [];
-        $types = ['s_shape' => 'shape', 's_color' => 'color', 's_clarity' => 'clarity', 's_cut' => 'cut', 's_grade' => 'grade', 's_certificate' => 'cerType'];
-        foreach (array_keys($types) as $type) {
-            $que = \DB::table($type);
+        $types = ['s_shape' => 's_shapes', 's_color' => 's_colors', 's_clarity' => 's_clarities', 's_cut' => 's_cuts', 's_grade' => 's_grades', 's_certificate' => 's_certificates'];
+        foreach ($types as $type => $table) {
+            $que = \DB::table($table);
             if ($mid > 0) {
                 $que->where('material_id', $mid);
             }
-            $data[$type] = $que->select(['id','name as title','material_id as mid','pinyin','letter'])->get();
+            $data[$type] = $que->select(['id', 'name as title', 'material_id as mid', 'pinyin', 'letter'])->get();
         }
 
         return self::response($data);
