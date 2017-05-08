@@ -50,7 +50,8 @@
 @stop
 @section('toolRight-two')
     <div class="input-group">
-        <input id="searchQueryBox" type="text" name="query" value="{{$query}}" class="input-sm form-control" placeholder="请输入{{ $modName }}名称查询">
+        <input id="searchQueryBox" type="text" name="query" value="{{$query}}" class="input-sm form-control"
+               placeholder="请输入{{ $modName }}名称查询">
         <span class="input-group-btn">
     <button class="btn btn-sm btn-default" type="button"
             onclick="window.location.href='?mod={{ $mod }}&query='+$('#searchQueryBox').val();">搜!
@@ -75,10 +76,9 @@
             <td>{{$row->m_titles}}</td>
             <td>
                 <button class="btn btn-xs btn-info m-b-none" type="button"
-                        onClick="save('{{ $row->name }}', '{{ $row->m_ids }}','{{$row->m_titles}}','{{$row->pinyin}}','{{$row->letter}}')">编辑
+                        onClick="save('{{ $row->name }}', '{{ $row->m_ids }}','{{$row->m_titles}}','{{$row->pinyin}}','{{$row->letter}}')">
+                    编辑
                 </button>
-                <a class="btn btn-xs btn-danger m-b-none" type="button"
-                   href="/console/standard/destroy/{{ $row->ids }}?mod={{ $mod }}">删除</a>
             </td>
         </tr>
     @endforeach
@@ -89,7 +89,7 @@
 @stop
 
 @section('footerRight')
-    @include('layouts.blocks.pager', ['paginator' =>$rows->appends(['query' => $query, 'mode' => $mod])])
+    @include('layouts.blocks.pager', ['paginator' =>$rows->appends(['query' => $query, 'mod' => $mod])])
 @stop
 
 <!--编辑页面-->
@@ -99,19 +99,19 @@
 
 @section('scripts')
     <script>
-        function save(name, m_ids, m_titles,pinyin,letter) {
+        function save(name, m_ids, m_titles, pinyin, letter) {
             var mWin = $("#modalWin");
             mWin.find('form').get(0).reset();
 
             if (name && name.length > 0) {
                 mWin.find('[name="name"]').val(name);
+                mWin.find('[name="origin"]').val(name);
                 mWin.find('[name="pinyin"]').val(pinyin);
                 mWin.find('[name="letter"]').val(letter);
                 mWin.find('[name="material"]').val(m_ids);
                 mWin.find('[name="material-show"]').val(m_titles);
-                mWin.find('[name="name"]').attr('readonly', true)
             } else {
-                mWin.find('[name="name"]').focus().attr('readonly', false)
+                mWin.find('[name="name"]').focus();
             }
 
             mWin.modal();
@@ -120,9 +120,8 @@
             $("#submitBtn").click(function (e) {
                 var name = $("#name").val();
                 var materials = $("#material").val();
-                var pinyin  = $("#pinyin").val();
-                var letter = $("#letter").val();
-                if (!name || name.length <= 0 || !materials || materials.length <= 0) {
+                var origin = $("#origin").val();
+                if (!name || name.length <= 0) {
                     alert('分类名称或材质不能为空！');
                     return;
                 }
@@ -130,9 +129,9 @@
                     url: "/console/standard/store?mod={{ $mod }}",
                     type: "GET",
                     dataType: 'json',
-                    data: {'name': name, 'materials': materials,'pinyin':pinyin,'letter':letter},
+                    data: {'name': name, 'materials': materials, 'origin': origin},
                     success: function () {
-                        document.location.href="?mod={{$mod}}";
+                        window.location.reload();
                     },
                 });
             });
@@ -218,7 +217,7 @@
                 if (materialName == '') {
                     materialID = '';
                 }
-                window.location.href = '?mod={{$mod}}'+'&query=' + $("#searchQueryBox").val() + "&mid=" + materialID;
+                window.location.href = '?mod={{$mod}}' + '&query=' + $("#searchQueryBox").val() + "&mid=" + materialID;
                 {{--window.location.href = "?mod={{$mod}}"+"&query="+$("#searchQueryBox").val()+"&mid="+materialID;--}}
             });
 

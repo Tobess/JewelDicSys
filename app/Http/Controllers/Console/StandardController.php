@@ -16,7 +16,7 @@ class StandardController extends Controller
      * 标准分类种类
      * @var array
      */
-    private static $modes = ['colors'=>'颜色', 'certificates'=>'证书', 'clarities'=>'净度', 'cuts'=>'切工', 'grades'=>'等级', 'shapes'=>'形状'];
+    private static $modes = ['colors' => '颜色', 'certificates' => '证书', 'clarities' => '净度', 'cuts' => '切工', 'grades' => '等级', 'shapes' => '形状'];
 
     private $mod = null;
 
@@ -59,12 +59,12 @@ class StandardController extends Controller
             });
         }
         if ($mid > 0) {
-            $que->where('m.id',$mid);
+            $que->where('m.id', $mid);
         }
 
         $lists = $que->paginate(10);
 
-        $mTitle = $mid > 0 ? \DB::table('materials')->where('id','=', $mid)->pluck('name') : '';
+        $mTitle = $mid > 0 ? \DB::table('materials')->where('id', '=', $mid)->pluck('name') : '';
 
 
         return view('console.standard.list', [
@@ -85,8 +85,7 @@ class StandardController extends Controller
      */
     public function getStore()
     {
-
-
+        $origin = \Input::get('origin');
         $name = \Input::get('name');
         $materials = \Input::get('materials');
 
@@ -94,31 +93,35 @@ class StandardController extends Controller
             return response()->json(['state' => false, 'msg' => '无效的参数']);
         }
 
-        //
+        $pinyin = pinyin($name);
+        $letter = letter($name);
+
         $mArr = explode(',', $materials);
-        $tableName = 's_'.$this->mod;
-        \DB::table($tableName)->where('name',$name)->whereNotIn('material_id',$mArr)->delete();
-        $material_id = \DB::table($tableName)->where('name',$name)->select('material_id')->get();
+        $tableName = 's_' . $this->mod;
+
         $ids = [];
-        foreach($material_id as $item){
-            array_push($ids,$item->material_id);
+        if ($origin) {
+            \DB::table($tableName)->where('name', $origin)->whereNotIn('material_id', $mArr)->delete();
+            $ids = \DB::table($tableName)->where('name', $origin)->list('material_id');
+            if (count($ids) > 0) {
+                \DB::table($tableName)->where('name', $origin)->update(['name' => $name, 'pinyin' => $pinyin, 'letter' => $letter ?: $pinyin]);
+            }
         }
         $saveIds = array_diff($mArr, $ids);
-        if($saveIds){
-            foreach($saveIds as $item){
-                \DB::table($tableName)->insert([
-                    'name'      =>      $name,
-                    'pinyin'    =>      Input::get('pinyin') ? Input::get('pinyin') : pinyin($name),
-                    'letter'    =>      Input::get('letter') ? Input::get('letter') : letter($name),
-                    'material_id'=>     $item
-                ]);
+        if ($saveIds) {
+            $values = [];
+            foreach ($saveIds as $item) {
+                $values[] = [
+                    'name' => $name,
+                    'pinyin' => $pinyin,
+                    'letter' => $letter ?: $pinyin,
+                    'material_id' => $item
+                ];
+
             }
-        }else{
-            \DB::table($tableName)->where('name',$name)->update([
-                'pinyin'=>Input::get('pinyin') ? Input::get('pinyin') : pinyin($name),
-                'letter'=>Input::get('letter') ? Input::get('letter') : letter($name),
-            ]);
+            \DB::table($tableName)->insert($values);
         }
+
         return response()->json(['state' => true, 'msg' => '保存成功']);
 
     }
@@ -132,9 +135,9 @@ class StandardController extends Controller
     public function getDestroy($ids)
     {
         // $ids 为index中查询出的ids字段
-        $tableName = 's_'.$this->mod;
+        $tableName = 's_' . $this->mod;
         if ($ids) {
-            DB::table($tableName)->whereIn('id',explode(',',$ids))->delete();
+            DB::table($tableName)->whereIn('id', explode(',', $ids))->delete();
         }
 
         return \redirect()->back();
