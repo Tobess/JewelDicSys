@@ -102,7 +102,7 @@ class StandardController extends Controller
         $ids = [];
         if ($origin) {
             \DB::table($tableName)->where('name', $origin)->whereNotIn('material_id', $mArr)->delete();
-            $ids = \DB::table($tableName)->where('name', $origin)->list('material_id');
+            $ids = \DB::table($tableName)->where('name', $origin)->values('material_id');
             if (count($ids) > 0) {
                 \DB::table($tableName)->where('name', $origin)->update(['name' => $name, 'pinyin' => $pinyin, 'letter' => $letter ?: $pinyin]);
             }
