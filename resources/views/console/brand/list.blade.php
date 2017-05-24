@@ -32,6 +32,7 @@
     <th>名称</th>
     <th>拼音</th>
     <th>简拼</th>
+    <th>品牌logo</th>
     <th style="width:106px;"></th>
 @stop
 
@@ -42,6 +43,7 @@
         <td id="brandName{{ $row->id }}">{{ $row->name }}</td>
         <td id="brandPinyin{{ $row->id }}">{{ $row->pinyin }}</td>
         <td id="brandLetter{{ $row->id }}">{{ $row->letter }}</td>
+        <td><img src="{{ url('/console/brands/logo/' . $row->id) }}?t={{ time() }}" id="brandLogo{{ $row->id }}" width="40" height="40" alt="品牌logo"></td>
         <td>
             <button class="btn btn-xs btn-info m-b-none" type="button" onClick="save({{ $row->id }})">编辑</button>
             <a class="btn btn-xs btn-danger m-b-none" type="button" href="/console/brands/destroy/{{ $row->id }}">删除</a>
@@ -73,10 +75,23 @@
                 mWin.find('[name="name"]').val($("#brandName"+id).text());
                 mWin.find('[name="pinyin"]').val($("#brandPinyin"+id).text());
                 mWin.find('[name="letter"]').val($("#brandLetter"+id).text());
+                $("#old").find('img').attr('src',$("#brandLogo"+id).attr("src"));
+                $("#old").attr('style','');
+            }else{
+                $("#old").attr('style','display: none');
             }
             mWin.find('[name="name"]').focus();
-
             mWin.modal();
         }
+        $(function(){
+            $("button[type='submit']").on('click',function(){
+                var name = $("input[name='name']").val();
+                if(name == ''){
+                    alert('品牌名称不能为空');
+                    return 0;
+                }
+
+            });
+        })
     </script>
 @stop

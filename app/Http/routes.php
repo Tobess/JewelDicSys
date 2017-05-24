@@ -18,9 +18,12 @@ Route::get('test', function () {
 Route::get('/', 'HomeController@getIndex');
 Route::get('search', 'HomeController@getSearch');
 
+// 获得品牌logo图片
+Route::get('logo/brand/{id}', 'BrandController@getLogo');
+
 Route::controllers([
-	'auth' => 'Auth\AuthController',
-	'password' => 'Auth\PasswordController',
+    'auth' => 'Auth\AuthController',
+    'password' => 'Auth\PasswordController',
 ]);
 
 // 管理后台
