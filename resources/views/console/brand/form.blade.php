@@ -20,19 +20,9 @@
                 <input name="letter" type="text" class="form-control" placeholder="请输入简拼">
             </div>
             <div class="form-group">
-                <div>
-                    <label>品牌LOGO：（图片尺寸300：132 ，图片大小小于100kb）</label>
-                    <input type="file" name="picture" class="file" showRemove="false"/>
-                </div>
-            </div>
-            <div class="form-group">
-                <div id="old" style="display: none" class="file-preview-frame krajee-default  kv-preview-thumb">
-                    <div class="kv-file-content">
-                        <img src="{{ url('/console/brands/logo/default.png') }}"
-                             class="file-preview-image kv-preview-data rotate-1" title="heihei.jpg" alt="heihei.jpg"
-                             style="width:auto;height:100%;">
-                    </div>
-                </div>
+                <label>品牌LOGO：（图片尺寸300：132 ，图片大小小于100kb）</label>
+                <img id="pic" src="{{ url('/console/brands/logo/0') }}" >
+                <input id="upload" name="picture" type="file"/>
             </div>
         </div>
     </div>
