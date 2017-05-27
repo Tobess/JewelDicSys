@@ -19,7 +19,7 @@ Route::get('/', 'HomeController@getIndex');
 Route::get('search', 'HomeController@getSearch');
 
 // 获得品牌logo图片
-Route::get('logo/brand/{id}', 'BrandController@getLogo');
+Route::get('logo/brand/{id}', 'Console\BrandController@getLogo');
 
 Route::controllers([
     'auth' => 'Auth\AuthController',
