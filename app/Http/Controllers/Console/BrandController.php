@@ -29,20 +29,7 @@ class BrandController extends ConsoleController
             $rows = \App\Brand::paginate(10);
         }
 
-        $path = $this->getPath();
-        return view('console.brand.list', ['rows' => $rows, 'query' => $query, 'path' => $path]);
-    }
-
-    /**
-     * @return string
-     */
-    private function getPath()
-    {
-        $ip = gethostbyname($_SERVER['SERVER_NAME']);
-        $pathNode = explode('\\', base_path());
-        $baseName = end($pathNode);
-        $otherPath = "storage/app/logo";
-        return 'http://' . $ip . '/' . $baseName . '/' . $otherPath . '/';
+        return view('console.brand.list', ['rows' => $rows, 'query' => $query]);
     }
 
     /**
