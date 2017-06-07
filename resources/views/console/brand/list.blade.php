@@ -53,7 +53,7 @@
             <td id="brandName{{ $row->id }}">{{ $row->name }}</td>
             <td id="brandPinyin{{ $row->id }}">{{ $row->pinyin }}</td>
             <td id="brandLetter{{ $row->id }}">{{ $row->letter }}</td>
-            <td><img src="{{ url('/console/brands/logo/' . $row->id) }}?t={{ time() }}" id="brandLogo{{ $row->id }}" width="40"
+            <td><img src="{{ url('/logo/brand/' . $row->id) }}?t={{ time() }}" id="brandLogo{{ $row->id }}" width="40"
                      height="40" alt="品牌logo"></td>
             <td>
                 <button class="btn btn-xs btn-info m-b-none" type="button" onClick="save({{ $row->id }})">编辑</button>

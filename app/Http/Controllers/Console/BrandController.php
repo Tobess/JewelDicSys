@@ -154,6 +154,11 @@ class BrandController extends ConsoleController
      */
     public function getLogo($id)
     {
+        return response()->download(self::logo($id));
+    }
+
+    public static function logo($id)
+    {
         $path = storage_path('app/logo/default.png');
         $brand = \App\Brand::find($id);
         if ($brand && isset($brand->address)) {
@@ -163,7 +168,7 @@ class BrandController extends ConsoleController
             }
         }
 
-        return response()->download($path);
+        return $path;
     }
 
 }

@@ -19,7 +19,9 @@ Route::get('/', 'HomeController@getIndex');
 Route::get('search', 'HomeController@getSearch');
 
 // 获得品牌logo图片
-Route::get('logo/brand/{id}', 'Console\BrandController@getLogo');
+Route::get('logo/brand/{id}', function ($id) {
+    return response()->download(\App\Http\Controllers\Console\BrandController::logo($id));
+});
 
 Route::controllers([
     'auth' => 'Auth\AuthController',
