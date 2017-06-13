@@ -6,6 +6,15 @@
 @stop
 
 @section('toolLeft')
+    @if( Session::get('message'))
+    <div class="alert alert-danger alert-dismissable">
+        <button type="button" class="close" data-dismiss="alert"
+                aria-hidden="true">
+            &times;
+        </button>
+        {{ Session::get('message') }}
+    </div>
+    @endif
     <span class="input-group-btn">
       <button class="btn btn-sm btn-success" type="button" onclick="save(0)">
           <i class="fa fa-plus"></i>
@@ -97,15 +106,6 @@
         }
 
         $(function () {
-            //
-            $("button[type='submit']").on('click', function () {
-                var name = $("input[name='name']").val();
-                if (name == '') {
-                    alert('品牌名称不能为空');
-                    return 0;
-                }
-            });
-
             $("#pic").click(function () {
                 $("#upload").click(); //隐藏了input:file样式后，点击头像就可以本地上传
                 $("#upload").on("change", function () {

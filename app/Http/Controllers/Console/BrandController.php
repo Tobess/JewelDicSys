@@ -23,8 +23,7 @@ class BrandController extends ConsoleController
                 $que->where('pinyin', 'like', $query . '%')
                     ->orWhere('letter', 'like', $query . '%')
                     ->orWhere('name', 'like', $query . '%');
-            })
-                ->paginate(10);
+            })->paginate(10);
         } else {
             $rows = \App\Brand::paginate(10);
         }
@@ -48,14 +47,14 @@ class BrandController extends ConsoleController
             $brand->letter = \Input::get('letter') ?: letter($name);
             $brand->save();
         } else {
-            return redirect('console/brands');
+            return redirect('console/brands')->with('message','品牌名称不能为空');
         }
         //品牌logo
         $file = $request->file('picture');
         $fileName = $this->uploadFile($file, $brand);
         $brand->address = $fileName;
         $brand->update();
-        return redirect('console/brands');
+        return redirect('console/brands')->with('message','品牌信息上传成功!');
     }
 
     /**
@@ -73,9 +72,11 @@ class BrandController extends ConsoleController
                 $imageTypes = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'];
                 $type = $file->getClientMimeType();
                 $realPath = $file->getRealPath();
-                if (!in_array($type, $imageTypes) || (($file->getSize() / 1000) > 100)) {
-                    $image = $defaultImage;
-                    return $image;
+                if(!in_array($type, $imageTypes)){
+                    return redirect('console/brands')->with('message','上传文件格式不正确');
+                }
+                if((($file->getSize() / 1000) > 100)){
+                    return redirect('console/brands')->with('message','图片大小不能超过100kb！');
                 }
 
                 $filename = 'brand' . '_' . $brand->id . '.' . 'png';
@@ -111,10 +112,10 @@ class BrandController extends ConsoleController
             $brandLogo = $this->uploadFile($file, $brand);
             $brand->address = $brandLogo;
             $brand->save();
+        }else{
+            return redirect()->back()->with('message','品牌名称不能为空');
         }
-
-
-        return redirect('console/brands');
+        return redirect()->back();
     }
 
     /**
