@@ -40,11 +40,25 @@ class BrandController extends ConsoleController
     {
         
         $name = \Input::get('name');
+        $pinyin = \Input::get('pinyin');
+        $letter = \Input::get('letter');
+
+        $brand = \DB::table("brands")->select("id")->where("name",'=',$name)->first();
+        if($brand){
+            return redirect('console/brands')->with('message',"`{$name}` 该品牌名称已被占用！");
+        }
+        if($pinyin && !preg_match('/^[a-zA-Z]+$/',$pinyin)){
+            return redirect('console/brands')->with('message','非法的字符!请输入正确的拼音');
+        }
+        if($letter && !preg_match('/^[a-zA-Z]+$/',$letter)){
+            return redirect('console/brands')->with('message','非法的字符!请输入正确的短拼');
+        }
+
         $brand = new \App\Brand;
         if ($name) {
             $brand->name = $name;
-            $brand->pinyin = \Input::get('pinyin') ?: pinyin($name);
-            $brand->letter = \Input::get('letter') ?: letter($name);
+            $brand->pinyin = $pinyin ?: pinyin($name);
+            $brand->letter = $letter ?: letter($name);
             $brand->save();
         } else {
             return redirect('console/brands')->with('message','品牌名称不能为空');
@@ -115,13 +129,27 @@ class BrandController extends ConsoleController
     public function postUpdate($id, Request $request)
     {
         $name = \Input::get('name');
+        $pinyin = \Input::get('pinyin');
+        $letter = \Input::get('letter');
         $brand = \App\Brand::find($id);
         $file = $request->file('picture');
 
+
+        $brand_id = \DB::table("brands")->select("id")->where("name",'=',$name)->first();
+        if($name != $brand->name && $brand_id){
+            return redirect()->back()->with('message',"`{$name}` 该品牌名称已被占用！");
+        }
+        if($pinyin && !preg_match('/^[a-zA-Z]+$/',$pinyin)){
+            return  redirect()->back()->with('message','非法的字符!请输入正确的拼音');
+        }
+        if($letter && !preg_match('/^[a-zA-Z]+$/',$letter)){
+            return  redirect()->back()->with('message','非法的字符!请输入正确的短拼');
+        }
+
         if ($name && $brand) {
             $brand->name = $name;
-            $brand->pinyin = \Input::get('pinyin') ?: pinyin($name);
-            $brand->letter = \Input::get('letter') ?: letter($name);
+            $brand->pinyin = $pinyin ?: pinyin($name);
+            $brand->letter = $letter ?: letter($name);
             $brandLogo = $this->uploadFile($file, $brand);
             $brand->address = $brandLogo;
             $brand->save();
