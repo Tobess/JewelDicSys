@@ -38,7 +38,7 @@ class BrandController extends ConsoleController
      */
     public function postStore(Request $request)
     {
-
+        
         $name = \Input::get('name');
         $brand = new \App\Brand;
         if ($name) {
@@ -79,6 +79,11 @@ class BrandController extends ConsoleController
                     return redirect('console/brands')->with('message','图片大小不能超过100kb！');
                 }
 
+                $imgInfo =  getimagesize($file);
+                if( !$this->is_proportion($imgInfo[0],300) || !$this->is_proportion($imgInfo[1],132) ){
+                    return redirect('console/brands')->with('message','图片尺寸不符合规范！');
+                }
+                
                 $filename = 'brand' . '_' . $brand->id . '.' . 'png';
                 $exists = \Storage::disk($localName)->exists($filename);
                 if ($exists) {
@@ -91,6 +96,14 @@ class BrandController extends ConsoleController
             }
         }
         return $defaultImage;
+    }
+
+
+    private function is_proportion($upload_num,$standard_num){
+        if($upload_num > $standard_num){
+            return is_int($upload_num/$standard_num);
+        }
+        return is_int($standard_num/$upload_num);
     }
 
     /**
