@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Log;
+use League\Flysystem\Exception;
 
 class HomeController extends Controller {
 
@@ -67,6 +68,7 @@ class HomeController extends Controller {
      */
     public function getAnalyse($redisIdentify)
     {
+        Log::info($redisIdentify);
         // S1 通过Redis Key获取商品名称列表
         $redis = \Redis::connection('serve');
         if ($redis->exists($redisIdentify)) {
@@ -80,19 +82,24 @@ class HomeController extends Controller {
                     // 商品名称拆分队列
                     \Queue::push(function($job) use ($gName, $redisIdentify, $sKey, $redis)
                     {
-                        $gNameKey = $redisIdentify . ':'. md5($gName);
-                        // S1 生成商品名称全拼码
-                        $pinyin = \App\Word::getPinyinAndCache($gName);
+                        try {
+                            $gNameKey = $redisIdentify . ':' . md5($gName);
+                            // S1 生成商品名称全拼码
+                            $pinyin = \App\Word::getPinyinAndCache($gName);
 
-                        // S2 拆分分析
-                        $results = \App\Word::search($pinyin);
-                        if (isset($results['words']) && count($results['words'])) {
-                            $redis->set($gNameKey, json_encode($results));
-                            $redis->expire($gNameKey, 2*60*60);
+                            // S2 拆分分析
+                            $results = \App\Word::search($pinyin);
+                            if (isset($results['words']) && count($results['words'])) {
+                                $redis->del($gNameKey);
+                                $redis->set($gNameKey, json_encode($results));
+                                $redis->expire($gNameKey, 24 * 60 * 60);
+                            }
+
+                            $redis->incr($sKey);
+                            $redis->expire($sKey, 24 * 60 * 60);
+                        } catch (Exception $ex) {
+                            //
                         }
-
-                        $redis->incr($sKey);
-                        $redis->expire($sKey, 2*60*60);
 
                         $job->delete();
                     });
