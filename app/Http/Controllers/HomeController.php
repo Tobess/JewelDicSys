@@ -89,6 +89,7 @@ class HomeController extends Controller {
 
                             // S2 拆分分析
                             $results = \App\Word::search($pinyin);
+                            Log::info(print_r($results, true));
                             if (isset($results['words']) && count($results['words'])) {
                                 $redis->del($gNameKey);
                                 $redis->set($gNameKey, json_encode($results));
