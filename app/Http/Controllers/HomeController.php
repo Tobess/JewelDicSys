@@ -78,6 +78,8 @@ class HomeController extends Controller {
                 $sKey = $redisIdentify.':status';
                 $redis->del($sKey);
 
+                Log::info(print_r($gNameArr, true));
+
                 foreach ($gNameArr as $gName) {
                     // 商品名称拆分队列
                     \Queue::push(function($job) use ($gName, $redisIdentify, $sKey, $redis)
