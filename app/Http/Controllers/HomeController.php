@@ -101,7 +101,7 @@ class HomeController extends Controller {
                             $redis->incr($sKey);
                             $redis->expire($sKey, 24 * 60 * 60);
                         } catch (Exception $ex) {
-                            //
+                            Log::info($ex->getMessage());
                         }
 
                         $job->delete();
