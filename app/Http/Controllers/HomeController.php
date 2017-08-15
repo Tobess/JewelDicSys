@@ -68,7 +68,6 @@ class HomeController extends Controller {
      */
     public function getAnalyse($redisIdentify)
     {
-        Log::info($redisIdentify);
         // S1 通过Redis Key获取商品名称列表
         $redis = \Redis::connection('serve');
         if ($redis->exists($redisIdentify)) {
@@ -77,8 +76,6 @@ class HomeController extends Controller {
                 $gNameArr = explode(',', $gNames);
                 $sKey = $redisIdentify.':status';
                 $redis->del($sKey);
-
-                Log::info(print_r($gNameArr, true));
 
                 foreach ($gNameArr as $gName) {
                     // 商品名称拆分队列
@@ -91,7 +88,6 @@ class HomeController extends Controller {
 
                             // S2 拆分分析
                             $results = \App\Word::search($pinyin);
-                            Log::info(print_r($results, true));
                             if (isset($results['words']) && count($results['words'])) {
                                 $redis->del($gNameKey);
                                 $redis->set($gNameKey, json_encode($results));

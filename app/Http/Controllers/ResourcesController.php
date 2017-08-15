@@ -394,7 +394,6 @@ class ResourcesController extends Controller
                 $sql->where('name', 'like', '%' . $city . '%')
                     ->orWhere('short_name', 'like', '%' . $city . '%');
             })->lists('id');
-            \Log::info(print_r($ppid, true));
             if (count($ppid) > 0) {
                 $did = \App\Area::where('level', '3')
                     ->where(function ($sql) use ($district) {
