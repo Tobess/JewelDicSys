@@ -338,7 +338,7 @@ class Word extends Model {
                                 $relValues = [];
                                 if (isset($typeLinks[$rel])) {
                                     foreach ($typeLinks[$rel] as $relId => $relIdx) {
-                                        if ($realRule[$relIdx] == $rel) {
+                                        if (isset($realRule[$relIdx]) && $realRule[$relIdx] == $rel) {
                                             $relValues[] = $relId;
                                         }
                                     }
@@ -581,7 +581,7 @@ class Word extends Model {
                     // 筛选出正确的匹配规则
                     $hasMatched = true;
                     foreach ($types as $_idx => $_type) {
-                        if (!in_array($rEles[$_idx], $_type)) {
+                        if (!isset($rEles[$_idx]) || !in_array($rEles[$_idx], $_type)) {
                             $hasMatched = false;
                             break;
                         }
