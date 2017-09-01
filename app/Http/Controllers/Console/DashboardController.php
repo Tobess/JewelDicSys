@@ -24,6 +24,7 @@ class DashboardController extends ConsoleController {
      */
     public function getGenerateCache()
     {
+        set_time_limit(0);
         // 清除缓存
         $keyPrefix = 'laravel:dictionary:';
         foreach (['pinyin*', 'words*', 'rules*', 'aliases*', 'data*'] as $key) {
