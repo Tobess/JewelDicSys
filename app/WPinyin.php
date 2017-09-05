@@ -108,6 +108,24 @@ class WPinyin extends Model {
         'g999.9',
         'wcj',
 
+        // 足金问题
+        'zujinxiangqian',
+        'zujin99999',
+        'zujin9999',
+        'zujinAu999',
+        'zujinAu999',
+        'zujin999',
+        '3Dzujin999',
+        '3Dyingzujin',
+        'qianzujinyingjin',
+        'qianzujinxiangqian',
+        'qianzujinjingpin',
+        'yingzujin',
+        '3Dzujin',
+        'zujinjingpin',
+        'zujinhetianbaiyu',
+        'zujin990',
+
         // ag 银
         // 银925
         'ag925',
