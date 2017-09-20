@@ -152,6 +152,11 @@ class WPinyin extends Model {
         // 其他
         'bixi',
 
+        // 样式
+        'xianglianpai',
+        'xianglianzhui',
+        'xianglian'
+
     ];
 
     /**
