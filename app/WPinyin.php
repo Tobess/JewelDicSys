@@ -91,7 +91,7 @@ class WPinyin extends Model {
         'g750',
         'g18K',
         '22kj',
-        'jinau916',
+        'jinAu916',
         'au916',
         'g916',
         '22k',

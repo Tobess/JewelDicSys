@@ -26,10 +26,7 @@ class DashboardController extends ConsoleController {
     {
         set_time_limit(0);
         // 清除缓存
-        $keyPrefix = 'laravel:dictionary:';
-        foreach (['pinyin*', 'words*', 'rules*', 'aliases*', 'data*'] as $key) {
-            $exitCode = \Artisan::call('redis:clear', ['key' => $keyPrefix.$key]);
-        }
+        \Artisan::call('cache:clear');
 
         \DB::transaction(function()
         {
