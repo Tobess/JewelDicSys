@@ -447,8 +447,8 @@ class ResourcesController extends Controller
     {
         $brands = Input::get('brands');
         $bidArr = [];
-        if ($brands) {
-            $brands = explode(',', $brands);
+        if ($brands && !empty($brands)) {
+            $brands = is_array($brands) ? $brands : explode(',', $brands);
             foreach ($brands as $bName) {
                 $brand = Brand::where('name', $bName)->first();
                 if (!$brand) {
