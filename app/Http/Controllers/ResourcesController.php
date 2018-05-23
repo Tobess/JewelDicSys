@@ -463,6 +463,6 @@ class ResourcesController extends Controller
             }
         }
 
-        return self::response(['brands' => $bidArr]);
+        return self::response($bidArr);
     }
 }
