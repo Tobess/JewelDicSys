@@ -1,9 +1,12 @@
 <?php namespace App\Http\Controllers;
 
+use App\Brand;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Input;
 
 class ResourcesController extends Controller
 {
@@ -433,5 +436,33 @@ class ResourcesController extends Controller
 
         return self::response($data);
 
+    }
+
+    /**
+     * 按名称获得品牌id或创建品牌
+     *
+     * @return Response
+     */
+    public function postBrands()
+    {
+        $brands = Input::get('brands');
+        $bidArr = [];
+        if ($brands) {
+            $brands = explode(',', $brands);
+            foreach ($brands as $bName) {
+                $brand = Brand::where('name', $bName)->first();
+                if (!$brand) {
+                    $brand = new \App\Brand;
+                    $brand->name = $bName;
+                    $brand->pinyin = pinyin($bName);
+                    $brand->letter = letter($bName);
+                    $brand->save();
+                }
+
+                $bidArr[] = $brand->id;
+            }
+        }
+
+        return self::response(['brands' => $bidArr]);
     }
 }
