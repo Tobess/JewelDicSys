@@ -52,17 +52,18 @@ return [
 			'prefix'   => '',
 		],
 
-		'mysql' => [
-			'driver'    => 'mysql',
-			'host'      => env('DB_HOST', 'localhost'),
-			'database'  => env('DB_DATABASE', 'forge'),
-			'username'  => env('DB_USERNAME', 'forge'),
-			'password'  => env('DB_PASSWORD', ''),
-			'charset'   => 'utf8',
-			'collation' => 'utf8_unicode_ci',
-			'prefix'    => '',
-			'strict'    => false,
-		],
+		'mysql' => mysql_clusters(
+            env('DB_HOST', '127.0.0.1'),
+            env('DB_PORT', '3306'),
+            env('DB_DATABASE', 'forge'),
+            env('DB_USERNAME', 'forge'),
+            env('DB_PASSWORD', ''),
+            [
+                'charset' => 'utf8',
+                'collation' => 'utf8_unicode_ci',
+                'strict' => false,
+            ]
+        ),
 
 	],
 
