@@ -69,7 +69,7 @@ class HomeController extends Controller {
     public function getAnalyse($redisIdentify)
     {
         // S1 通过Redis Key获取商品名称列表
-        $redis = \Redis::connection('serve');
+        $redis = \Redis::connection('default');
         if ($redis->exists($redisIdentify)) {
             $gNames = $redis->get($redisIdentify);
             if ($gNames) {

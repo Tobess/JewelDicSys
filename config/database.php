@@ -64,38 +64,6 @@ return [
 			'strict'    => false,
 		],
 
-		'pgsql' => [
-			'driver'   => 'pgsql',
-			'host'     => env('DB_HOST', 'localhost'),
-			'database' => env('DB_DATABASE', 'forge'),
-			'username' => env('DB_USERNAME', 'forge'),
-			'password' => env('DB_PASSWORD', ''),
-			'charset'  => 'utf8',
-			'prefix'   => '',
-			'schema'   => 'public',
-		],
-
-		'sqlsrv' => [
-			'driver'   => 'sqlsrv',
-			'host'     => env('DB_HOST', 'localhost'),
-			'database' => env('DB_DATABASE', 'forge'),
-			'username' => env('DB_USERNAME', 'forge'),
-			'password' => env('DB_PASSWORD', ''),
-			'prefix'   => '',
-		],
-
-        'mongodb' => array(
-            'driver'   => 'mongodb',
-            'host'     => 'localhost',
-            'port'     => 27017,
-            'username' => null,
-            'password' => null,
-            'database' => 'dictionary',
-            'options' => array(
-                'db' => 'admin' // sets the authenication database required by mongo 3
-            )
-        ),
-
 	],
 
 	/*
@@ -130,13 +98,7 @@ return [
 			'host'     => env('REDIS_HOST', '127.0.0.1'),
 			'port'     => env('REDIS_PORT', 6379),
 			'database' => env('REDIS_DATABASE', 0)
-		],
-
-        'serve' => [
-            'host'     => env('REDIS_DB_HOST', '192.168.2.157'),
-            'port'     => env('REDIS_DB_PORT', 6379),
-            'database' => env('REDIS_DB_DATABASE', 0),
-        ]
+		]
 	],
 
 ];
