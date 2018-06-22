@@ -74,6 +74,6 @@ return [
 	|
 	*/
 
-	'prefix' => ('offline' == env('APP_ENV')) ? 'off:dic:' : 'pro:dic:',
+	'prefix' => ('offline' == env('APP_ENV')) ? 'off:dic:cache_' : 'dic:cache_',
 
 ];
