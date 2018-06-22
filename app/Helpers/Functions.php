@@ -21,7 +21,7 @@ if (!function_exists('mysql_clusters')) {
             'charset' => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix' => '',
-            'strict' => true,
+            'strict' => false,
         ];
         if (substr_count($hosts, ';') == 1 && substr_count($hosts, ':') == 2) {
             $hostsArr = explode(';', $hosts);
