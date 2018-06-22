@@ -109,7 +109,7 @@ return [
 	|
 	*/
 
-	'cookie' => env('APP_ENV', null) == 'offline' ? 'dic-off-session' : 'dic-session',
+	'cookie' => env('APP_ENV', null) == 'offline' ? 'dic_off_session' : 'dic_session',
 
 	/*
 	|--------------------------------------------------------------------------
