@@ -11,10 +11,6 @@
 |
 */
 
-Route::get('test', function () {
-    return print_r($_SERVER, true);
-});
-
 Route::get('/', 'HomeController@getIndex');
 Route::get('search', 'HomeController@getSearch');
 
@@ -54,8 +50,8 @@ Route::group(['namespace' => 'Console', 'prefix' => 'console'], function()
 });
 
 // 内网公开接口
-Route::group(['domain' => env('APP_ENV', null) == 'local' ? 'dic.loc' : (env('APP_ENV', null) == 'offline' ? '192.168.1.11' : '192.168.1.11')], function()
+Route::group(['middleware' => 'sso'], function()
 {
-    Route::get('analyse/{identify}', 'HomeController@getAnalyse');
-    Route::controller('resource', 'ResourcesController');
+    Route::get('analyse/{identify}', 'HomeController@postAnalyse');
 });
+Route::controller('resource', 'ResourcesController');

@@ -68,7 +68,7 @@ return [
 
 		'redis' => [
 			'driver' => 'redis',
-			'queue'  => 'default',
+			'queue'  => ('offline' == env('APP_ENV')) ? 'off:dic:queue:' : 'pro:dic:queue:',
 			'expire' => 60,
 		],
 

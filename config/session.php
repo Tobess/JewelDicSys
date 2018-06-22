@@ -109,7 +109,7 @@ return [
 	|
 	*/
 
-	'cookie' => env('APP_ENV', null) == 'offline' ? 'off-dic-sso' : 'pro-dic-sso',
+	'cookie' => env('APP_ENV', null) == 'offline' ? 'dic-off-sso' : 'dic-sso',
 
 	/*
 	|--------------------------------------------------------------------------
