@@ -85,6 +85,7 @@ class HomeController extends Controller {
                             $gNameKey = $redisIdentify . ':' . md5($gName);
                             // S1 生成商品名称全拼码
                             $pinyin = \App\Word::getPinyinAndCache($gName);
+                            \Log::info($pinyin);
 
                             // S2 拆分分析
                             $results = \App\Word::search($pinyin);
@@ -93,21 +94,23 @@ class HomeController extends Controller {
                                 $redis->set($gNameKey, json_encode($results));
                                 $redis->expire($gNameKey, 24 * 60 * 60);
                             }
+                            \Log::info($results);
 
                             $redis->incr($sKey);
                             $redis->expire($sKey, 24 * 60 * 60);
                         } catch (Exception $ex) {
-                            Log::info($ex->getMessage());
+                            Log::info($ex->getTraceAsString());
                         }
 
                         $job->delete();
                     });
                 }
-
+                \Log::info('拆分请求已推送至队列中');
                 return \Response::json(['state'=>true, 'message'=>'拆分请求已推送至队列中，请使用'.$redisIdentify.':status获取生成进度,使用'.$redisIdentify.':{md5(商品名称)}的key从Redis中获取拆分结果']);
             }
         }
 
+        \Log::info('未能获取到商品名称');
         return \Response::json(['state'=>false, 'message'=>'未能获取到商品名称.']);
     }
 }
