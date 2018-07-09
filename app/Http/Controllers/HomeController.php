@@ -105,7 +105,7 @@ class HomeController extends Controller {
                         $job->delete();
                     });
                 }
-                \Log::info('拆分请求已推送至队列中');
+                \Log::info('拆分请求已推送至队列中'. print_r($gNameArr, true));
                 return \Response::json(['state'=>true, 'message'=>'拆分请求已推送至队列中，请使用'.$redisIdentify.':status获取生成进度,使用'.$redisIdentify.':{md5(商品名称)}的key从Redis中获取拆分结果']);
             }
         }
