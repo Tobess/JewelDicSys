@@ -26,7 +26,7 @@ class DashboardController extends ConsoleController {
     {
         set_time_limit(0);
         // 清除缓存
-        \Artisan::call('cache:clear');
+        //\Artisan::call('cache:clear');
 
         \DB::transaction(function()
         {
