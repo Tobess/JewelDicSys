@@ -405,7 +405,6 @@ class ResourcesController extends Controller
                     })
                     ->whereIn('parent_id', $ppid)
                     ->pluck('id');
-                \Log::info(print_r($did, true));
                 if ($did > 0) {
                     $countries = \App\Area::where('level', 4)->where('parent_id', $did)
                         ->select('id', 'name')->get();
@@ -464,5 +463,24 @@ class ResourcesController extends Controller
         }
 
         return self::response($bidArr);
+    }
+
+    /**
+     * 级行政区划获取
+     *
+     * @return Response
+     */
+    public function getL4Areas()
+    {
+        $areaLevel = \Input::get('area_level') ?: 0;
+        $areaPid = \Input::get('area_pid') ?: 0;
+
+        $areas = \App\Area::where('level', $areaLevel)
+            ->where('parent_id', $areaPid)
+            ->select('id', 'name')
+            ->orderBy('id')
+            ->get();
+
+        return self::response($areas);
     }
 }
