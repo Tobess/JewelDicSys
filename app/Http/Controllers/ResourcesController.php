@@ -475,11 +475,18 @@ class ResourcesController extends Controller
         $areaLevel = \Input::get('area_level') ?: 0;
         $areaPid = \Input::get('area_pid') ?: 0;
 
-        $areas = \App\Area::where('level', $areaLevel)
-            ->where('parent_id', $areaPid)
-            ->select('id', 'name')
-            ->orderBy('id')
-            ->get();
+        $cacheKey = "res:l4-area:{$areaLevel}-{$areaPid}";
+        if (\Cache::has($cacheKey)) {
+            $areas = \Cache::get($cacheKey);
+        }
+        if (!isset($areas) || empty($areas)) {
+            $areas = \App\Area::where('level', $areaLevel)
+                ->where('parent_id', $areaPid)
+                ->select('id', 'name')
+                ->orderBy('id')
+                ->get();
+            \Cache::put($cacheKey, $areas, \Carbon\Carbon::now()->endOfDay());
+        }
 
         return self::response($areas);
     }
