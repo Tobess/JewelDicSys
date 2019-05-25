@@ -371,7 +371,7 @@ class ResourcesController extends Controller
         $fileGroup = \Input::get('file_group');
         $fileName = \Input::get('file_name');
 
-        $redis = \Redis::connection('default');
+        $redis = \RedisServer::connection('default');
         if ($redis->exists($contents)) {
             $contents = $redis->get($contents);
         } else {

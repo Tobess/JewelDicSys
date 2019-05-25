@@ -45,7 +45,7 @@ class ClearRedis extends Command {
 
         passthru('redis-cli -h '.$host.' -p '.$port.' keys "'.$keyName.'" | xargs redis-cli -h '.$host.' -p '.$port.' del');
 
-        $this->info('Redis keys cleared!');
+        $this->info('RedisServer keys cleared!');
 	}
 
 	/**
