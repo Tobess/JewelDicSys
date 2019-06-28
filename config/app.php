@@ -151,6 +151,8 @@ return [
         'Overtrue\LaravelPinyin\ServiceProvider',
         'Jenssegers\Mongodb\MongodbServiceProvider',
 
+        'Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider',
+
 	],
 
 	/*

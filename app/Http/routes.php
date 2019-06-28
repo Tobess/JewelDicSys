@@ -52,6 +52,7 @@ Route::group(['namespace' => 'Console', 'prefix' => 'console'], function()
 // 内网公开接口
 Route::group(['middleware' => 'sso'], function()
 {
-    Route::get('analyse/{identify}', 'HomeController@getAnalyse');
+    Route::post('analyse', 'HomeController@getAnalyse');
+    Route::get('analyse/result', 'HomeController@getAnalyseResult');
 });
 Route::controller('resource', 'ResourcesController');

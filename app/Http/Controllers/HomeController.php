@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use League\Flysystem\Exception;
 
@@ -63,40 +64,37 @@ class HomeController extends Controller {
     /**
      * 批量拆分商品名称并缓存
      *
-     * @param string $redisIdentify 商品名称列表在Redis服务器中的key
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getAnalyse($redisIdentify)
+    public function getAnalyse()
     {
-        // S1 通过Redis Key获取商品名称列表
-        $redis = \RedisServer::connection('default');
-        if ($redis->exists($redisIdentify)) {
-            $gNames = $redis->get($redisIdentify);
-            if ($gNames) {
+        $gNames = \Input::get('names');
+        if ($gNames) {
+            $namesIdentify = md5($gNames);
+            if (!\Cache::has($namesIdentify)) {
                 $gNameArr = explode(',', $gNames);
-                $sKey = $redisIdentify.':status';
-                $redis->del($sKey);
-
+                $sKey = $namesIdentify.':status';
+                \Cache::put($namesIdentify, $gNames, Carbon::now()->endOfDay()->diffInSeconds());
                 foreach ($gNameArr as $gName) {
                     // 商品名称拆分队列
-                    \Queue::push(function($job) use ($gName, $redisIdentify, $sKey, $redis)
-                    {
+                    \Queue::push(function($job) use ($gName, $namesIdentify, $sKey) {
                         try {
-                            $gNameKey = $redisIdentify . ':' . md5($gName);
+                            $gMd5Key = md5($gName);
+                            $gNameKey = $namesIdentify . ':' . $gMd5Key;
                             // S1 生成商品名称全拼码
                             $pinyin = \App\Word::getPinyinAndCache($gName);
 
                             // S2 拆分分析
                             $results = \App\Word::search($pinyin);
-                            if (isset($results['words']) && count($results['words'])) {
-                                $redis->del($gNameKey);
-                                $redis->set($gNameKey, json_encode($results));
-                                $redis->expire($gNameKey, 24 * 60 * 60);
+                            if (isset($results['words']) && !empty($results['words'])) {
+                                \Cache::put($gNameKey, ['key' => $gMd5Key, 'result' => $results], Carbon::now()->endOfDay()->diffInSeconds());
                             }
-                            \Log::info($results);
 
-                            $redis->incr($sKey);
-                            $redis->expire($sKey, 24 * 60 * 60);
+                            if (!\Cache::has($sKey)) {
+                                \Cache::put($sKey, 1, 180);
+                            } else {
+                                \Cache::increment($sKey);
+                            }
                         } catch (Exception $ex) {
                             Log::info($ex->getTraceAsString());
                         }
@@ -104,10 +102,57 @@ class HomeController extends Controller {
                         $job->delete();
                     });
                 }
-                return \Response::json(['state'=>true, 'message'=>'拆分请求已推送至队列中，请使用'.$redisIdentify.':status获取生成进度,使用'.$redisIdentify.':{md5(商品名称)}的key从Redis中获取拆分结果']);
+            }
+
+            return \Response::json([
+                'state' => true,
+                'data' => $namesIdentify,
+                'message' => '请通过analyse/result接口获取结果。'
+            ]);
+        }
+
+        return \Response::json([
+            'state' => false,
+            'message' => '分析任务启动失败。'
+        ]);
+    }
+
+    /**
+     * 获得批量拆分商品名称结果
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getAnalyseResult()
+    {
+        $namesIdentify = \Input::get('identify');
+        $sKey = $namesIdentify.':status';
+        if (\Cache::has($namesIdentify) && \Cache::has($sKey)) {
+            $gNames = \Cache::get($namesIdentify);
+            $gNameArr = explode(',', $gNames);
+            $analysedCount = \Cache::get($sKey);
+            if ($analysedCount > 0 && $analysedCount == count($gNameArr)) {
+                $gResults = [];
+                foreach ($gNameArr as $gName) {
+                    // 商品名称拆分结果
+                    $gMd5Key = md5($gName);
+                    $gNameKey = $namesIdentify . ':' . $gMd5Key;
+                    if (\Cache::has($gNameKey)) {
+                        $gRet = \Cache::get($gNameKey);
+                        if (isset($gRet['key']) && $gRet['result']) {
+                            $gResults[$gRet['key']] = $gRet['result'];
+                        }
+                    }
+                }
+                return \Response::json([
+                    'state' => true,
+                    'data' => $gResults
+                ]);
             }
         }
 
-        return \Response::json(['state'=>false, 'message'=>'未能获取到商品名称.']);
+        return \Response::json([
+            'state' => false,
+            'message' => '分析结果获取失败。'
+        ]);
     }
 }

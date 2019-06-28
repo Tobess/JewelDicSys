@@ -16,56 +16,29 @@ class SSOVerify {
 	 */
 	public function handle($request, Closure $next)
 	{
-        $bearerToken = $request->header('Authorization', '');
-        if ($bearerToken) {
-            //根据调式模式选择服务器
-            $cTokenKey = 'sys.sso.token:' . md5($bearerToken);
-            $cData = \Cache::get($cTokenKey);
-            $cacheToken = isset($cData['token']) ? $cData['token'] : null;
-            //验证token缓存
-            if (!($authenticated = ($bearerToken == $cacheToken))) {
-                if ($user = self::getSSOUserInfoByBearerToken($bearerToken)) {
-                    $authenticated = true;
-                }
+        $signTxt = \Input::header('X_JEAT_SIGNATURE_TEXT');
+        if (!$signTxt) {
+            $signTxt = json_encode(\Input::all(), JSON_NUMERIC_CHECK);
+        }
+
+        // 签名在头部信息的 x-jeat-signature 字段
+        $signature = \Input::header('X_JEAT_SIGNATURE');
+        if ($signature) {
+            $pkPath = env('JEAT_AUTH_KEY_PATH', storage_path('keys/jeat_public_key.pem'));
+            if (file_exists($pkPath)) {
+                $public_key = file_get_contents($pkPath);
             }
 
-            if ($authenticated) {
-                return $next($request);
+            if (isset($public_key) && $public_key &&
+                openssl_verify($signTxt, base64_decode($signature), $public_key, OPENSSL_ALGO_SHA256)) {
+                $authorized = true;
             }
-        } else {
-            $msg = '缺少用户身份信息！';
+        }
+
+        if (isset($authorized) && $authorized) {
+            return $next($request);
         }
 
         return response(isset($msg) ? $msg : '身份鉴权失败！', 401);
 	}
-
-    /**
-     * 通过访问令牌获取登陆用户信息
-     *
-     * @param string $token 访问令牌
-     * @return null
-     */
-    public static function getSSOUserInfoByBearerToken($token)
-    {
-        $sso_url = env('AUTH_SSO_URL', 'http://login.fromai.cn/api/');
-        $curl = new Curl();
-        $curl->setHeader('Authorization', $token);
-        $curl->post($sso_url . 'auth-info');
-        $uRst = $curl->response;
-
-        $user = null;
-        if ((isset($uRst->code) &&
-            200 == $uRst->code &&
-            isset($uRst->data) &&
-            isset($uRst->data->id) && $uRst->data->id > 0)) {
-            $user = $uRst->data;
-
-            // 判断是否是首次在个人端使用token
-            $cTokenKey = 'sys.sso.token:' . md5($token);
-            \Cache::put($cTokenKey, ['user' => $user, 'token' => $token], Carbon::now()->addHour(2));
-        }
-
-        return $user;
-    }
-
 }
