@@ -71,36 +71,39 @@ class HomeController extends Controller {
         $gNames = \Input::get('names');
         if ($gNames) {
             $namesIdentify = md5($gNames);
-            $gNameArr = explode(',', $gNames);
-            $sKey = $namesIdentify.':status';
-            \Cache::put($namesIdentify, $gNames, Carbon::now()->endOfDay()->diffInSeconds());
-            \Cache::forget($sKey);
-            foreach ($gNameArr as $gName) {
-                // 商品名称拆分队列
-                \Queue::push(function($job) use ($gName, $namesIdentify, $sKey) {
-                    try {
-                        $gMd5Key = md5($gName);
-                        $gNameKey = $namesIdentify . ':' . $gMd5Key;
-                        // S1 生成商品名称全拼码
-                        $pinyin = \App\Word::getPinyinAndCache($gName);
+            if (!\Cache::has($namesIdentify)) {
+                $gNameArr = explode(',', $gNames);
+                $sKey = $namesIdentify.':status';
+                $expireAt = Carbon::now()->endOfDay()->diffInMinutes();
+                \Cache::put($namesIdentify, $gNames, $expireAt);
+                \Cache::forget($sKey);
+                foreach ($gNameArr as $gName) {
+                    // 商品名称拆分队列
+                    \Queue::push(function($job) use ($gName, $namesIdentify, $sKey, $expireAt) {
+                        try {
+                            $gMd5Key = md5($gName);
+                            $gNameKey = $namesIdentify . ':' . $gMd5Key;
+                            // S1 生成商品名称全拼码
+                            $pinyin = \App\Word::getPinyinAndCache($gName);
 
-                        // S2 拆分分析
-                        $results = \App\Word::search($pinyin);
-                        if (isset($results['words']) && !empty($results['words'])) {
-                            \Cache::put($gNameKey, ['key' => $gMd5Key, 'result' => $results], Carbon::now()->endOfDay()->diffInSeconds());
+                            // S2 拆分分析
+                            $results = \App\Word::search($pinyin);
+                            if (isset($results['words']) && !empty($results['words'])) {
+                                \Cache::put($gNameKey, ['key' => $gMd5Key, 'result' => $results], $expireAt);
+                            }
+
+                            if (!\Cache::has($sKey)) {
+                                \Cache::put($sKey, 1, $expireAt);
+                            } else {
+                                \Cache::increment($sKey);
+                            }
+                        } catch (Exception $ex) {
+                            Log::info($ex->getTraceAsString());
                         }
 
-                        if (!\Cache::has($sKey)) {
-                            \Cache::put($sKey, 1, 180);
-                        } else {
-                            \Cache::increment($sKey);
-                        }
-                    } catch (Exception $ex) {
-                        Log::info($ex->getTraceAsString());
-                    }
-
-                    $job->delete();
-                });
+                        $job->delete();
+                    });
+                }
             }
 
             return \Response::json([
@@ -148,6 +151,9 @@ class HomeController extends Controller {
                 ]);
             }
         }
+
+        \Cache::has($namesIdentify) && \Cache::forget($namesIdentify);
+        \Cache::has($sKey) && \Cache::forget($sKey);
 
         return \Response::json([
             'state' => false,
