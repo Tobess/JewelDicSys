@@ -71,9 +71,9 @@ class HomeController extends Controller {
         $gNames = \Input::get('names');
         if ($gNames) {
             $namesIdentify = md5($gNames);
+            $sKey = $namesIdentify.':status';
             if (!\Cache::has($namesIdentify)) {
                 $gNameArr = explode(',', $gNames);
-                $sKey = $namesIdentify.':status';
                 $expireAt = Carbon::now()->endOfDay()->diffInMinutes();
                 \Cache::put($namesIdentify, $gNames, $expireAt);
                 \Cache::forget($sKey);
@@ -103,6 +103,13 @@ class HomeController extends Controller {
 
                         $job->delete();
                     });
+                }
+            } else {
+                $analysedCount = \Cache::get($sKey);
+                $gNameArr = explode(',', $gNames);
+                if (!($analysedCount > 0 && $analysedCount == count($gNameArr))) {
+                    \Cache::has($namesIdentify) && \Cache::forget($namesIdentify);
+                    \Cache::has($sKey) && \Cache::forget($sKey);
                 }
             }
 
