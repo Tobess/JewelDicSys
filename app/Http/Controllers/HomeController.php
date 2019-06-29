@@ -152,9 +152,6 @@ class HomeController extends Controller {
             }
         }
 
-        \Cache::has($namesIdentify) && \Cache::forget($namesIdentify);
-        \Cache::has($sKey) && \Cache::forget($sKey);
-
         return \Response::json([
             'state' => false,
             'message' => '分析结果获取失败。'
