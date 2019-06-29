@@ -74,6 +74,7 @@ class HomeController extends Controller {
             $gNameArr = explode(',', $gNames);
             $sKey = $namesIdentify.':status';
             \Cache::put($namesIdentify, $gNames, Carbon::now()->endOfDay()->diffInSeconds());
+            \Cache::forget($sKey);
             foreach ($gNameArr as $gName) {
                 // 商品名称拆分队列
                 \Queue::push(function($job) use ($gName, $namesIdentify, $sKey) {
