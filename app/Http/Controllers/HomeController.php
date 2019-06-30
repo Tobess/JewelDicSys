@@ -72,39 +72,45 @@ class HomeController extends Controller {
         if ($gNames) {
             $namesIdentify = md5($gNames);
             $sKey = $namesIdentify.':status';
-            $gNameArr = explode(',', $gNames);
-            $expireAt = Carbon::now()->endOfDay()->diffInMinutes();
-            \Cache::forget($sKey);
-            \Cache::forget($sKey);
-            \Log::info($gNames . ' ' . count($gNameArr));
+            if (!\Cache::has($namesIdentify)) {
+                $gNameArr = explode(',', $gNames);
+                $expireAt = Carbon::now()->endOfDay()->diffInMinutes();
+                \Cache::put($namesIdentify, $gNames, $expireAt);
+                \Cache::forget($sKey);
+                foreach ($gNameArr as $gName) {
+                    // 商品名称拆分队列
+                    \Queue::push(function($job) use ($gName, $namesIdentify, $sKey, $expireAt) {
+                        try {
+                            $gMd5Key = md5($gName);
+                            $gNameKey = $namesIdentify . ':' . $gMd5Key;
+                            // S1 生成商品名称全拼码
+                            $pinyin = \App\Word::getPinyinAndCache($gName);
 
-            \Cache::put($namesIdentify, $gNames, $expireAt);
-            foreach ($gNameArr as $gName) {
-                // 商品名称拆分队列
-                \Queue::push(function($job) use ($gName, $namesIdentify, $sKey, $expireAt) {
-                    try {
-                        $gMd5Key = md5($gName);
-                        $gNameKey = $namesIdentify . ':' . $gMd5Key;
-                        // S1 生成商品名称全拼码
-                        $pinyin = \App\Word::getPinyinAndCache($gName);
+                            // S2 拆分分析
+                            $results = \App\Word::search($pinyin);
+                            if (isset($results['words']) && !empty($results['words'])) {
+                                \Cache::put($gNameKey, ['key' => $gMd5Key, 'result' => $results], $expireAt);
+                            }
 
-                        // S2 拆分分析
-                        $results = \App\Word::search($pinyin);
-                        if (isset($results['words']) && !empty($results['words'])) {
-                            \Cache::put($gNameKey, ['key' => $gMd5Key, 'result' => $results], $expireAt);
+                            if (!\Cache::has($sKey)) {
+                                \Cache::put($sKey, 1, $expireAt);
+                            } else {
+                                \Cache::increment($sKey);
+                            }
+                        } catch (Exception $ex) {
+                            Log::info($ex->getTraceAsString());
                         }
 
-                        if (!\Cache::has($sKey)) {
-                            \Cache::put($sKey, 1, $expireAt);
-                        } else {
-                            \Cache::increment($sKey);
-                        }
-                    } catch (Exception $ex) {
-                        Log::info($ex->getTraceAsString());
-                    }
-
-                    $job->delete();
-                });
+                        $job->delete();
+                    });
+                }
+            } else {
+                $analysedCount = \Cache::get($sKey);
+                $gNameArr = explode(',', $gNames);
+                if (!($analysedCount > 0 && $analysedCount == count($gNameArr))) {
+                    \Cache::has($namesIdentify) && \Cache::forget($namesIdentify);
+                    \Cache::has($sKey) && \Cache::forget($sKey);
+                }
             }
 
             return \Response::json([
@@ -133,9 +139,6 @@ class HomeController extends Controller {
             $gNames = \Cache::get($namesIdentify);
             $gNameArr = explode(',', $gNames);
             $analysedCount = \Cache::get($sKey);
-
-            \Log::info($namesIdentify + ' ' + $analysedCount + ' ' + $gNames + ' ' + count($gNameArr));
-
             if ($analysedCount > 0 && $analysedCount == count($gNameArr)) {
                 $gResults = [];
                 foreach ($gNameArr as $gName) {
