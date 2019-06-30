@@ -74,8 +74,11 @@ class HomeController extends Controller {
             $sKey = $namesIdentify.':status';
             $gNameArr = explode(',', $gNames);
             $expireAt = Carbon::now()->endOfDay()->diffInMinutes();
-            \Cache::put($namesIdentify, $gNames, $expireAt);
             \Cache::forget($sKey);
+            \Cache::forget($sKey);
+            \Log::info($gNames . ' ' + count($gNameArr));
+
+            \Cache::put($namesIdentify, $gNames, $expireAt);
             foreach ($gNameArr as $gName) {
                 // 商品名称拆分队列
                 \Queue::push(function($job) use ($gName, $namesIdentify, $sKey, $expireAt) {
