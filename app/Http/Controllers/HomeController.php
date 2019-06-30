@@ -148,6 +148,7 @@ class HomeController extends Controller {
                     'data' => $gResults
                 ]);
             }
+            \Log::info($namesIdentify + ' ' + $analysedCount + ' ' + $gNames + ' ' + count($gNameArr));
         }
 
         return \Response::json([
