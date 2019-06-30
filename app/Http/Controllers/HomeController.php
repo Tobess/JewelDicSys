@@ -133,6 +133,9 @@ class HomeController extends Controller {
             $gNames = \Cache::get($namesIdentify);
             $gNameArr = explode(',', $gNames);
             $analysedCount = \Cache::get($sKey);
+
+            \Log::info($namesIdentify + ' ' + $analysedCount + ' ' + $gNames + ' ' + count($gNameArr));
+
             if ($analysedCount > 0 && $analysedCount == count($gNameArr)) {
                 $gResults = [];
                 foreach ($gNameArr as $gName) {
@@ -151,7 +154,6 @@ class HomeController extends Controller {
                     'data' => $gResults
                 ]);
             }
-            \Log::info($namesIdentify + ' ' + $analysedCount + ' ' + $gNames + ' ' + count($gNameArr));
         }
 
         return \Response::json([
