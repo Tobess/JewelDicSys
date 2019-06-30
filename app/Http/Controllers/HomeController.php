@@ -76,7 +76,7 @@ class HomeController extends Controller {
             $expireAt = Carbon::now()->endOfDay()->diffInMinutes();
             \Cache::forget($sKey);
             \Cache::forget($sKey);
-            \Log::info($gNames . ' ' + count($gNameArr));
+            \Log::info($gNames . ' ' . count($gNameArr));
 
             \Cache::put($namesIdentify, $gNames, $expireAt);
             foreach ($gNameArr as $gName) {
